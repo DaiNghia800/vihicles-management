@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/slick/slick.css" />
+    <link rel="stylesheet" href="/lib/slick/slick-theme.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <title>@ViewBag.title</title>
+</head>
+<body>
+
+    <header class="header position-fixed top-0">
+        <div class="header-wrapper">
+            <div class="header-left">
+                <form action="#">
+                    <div class="form-group position-relative">
+                        <input type="text" name="name" value="" class="form-control" placeholder="Search Fastkart .." />
+                        <button>
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="header-right">
+                <ul class="d-flex align-items-center">
+                    <li class="message-box position-relative">
+                        <div class="notification-box position-relative">
+                            <i class="fa-regular fa-bell"></i>
+                            <span class="badge rounded-pill">4</span>
+                        </div>
+                        <ul class="notification-dropdown">
+                            <li>
+                                <i class="fa-regular fa-bell"></i>
+                                <h6 class="mb-0 fs-5 fw-bold">Notitications</h6>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa-solid fa-circle me-2 font-primary"></i>
+                                    Delivery processing
+                                    <span class="pull-right">10 min.</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa-solid fa-circle me-2 font-success"></i>
+                                    Delivery processing
+                                    <span class="pull-right">10 min.</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa-solid fa-circle me-2 font-info"></i>
+                                    Delivery processing
+                                    <span class="pull-right">10 min.</span>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <i class="fa-solid fa-circle me-0 font-danger"></i>
+                                    Delivery processing
+                                    <span class="pull-right">10 min.</span>
+                                </p>
+                            </li>
+                            <li>
+                                <a href="#" class="">Check all notification</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="mode">
+                        <i class="fa-regular fa-moon"></i>
+                    </li>
+                    
+                    <li class="profile-box position-relative me-0 pe-0">
+                        <div class="profile d-flex align-items-center">
+
+                            <img src="https://cdn2.fptshop.com.vn/small/avatar_trang_1_cd729c335b.jpg" alt="" class="img-fluid rounded-circle mb-0"
+                                            style="width: 40px; height: 40px; object-fit: cover;  " />
+                            <div class="user-name">
+                                <span style="display:block; max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Nguyen Van A</span>
+                                <p>
+                                    Admin
+                                    <i class="fa-solid fa-angle-down"></i>
+                                </p>
+                            </div>
+                        </div>
+                        <ul class="profile-dropdown">
+                            <li>
+                                <a href="javascript:void(0)"  style="cursor:pointer;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>My Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/user" style="cursor:pointer;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    <span>Users</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/orders" style="cursor:pointer;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-archive">
+                                        <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                                        <rect x="1" y="3" width="22" height="5"></rect>
+                                        <line x1="10" y1="12" x2="14" y2="12"></line>
+                                    </svg>
+                                    <span>Orders</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" style="cursor:pointer;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                    </svg>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/Account/Logout" id="btnLogout" style="cursor:pointer;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-out">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>Log out</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    @* <li class="profile-box position-relative me-0 pe-0">
+                        <div class="profile d-flex align-items-center">
+                            <img src="/images/users/default-avatar.png" alt="Guest" class="user-img img-fluid" />
+                            <div class="user-name">
+                                <span>Guest</span>
+                                <p>Not logged in</p>
+                            </div>
+                        </div>
+                    </li> *@
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="body">
+        <aside class="sidebar">
+            <div id="sidebarEffect"></div>
+            <div class="">
+                <div class="logo-wrapper">
+                    <a href="#" class="d-block">
+                        <img src="/images/full-white.png" alt="Alternate Text" class="img-fluid" />
+                    </a>
+                    <a href="#">
+
+                    </a>
+                    <div class="toggle-sidebar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.75 2.5C9.09721 2.5 11 4.40279 11 6.75V11H6.75C4.40279 11 2.5 9.09721 2.5 6.75C2.5 4.40279 4.40279 2.5 6.75 2.5ZM9 9V6.75C9 5.50736 7.99264 4.5 6.75 4.5C5.50736 4.5 4.5 5.50736 4.5 6.75C4.5 7.99264 5.50736 9 6.75 9H9ZM6.75 13H11V17.25C11 19.5972 9.09721 21.5 6.75 21.5C4.40279 21.5 2.5 19.5972 2.5 17.25C2.5 14.9028 4.40279 13 6.75 13ZM6.75 15C5.50736 15 4.5 16.0074 4.5 17.25C4.5 18.4926 5.50736 19.5 6.75 19.5C7.99264 19.5 9 18.4926 9 17.25V15H6.75ZM17.25 2.5C19.5972 2.5 21.5 4.40279 21.5 6.75C21.5 9.09721 19.5972 11 17.25 11H13V6.75C13 4.40279 14.9028 2.5 17.25 2.5ZM17.25 9C18.4926 9 19.5 7.99264 19.5 6.75C19.5 5.50736 18.4926 4.5 17.25 4.5C16.0074 4.5 15 5.50736 15 6.75V9H17.25ZM13 13H17.25C19.5972 13 21.5 14.9028 21.5 17.25C21.5 19.5972 19.5972 21.5 17.25 21.5C14.9028 21.5 13 19.5972 13 17.25V13ZM15 15V17.25C15 18.4926 16.0074 19.5 17.25 19.5C18.4926 19.5 19.5 18.4926 19.5 17.25C19.5 16.0074 18.4926 15 17.25 15H15Z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="logo-icon-wrapper">
+                    <a href="#">
+                        <img src="/images/logo.png" alt="Alternate Text" class="img-fluid" />
+                    </a>
+                </div>
+                <nav class="sidebar-main">
+                    <ul class="sidebar-links list-unstyled p-0">
+                        @{
+
+                            <li class="sidebar-list">
+                                <a href="/admin/dashboard" class="sidebar-link @(Context.Request.Path == "/admin/dashboard" ? "active" : "")">
+                                    <i class="fa-regular fa-house"></i>
+                                    <span class="text-capitalize">Dashboard</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="main">
+            @RenderBody()
+        </main>
+    </div>
+
+
+    <div class="modal fade" id="myProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">My Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="myProfileContent">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p class="mb-0 text-center">Copyright 2022 © Fastkart theme by pixelstrap</p>
+    </footer>
+
+    <script src="/lib/jquery/jquery.min.js"></script>
+    <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="/lib/tinymce/tinymce.min.js"></script>
+    <script src="/lib/slick/slick.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.all.min.js"></script>
+    <script src="~/js/sidebar-effect.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
