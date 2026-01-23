@@ -12,7 +12,7 @@ using Public_Transport.Models.EF;
 namespace Public_Transport.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260123021301_AddBusRouteFeature")]
+    [Migration("20260123113217_AddBusRouteFeature")]
     partial class AddBusRouteFeature
     {
         /// <inheritdoc />

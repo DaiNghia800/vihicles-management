@@ -1,0 +1,1134 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&family=Oswald:wght@200..700&display=swap');
+
+:root {
+    --brand-yellow: #FFBA00;
+    --brand-dark: #130C00;
+    --text-white: #ffffff;
+    --text-gray: #cccccc;
+    --font-main: "Oswald", sans-serif;
+    --navbar-height: 80px;
+    --font-secondary: "Heebo", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none !important;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+body {
+    font-family: var(--font-main) !important;
+    color: var(--brand-dark);
+}
+
+.color-primary {
+    color: var(--brand-yellow);
+}
+
+.font-secondary {
+    font-family: var(--font-secondary) !important;
+}
+
+/* Navbar & Global Buttons */
+.navbar-custom {
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--text-white) !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-link {
+    color: var(--text-white) !important;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--brand-yellow) !important;
+}
+
+.nav-link i {
+    font-size: 0.75rem;
+    margin-left: 3px;
+}
+
+.btn-contact {
+    background-color: var(--brand-yellow);
+    color: var(--brand-dark);
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 12px 30px;
+    border-radius: 50px;
+    border: none;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-contact:hover {
+    background-color: #e6a800;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 186, 0, 0.4);
+}
+
+/* Index */
+.hero-section {
+    position: relative;
+    height: 100vh;
+    min-height: 750px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hero-bg-animate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/teacher-pointing-on-something-to-student-in-car-during-driving-test.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    animation: kenBurns 20s infinite alternate linear;
+}
+
+@keyframes kenBurns {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.15);
+    }
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: var(--text-white);
+    padding-top: 60px;
+}
+
+.hero-title {
+    font-weight: 700;
+    font-size: 3.5rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+
+@media (min-width: 992px) {
+    .hero-title {
+        font-size: 4.5rem;
+    }
+}
+
+.hero-desc {
+    font-size: 1.15rem;
+    color: var(--text-gray);
+    margin-bottom: 2.5rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 300;
+}
+
+.hero-btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.btn-primary-custom {
+    background-color: var(--brand-yellow);
+    color: var(--brand-dark);
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 14px 40px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    border: 2px solid var(--brand-yellow);
+}
+
+.btn-primary-custom:hover {
+    background-color: transparent;
+    color: var(--brand-yellow);
+}
+
+.btn-video-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: var(--text-white);
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+
+.btn-video-custom .icon-box {
+    width: 50px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.btn-video-custom .icon-box i {
+    color: var(--text-white);
+    font-size: 14px;
+    margin-left: 2px;
+}
+
+.btn-video-custom:hover .icon-box {
+    background-color: var(--brand-yellow);
+    border-color: var(--brand-yellow);
+    transform: scale(1.1);
+}
+
+.btn-video-custom:hover .icon-box i {
+    color: var(--brand-dark);
+}
+
+.btn-video-custom:hover span {
+    color: var(--brand-yellow);
+}
+
+.features-overlap {
+    position: relative;
+    z-index: 10;
+    margin-top: -70px;
+    padding-bottom: 80px;
+}
+
+.feature-box {
+    background: #fff;
+    padding: 30px;
+    height: 100%;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.feature-box:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: var(--brand-yellow);
+    margin-bottom: 1.5rem;
+}
+
+.feature-title {
+    font-weight: 500;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--brand-dark);
+}
+
+.feature-desc {
+    color: #555555;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.img-logo {
+    width: 130px;
+    height: auto;
+}
+
+.read-more-link {
+    text-decoration: none;
+    color: var(--brand-yellow);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap 0.3s;
+}
+
+.read-more-link:hover {
+    gap: 15px;
+}
+
+.feature-box.highlight {
+    background-color: var(--brand-yellow);
+}
+
+.feature-box.highlight .feature-icon,
+.feature-box.highlight .read-more-link {
+    color: var(--brand-dark);
+}
+
+.feature-image-box {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background-image: url('https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/instructor-showing-traffic-shemes-to-a-female-student-outdooors-e1627375393147.jpg');
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 991px) {
+    .features-overlap {
+        margin-top: 0;
+        padding-top: 50px;
+    }
+
+    .feature-box {
+        margin-bottom: 20px;
+    }
+}
+
+.about-section {
+    padding: 100px 0;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+.img-stack-wrapper {
+    position: relative;
+    padding-right: 30px;
+    padding-bottom: 50px;
+}
+
+.img-main {
+    width: 90%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.img-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 55%;
+    height: auto;
+    border: 12px solid #fff;
+    border-radius: 5px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
+.sub-title {
+    color: var(--brand-yellow);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--brand-dark);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.section-desc {
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+}
+
+.check-list li {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 15px;
+    color: #444;
+    font-weight: 500;
+}
+
+.check-list li::before {
+    font-family: "Font Awesome 6 Free";
+    content: "\f058";
+    font-weight: 900;
+    color: var(--brand-yellow);
+    position: absolute;
+    left: 0;
+    top: 3px;
+    font-size: 1.1rem;
+}
+
+.fun-fact-box {
+    background-color: var(--brand-yellow);
+    padding: 25px 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    border-radius: 4px;
+    box-shadow: 0 10px 20px rgba(255, 186, 0, 0.2);
+    transition: transform 0.3s;
+}
+
+.fun-fact-box:hover {
+    transform: translateY(-5px);
+}
+
+.fun-fact-icon {
+    font-size: 2.5rem;
+    color: var(--brand-dark);
+}
+
+.fun-fact-content h4 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1;
+    color: var(--brand-dark);
+}
+
+.fun-fact-content span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+@media (max-width: 991px) {
+    .about-section {
+        padding: 60px 0;
+    }
+
+    .img-stack-wrapper {
+        margin-bottom: 40px;
+        padding: 0;
+    }
+
+    .img-main {
+        width: 100%;
+    }
+
+    .img-overlay {
+        display: none;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+.lessons-section {
+    padding: 100px 0;
+    background-color: #fcfcfc;
+    background-image: linear-gradient(#fcfcfc 50%, #fff 50%);
+}
+
+.section-header-center {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 60px auto;
+}
+
+.lesson-card {
+    margin-bottom: 30px;
+    border: none;
+    background: transparent;
+}
+
+.lesson-img-wrapper {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: -50px;
+    z-index: 1;
+}
+
+.lesson-img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.lesson-card:hover .lesson-img {
+    transform: scale(1.1);
+}
+
+.lesson-content-box {
+    position: relative;
+    background: #fff;
+    width: 88%;
+    margin: 0 auto;
+    padding: 35px 25px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    z-index: 2;
+    transition: transform 0.3s;
+}
+
+.lesson-card:hover .lesson-content-box {
+    transform: translateY(-10px);
+}
+
+.lesson-icon-img {
+    height: 60px;
+    width: auto;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lesson-icon-font {
+    font-size: 3rem;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--brand-yellow);
+    margin-bottom: 20px;
+}
+
+.lesson-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--brand-dark);
+    margin-bottom: 10px;
+}
+
+.lesson-desc {
+    font-size: 0.95rem;
+    color: #777;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.lesson-cta-footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 1.1rem;
+    color: #555;
+    font-weight: 400;
+}
+
+.cta-link-yellow {
+    color: var(--brand-yellow);
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    margin-left: 10px;
+    transition: all 0.3s;
+}
+
+.cta-link-yellow:hover {
+    color: var(--brand-dark);
+    margin-left: 15px;
+}
+
+.video-cta-section {
+    position: relative;
+    padding: 120px 0;
+    background-image: url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    text-align: center;
+    color: #fff;
+}
+
+.video-cta-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 1;
+}
+
+.video-cta-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.play-btn-large {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 50%;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    animation: pulse-white 2s infinite;
+    text-decoration: none;
+}
+
+.play-btn-large i {
+    color: var(--brand-yellow);
+    font-size: 1.8rem;
+    margin-left: 5px;
+}
+
+.play-btn-large:hover {
+    transform: scale(1.1);
+    background-color: var(--brand-yellow);
+}
+
+.play-btn-large:hover i {
+    color: #fff;
+}
+
+@keyframes pulse-white {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.cta-desc {
+    font-size: 1.1rem;
+    color: #ddd;
+    margin-bottom: 40px;
+    font-weight: 300;
+}
+
+.btn-cta-yellow {
+    background-color: var(--brand-yellow);
+    color: var(--brand-dark);
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 15px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+    border: 2px solid var(--brand-yellow);
+}
+
+.btn-cta-yellow:hover {
+    background-color: transparent;
+    color: var(--brand-yellow);
+}
+
+@media (max-width: 768px) {
+    .cta-title {
+        font-size: 1.8rem;
+    }
+
+    .play-btn-large {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+.blog-section {
+    padding: 100px 0;
+    background-color: #fff;
+}
+
+.blog-card {
+    border: none;
+    background: transparent;
+    margin-bottom: 30px;
+    transition: all 0.3s;
+}
+
+.blog-thumb {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.blog-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.blog-card:hover .blog-img {
+    transform: scale(1.1);
+}
+
+.blog-category {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: var(--brand-yellow);
+    color: var(--brand-dark);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 5px 15px;
+    border-radius: 3px;
+    z-index: 2;
+}
+
+.blog-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.blog-title a {
+    color: var(--brand-dark);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.blog-title a:hover {
+    color: var(--brand-yellow);
+}
+
+.blog-excerpt {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* Footer */
+.site-footer {
+    background-color: #111;
+    color: #b0b0b0;
+    padding-top: 80px;
+    font-size: 0.95rem;
+}
+
+.footer-widget {
+    margin-bottom: 40px;
+}
+
+.footer-title {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.footer-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 50px;
+    height: 3px;
+    background-color: var(--brand-yellow);
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #b0b0b0;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.footer-links a:hover {
+    color: var(--brand-yellow);
+    padding-left: 5px;
+}
+
+.contact-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.contact-list i {
+    color: var(--brand-yellow);
+    margin-top: 4px;
+}
+
+.newsletter-form {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.newsletter-input {
+    background: #fff;
+    border: none;
+    padding: 12px 15px;
+    width: 100%;
+    outline: none;
+    border-radius: 4px 0 0 4px;
+}
+
+.newsletter-btn {
+    background: var(--brand-yellow);
+    color: var(--brand-dark);
+    border: none;
+    padding: 0 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.newsletter-btn:hover {
+    background: #fff;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--brand-yellow);
+    color: var(--brand-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.social-icon:hover {
+    background-color: #fff;
+    transform: translateY(-3px);
+    color: var(--brand-dark);
+}
+
+.footer-bottom {
+    background-color: #0a0a0a;
+    padding: 20px 0;
+    margin-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.copyright-text {
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* 404 */
+.error-section {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/instructor-helps-woman-to-drive-the-car-1-e1627375497979.jpg');
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.error-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1;
+}
+
+.error-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding-top: 60px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.error-code {
+    font-size: 10rem;
+    font-weight: 900;
+    color: var(--brand-yellow);
+    line-height: 1;
+    margin-bottom: 0;
+}
+
+.error-heading {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+.error-desc {
+    font-size: 1.1rem;
+    color: #ccc;
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .error-code {
+        font-size: 6rem;
+    }
+
+    .error-heading {
+        font-size: 2rem;
+    }
+}
+
+/* routes */
+.routes-1 {
+    background-image: url('../images/bg-category.webp');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 200px 0px 140px 0px;
+    position: relative;
+}
+
+.routes-1 h2 {
+    color: white;
+    font-size: 32px;
+    text-transform: capitalize;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.routes-2 {
+    padding: 100px 0 100px 0;
+}
+
+.routes-2 p {
+    font-family: var(--brand-yellow), sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: #555555;
+    padding: 0 26% 0 26%;
+    text-align: center;
+}
+
+.routes-2 .body .inner-body {
+    box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.07);
+}
+
+.routes-2 .body .inner-body .bg-gray {
+    background-color: #faf9f9;
+}
+
+.routes-2 .body .inner-body .box-img {
+    height: 230px;
+}
+
+.routes-2 .body .inner-body .box-img span {
+    background-color: #03579b;
+}
+
+.routes-2 .body .box-content .inner-content {
+    padding: 40px 30px 20px 30px;
+    text-align: center;
+}
+
+.routes-2 .body .box-content .box-icon {
+    box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.07);
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.routes-2 .body .inner-body .button-detail {
+    background-color: var(--brand-yellow);
+}
+
+.routes-2 .body .inner-body .button-detail::before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    background-color: #f8cc53;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transition: transform 0.3s ease-in-out;
+    transform: scaleX(0);
+    transform-origin: right;
+}
+
+.routes-2 .body .inner-body .button-detail:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* end routes */
+
+/* route detail */
+.route-detail {
+    padding: 80px 0px;
+}
+
+.route-detail .timeline {
+    position: relative;
+    list-style: none;
+    padding: 20px 0;
+}
+
+.route-detail .timeline:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 2px;
+    background: var(--brand-yellow);
+}
+
+.route-detail .timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding-left: 50px;
+}
+
+.route-detail .timeline-icon {
+    position: absolute;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: 2px solid var(--brand-yellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand-yellow);
+    z-index: 1;
+}
+
+.route-detail .btn-warning {
+    background-color: var(--brand-yellow) !important;
+    border-color: var(--brand-yellow) !important;
+    color: #fff !important;
+}
+
+.route-detail .card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.07);
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0px 3px 15px 0px rgba(0, 0, 0, 0.07);
+}
+
+.routing-hidden {
+    display: none !important;
+}
+
+.leaflet-routing-container-hide {
+    display: none;
+}
+
+/* end route detail */

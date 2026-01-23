@@ -187,6 +187,32 @@
                                     <span class="text-capitalize">Dashboard</span>
                                 </a>
                             </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
+                                    <i class="fa-regular fa-user"></i>
+                                    <span class="text-capitalize">Role</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/role") ? "show" : "")" id="collapseRole">
+                                    <li>
+                                        <a href="/admin/role" class="text-capitalize">
+                                            All roles
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/role/create" class="text-capitalize">
+                                            Add new role
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/role/permission" class="text-capitalize">
+                                            Permission
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         }
                     </ul>
                 </nav>
