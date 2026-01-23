@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Public_Transport.Models.Entities.Trip>
+
+@{
+    ViewData["Title"] = "Danh sách tuyến xe";
+}
+
+<section class="routes-1 position-relative" style="height: 300px; background: url('/assets/images/bus.jpg') no-repeat center center/cover;">
+    <div class="bg-overlay position-absolute bg-black opacity-75 start-0 top-0 w-100 h-100"></div>
+    <div class="container mx-auto position-relative z-1 h-100">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div>
+                <h2 class="text-center text-white">ROUTES</h2>
+                <ul class="d-flex justify-content-center gap-1 list-unstyled">
+                    <li><span class="text-white fs-6 fw-light font-secondary">Home</span></li>
+                    <li><span class="color-primary text-white mx-2"><i class="fa-solid fa-angle-right"></i></span></li>
+                    <li><span class="text-white fs-6 fw-light font-secondary">Routes</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="routes-2 py-5 bg-light">
+    <div class="container mx-auto">
+        <div class="header mb-5">
+            <h5 class="color-primary fs-6 fw-medium mb-3 text-center text-warning">SELECT A ROUTE</h5>
+            <h2 class="text-black fs-2 fw-medium text-center mb-3">LIST OF PROPOSED ROUTES</h2>
+            <p class="text-center text-muted">Based on existing schedules available in our system.</p>
+        </div>
+
+        <div class="body">
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-4 mt-4">
+                        <div class="inner-body bg-white p-4 rounded-4 shadow-sm h-100">
+                            <div class="bg-gray rounded-4 overflow-hidden">
+                                <div class="box-img rounded-4 overflow-hidden position-relative">
+                                    <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=2071&auto=format&fit=crop" alt="Bus" class="mw-100 w-100 h-100 object-fit-cover" style="height: 200px;">
+                                    <span class="position-absolute top-0 end-0 bg-success text-white fs-6 fw-normal py-2 px-3 rounded-top-4 rounded-start-3">
+                                        @item.Vehicle?.VehicleType
+                                    </span>
+                                </div>
+
+                                <div class="box-content position-relative mt-3">
+                                    <div class="inner-content">
+                                        <div class="border-bottom pb-3 mb-3">
+                                            <h3 class="text-black fs-5 fw-medium mt-2 mb-3">@item.Route.RouteName</h3>
+                                            <p class="p-0 text-truncate mb-0 text-muted">@item.Route.Description</p>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-black fs-6 fw-light">
+                                                <i class="fa-solid fa-clock text-warning me-1"></i>
+                                                @item.DepartureTime.ToString("HH:mm") - @item.ArrivalTime.ToString("HH:mm")
+                                            </span>
+                                            <span class="text-black fs-6 fw-light">
+                                                <i class="fa-solid fa-sack-dollar text-warning me-1"></i>
+                                                @item.Route.BasePrice.ToString("N0") VND
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <a asp-action="Details" asp-route-id="@item.TripId" class="btn btn-warning text-white text-uppercase fw-medium fs-6 text-center d-block pt-3 pb-3 rounded-4 mt-4 w-100">
+                                    See details <i class="fa-solid fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                </div>
+        </div>
+    </div>
+</section>

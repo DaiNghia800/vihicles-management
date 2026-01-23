@@ -1,0 +1,83 @@
+﻿@model Public_Transport.Models.Entities.Trip
+
+@{
+    ViewData["Title"] = "Chi tiết lộ trình";
+}
+
+<section class="routes-1 position-relative" style="height: 250px; background: #333;">
+    <div class="container mx-auto position-relative z-1 h-100">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div>
+                <h2 class="text-center text-white">ROUTE DETAIL</h2>
+                <p class="text-center text-white-50">@Model.Route.RouteName</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="route-detail py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-3">@Model.Route.RouteName</h2>
+                <p class="text-muted">Vehicle: @Model.Vehicle?.LicensePlate | Type: @Model.Vehicle?.VehicleType</p>
+
+                <h4 class="fw-bold mb-4 mt-5">Timeline (Các trạm dừng)</h4>
+
+                <div class="timeline ps-3 border-start border-2 border-warning">
+
+                    @foreach (var detail in Model.Route.RouteDetails)
+                    {
+                        <div class="timeline-item mb-5 position-relative ps-4">
+                            <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-warning border border-4 border-white"
+                                 style="width: 20px; height: 20px; left: -1px;"></div>
+
+                            <h6 class="fw-bold mb-1">
+                                @if (detail.IsMajorStop)
+                                {
+                                    <span class="badge bg-danger me-2">Trạm chính</span>
+                                }
+                                @detail.Station.StationName
+                            </h6>
+                            <small class="text-muted d-block mb-2">@detail.Station.Address</small>
+
+                            <div class="p-2 bg-light rounded small text-secondary">
+                                <i class="fas fa-clock text-warning me-1"></i>
+                                Dự kiến đến: @Model.DepartureTime.AddMinutes(detail.DistanceFromStart * 2).ToString("HH:mm")
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card p-4 mb-4 shadow-sm border-0 rounded-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold text-warning mb-0">Summary</h4>
+                        <span class="badge bg-success rounded-pill">Active</span>
+                    </div>
+                    <hr>
+                    <div class="row g-3 text-center mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Departure</small>
+                            <span class="fw-bold text-dark">@Model.DepartureTime.ToString("HH:mm")</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Price</small>
+                            <span class="fw-bold text-warning">@Model.Route.BasePrice.ToString("N0") đ</span>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <small class="text-muted d-block">Total Distance</small>
+                            <span class="fw-bold text-dark">@Model.Route.TotalDistance km</span>
+                        </div>
+                    </div>
+
+                    <a href="/Trip" class="btn btn-outline-secondary w-100 rounded-pill">
+                        <i class="fa-solid fa-arrow-left me-2"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -9,36 +9,112 @@
     <link rel="stylesheet" href="~/Public_Transport.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Public_Transport</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <!-- <span class="fa-stack fa-xs" style="font-size: 1rem;">
+                    <i class="fas fa-circle fa-stack-2x text-white"></i>
+                    <i class="fas fa-steering-wheel fa-stack-1x text-dark"></i>
+                </span>
+                Driveria -->
+                <img class="img-logo" src="https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/logo-6FBNTQ.png" alt="logo">
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="fas fa-bars text-white"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+                    <li class="nav-item dropdown"><a class="nav-link" href="#">Courses <i class="fas fa-chevron-down"></i></a></li>
+                    <li class="nav-item dropdown"><a class="nav-link" href="#">Pages <i class="fas fa-chevron-down"></i></a></li>
+                    <li class="nav-item dropdown"><a class="nav-link" href="#">Blog <i class="fas fa-chevron-down"></i></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                </ul>
             </div>
-        </nav>
-    </header>
+
+            <div class="d-none d-lg-block">
+                <a href="#" class="btn btn-contact">
+                    <i class="fas fa-phone-alt"></i> Contact Us
+                </a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="site-footer">
         <div class="container">
-            &copy; 2026 - Public_Transport - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <img src="https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/logo-6FBNTQ.png" alt="Driveria Logo" style="max-width: 150px; margin-bottom: 20px;">
+                    <p class="mb-4">Lorem ipsum dolor sit amet, consectet adipiscing elit, sed do eiusmod.</p>
+
+                    <ul class="footer-links contact-list">
+                        <li><i class="fas fa-map-marker-alt"></i> <span>Jl. Raya Puputan No 142</span></li>
+                        <li><i class="fas fa-envelope"></i> <span>support@domain.com</span></li>
+                        <li><i class="fas fa-phone-alt"></i> <span>(+62)81 115 8596</span></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <h4 class="footer-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">Registration</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <h4 class="footer-title">Useful Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms and Conditions</a></li>
+                        <li><a href="#">Disclaimer</a></li>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <h4 class="footer-title">Newsletter</h4>
+                    <form class="newsletter-form">
+                        <input type="email" class="newsletter-input" placeholder="Your Email Address" required>
+                        <button type="submit" class="newsletter-btn">SEND</button>
+                    </form>
+                    <p class="mb-3">Lorem ipsum dolor sit amet, consectectur adipiscing elit.</p>
+
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="copyright-text">Driving Lessons & Traffic School Template Kit by Jegtheme</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p class="copyright-text">Copyright © 2021. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

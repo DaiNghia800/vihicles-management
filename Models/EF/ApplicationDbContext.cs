@@ -19,6 +19,11 @@ namespace Public_Transport.Models.EF
         public DbSet<PermissionType> PermissionTypes { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Users> Users { get; set; }
+        public DbSet<Station> Stations { get; set; }
+        public DbSet<Public_Transport.Models.Entities.Route> Routes { get; set; }
+        public DbSet<RouteDetail> RouteDetails { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Trip> Trips { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
