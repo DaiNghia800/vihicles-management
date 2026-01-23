@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
     --theme-color: #0da487;
@@ -504,7 +504,7 @@ header.close {
 .sidebar {
     position: fixed;
     top: 0;
-    z-index: 99;
+    z-index: 9999;
     text-align: left;
     width: 17.5rem;
     height: 100vh;
@@ -812,32 +812,32 @@ header.close {
 }
 
 .dashboard-area .box-total.box-product .box-contain::after {
-    background-color: #ef3f3e;
+    background-color: #ffa53b;
 }
 
 .dashboard-area .box-total.box-product .box-contain .media-body h4 span {
-    background-color: rgba(239, 63, 62, 0.1);
+    background-color: rgb(255, 165, 59, 0.1);
     color: #ef3f3e;
 }
 
 .dashboard-area .box-total.box-product .box-contain .box-icon {
-    background-color: rgba(239, 63, 62, 0.1);
-    color: #ef3f3e;
+    background-color: rgb(255, 165, 59, 0.1);
+    color: #ffa53b;
 }
 
 .dashboard-area .box-total.box-custom .box-contain::after {
-    background-color: #9e65c2;
+    background-color: #ef3f3e;
 }
 
 .dashboard-area .box-total.box-custom .box-contain .media-body h4 span {
-    background-color: rgba(158, 101, 194, 0.1);
+    background-color: rgba(239, 63, 62, 0.1);
     color: #9e65c2;
     text-transform: uppercase;
 }
 
 .dashboard-area .box-total.box-custom .box-contain .box-icon {
-    background-color: rgba(158, 101, 194, 0.1);
-    color: #9e65c2;
+    background-color: rgba(239, 63, 62, 0.1);
+    color: #ef3f3e;
 }
 
 .dashboard-area .box-title h4 {
@@ -1866,7 +1866,7 @@ header.close {
     background-color: #fff;
     box-shadow: 0 0 20px rgba(89, 102, 122, 0.1);
     padding: 15px;
-    z-index: 50;
+    z-index: 8888;
 }
 
 .footer p {
@@ -2584,4 +2584,17 @@ h5.card-title {
 }
 
 /* End otp */
+
+.custom-bus-icon {
+    background-color: #198754; 
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    padding: 10px;
+}
+
 

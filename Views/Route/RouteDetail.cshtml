@@ -1,0 +1,127 @@
+﻿<section class="routes-1">
+    <div class="bg-overlay position-absolute bg-black opacity-75 start-0 top-0 w-100 h-100"></div>
+    <div class="container mx-auto position-relative z-1">
+        <div class="d-flex justify-content-center align-items-center">
+            <div>
+                <h2 class="text-center">ROUTE DETAIL</h2>
+                <ul class="d-flex justify-content-center gap-1">
+                    <li>
+                        <span class="text-white fs-6 fw-light font-secondary">Home</span>
+                    </li>
+                    <li>
+                        <span class="color-primary">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </span>
+                        <span class="text-white fs-6 fw-light font-secondary">route detail</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="route-detail">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-3">Route 08: Ben Thanh - Cho Lon</h2>
+                <p class="text-muted">
+                    The optimal route is based on your location. The system updates in real time from
+                    various modes of transportation.
+                </p>
+
+                <div class="rounded-4 overflow-hidden mb-4 bg-light shadow-sm" style="height: 400px; position: relative;">
+                    <div id="map" class="mb-4"></div>
+                    <div class="position-absolute top-50 start-50 translate-middle badge bg-warning p-3 rounded-circle shadow">
+                        <i class="fas fa-bus fs-4"></i>
+                    </div>
+                </div>
+
+                <h4 class="fw-bold mb-4">Steps to Destination</h4>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon"><i class="fas fa-walking"></i></div>
+                        <h6 class="fw-bold mb-0">
+                            Walk
+                            <span class="" distance>150m</span>
+                            to Ben thanh Station
+                        </h6>
+                        <small class="text-muted">
+                            walk for about
+                            <span class="time">2 minutes</span>
+                        </small>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon bg-warning text-white"><i class="fas fa-bus"></i></div>
+                        <div class="card p-3 border-start border-warning border-4">
+                            <h6 class="fw-bold mb-1">On Board: Electric Bus 08</h6>
+                            <small class="text-muted">Vehicle license plate: 51B-123.45 | Driver: Nguyen Van A</small>
+                            <div class="mt-2 p-2 bg-light rounded small">
+                                <i class="fas fa-info-circle text-warning me-1"></i> Expected to arrive in 5 minutes
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <h6 class="fw-bold mb-0">Exit at Cho Lon Station</h6>
+                        <small class="text-muted">Your destination is on the right.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold text-warning mb-0">Route 08</h4>
+                        <span class="badge bg-success rounded-pill">Electric Bus</span>
+                    </div>
+                    <p class="text-muted small">Ben Thanh - Cho Lon</p>
+                    <hr>
+                    <div class="row g-3 text-center mb-4">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Duration</small>
+                            <span class="fw-bold"><i class="far fa-clock text-warning"></i> <span id="total-duration">25 mins</span></span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Fare</small>
+                            <span class="fw-bold"><i class="fas fa-ticket-alt text-warning"></i> 7.000đ</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Walking</small>
+                            <span class="fw-bold"><i class="fas fa-walking text-warning"></i> <span class="" distance>150m</span></span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Next Bus</small>
+                            <span class="fw-bold text-success">5 mins</span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="button" button-start class="btn btn-warning fw-bold rounded-pill py-2 shadow-sm">
+                            START NAVIGATION
+                        </button>
+                        <button type="button" id="btn-toggle-directions"
+                                class="btn btn-outline-secondary btn-sm rounded-pill d-none py-2">
+                            <i class="fas fa-list-ul me-1"></i> See detailed instructions.
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card p-4">
+                    <h6 class="fw-bold mb-3">Next Departures</h6>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span>08:00 AM</span>
+                        <span class="text-muted small">Trip 1</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span>08:15 AM</span>
+                        <span class="text-muted small text-success">Trip 2</span>
+                    </div>
+                    <div class="d-flex justify-content-between py-2">
+                        <span>08:30 AM</span>
+                        <span class="text-muted small">Trip 3</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
