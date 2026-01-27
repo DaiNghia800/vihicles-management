@@ -39,5 +39,18 @@ namespace Public_Transport.Controllers
 
             return View(trip);
         }
+
+        [HttpGet("/route")]
+        public async Task<IActionResult> GetRoute()
+        {
+            return View("~/Views/Route/Route.cshtml");
+        }
+
+        [HttpGet("/route/detail")]
+        public async Task<IActionResult> GetRouteDetail()
+        {
+            return View("~/Views/Route/RouteDetail.cshtml");
+        }
     }
+
 }
