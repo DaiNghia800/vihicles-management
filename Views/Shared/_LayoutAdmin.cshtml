@@ -188,6 +188,12 @@
                                 </a>
                             </li>
                             <li class="sidebar-list">
+                                <a href="/admin/trip/index" class="sidebar-link @(Context.Request.Path == "/admin/trip/index" ? "active" : "")">
+                                    <i class="fa-regular fa-house"></i>
+                                    <span class="text-capitalize">Trips</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-list">
                                 <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
                                     <i class="fa-regular fa-user"></i>
                                     <span class="text-capitalize">Role</span>
