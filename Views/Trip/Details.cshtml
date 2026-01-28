@@ -3,17 +3,34 @@
 
 @{
     ViewData["Title"] = "Chi tiết lộ trình";
-    // 1. Chuyển dữ liệu các trạm sang JSON để JavaScript đọc được
+    // 1. Chuyển dữ liệu các trạm sang JSON
     var stationsJson = JsonSerializer.Serialize(Model.Route.RouteDetails.Select(x => new
     {
         name = x.Station.StationName,
         address = x.Station.Address,
-        coords = x.Station.Coordinates, // Dạng "10.123, 106.456"
+        coords = x.Station.Coordinates,
         order = x.OrderIndex
     }));
 }
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
+<style>
+    /* Ẩn bảng chỉ đường mặc định để đỡ rối, bật lên khi cần */
+    .routing-hidden .leaflet-routing-container {
+        display: none !important;
+    }
+    /* Style cho icon xe buýt trên bản đồ */
+    .bus-icon-marker {
+        background-color: #ffc107;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 30px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+</style>
 
 <section class="routes-1 position-relative" style="height: 250px; background: #222;">
     <div class="container mx-auto position-relative z-1 h-100">
@@ -30,18 +47,15 @@
     <div class="container">
         <div class="row mb-5">
             <div class="col-lg-8">
-                <h3 class="fw-bold mb-3">@Model.Route.RouteName</h3>
-                <p class="text-muted">
-                    Hệ thống tự động cập nhật lộ trình thực tế. Bấm nút "Start Navigation" để tìm trạm gần bạn nhất.
-                </p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="fw-bold mb-0">Bản đồ lộ trình</h3>
+                    <button id="btn-toggle-directions" class="btn btn-sm btn-outline-secondary d-none rounded-pill">
+                        <i class="fas fa-list-ul me-1"></i> Xem hướng dẫn đi bộ
+                    </button>
+                </div>
 
-                <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 400px; border: 1px solid #ddd;">
+                <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 500px; border: 1px solid #ddd;">
                     <div id="map" style="width: 100%; height: 100%;"></div>
-
-                    <div id="loading-loc" class="position-absolute top-50 start-50 translate-middle bg-white p-3 rounded shadow d-none" style="z-index: 1000;">
-                        <div class="spinner-border text-warning" role="status"></div>
-                        <span class="ms-2">Đang định vị...</span>
-                    </div>
                 </div>
             </div>
 
@@ -60,7 +74,7 @@
                     <div class="row text-center mb-4">
                         <div class="col-6 mb-3">
                             <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Thời gian</small>
-                            <span class="fw-bold fs-5"><i class="far fa-clock text-warning me-1"></i> 25 mins</span>
+                            <span class="fw-bold fs-5" id="total-duration">-- phút</span>
                         </div>
                         <div class="col-6 mb-3">
                             <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Giá vé</small>
@@ -68,7 +82,7 @@
                         </div>
                         <div class="col-6">
                             <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Đi bộ</small>
-                            <span class="fw-bold fs-5" id="walking-distance">...</span>
+                            <span class="fw-bold fs-5" distance>0 m</span>
                         </div>
                         <div class="col-6">
                             <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Chuyến sau</small>
@@ -76,23 +90,12 @@
                         </div>
                     </div>
 
-                    <button onclick="startNavigation()" class="btn btn-warning w-100 fw-bold text-white py-3 rounded-pill shadow-sm mb-3 text-uppercase">
+                    <button type="button" button-start class="btn btn-warning w-100 fw-bold text-white py-3 rounded-pill shadow-sm mb-3 text-uppercase">
                         <i class="fas fa-location-arrow me-2"></i> Start Navigation
                     </button>
 
-                    <div id="nav-result" class="alert alert-info small d-none">
-                        📍 Bạn đang cách trạm <b><span id="nearest-station-name"></span></b> khoảng <b><span id="distance-val"></span></b>.
-                        <a href="#" id="google-map-link" target="_blank" class="d-block mt-1 fw-bold">Xem chỉ đường Google Maps &rarr;</a>
-                    </div>
-
-                    <div class="mt-auto">
-                        <h6 class="fw-bold mb-3">Các chuyến tiếp theo</h6>
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>08:00 AM</span> <span class="text-muted small">Trip 1</span>
-                        </div>
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>08:15 AM</span> <span class="text-muted small">Trip 2</span>
-                        </div>
+                    <div class="alert alert-light border small text-muted">
+                        <i class="fas fa-info-circle me-1"></i> Hệ thống sẽ tìm đường đi bộ ngắn nhất từ vị trí của bạn đến trạm xe gần nhất.
                     </div>
                 </div>
             </div>
@@ -100,15 +103,16 @@
 
         <div class="row">
             <div class="col-12">
-                <h4 class="fw-bold mb-4">Steps to Destination</h4>
-                <div class="timeline ps-3 ms-2">
+                <h4 class="fw-bold mb-4">Lộ trình chi tiết</h4>
+                <div class="timeline ps-3 border-start border-2 border-warning ms-2">
+
                     <div class="timeline-item mb-5 position-relative ps-5">
                         <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-white border border-2 border-warning d-flex align-items-center justify-content-center"
                              style="width: 40px; height: 40px; left: -1px;">
                             <i class="fas fa-walking text-warning"></i>
                         </div>
                         <h6 class="fw-bold mb-1">Đi bộ đến trạm đón</h6>
-                        <small class="text-muted">Di chuyển đến trạm gần nhất để bắt xe.</small>
+                        <small class="text-muted">Khoảng cách: <span distance>...</span> | Thời gian: <span class="time">...</span></small>
                     </div>
 
                     @foreach (var detail in Model.Route.RouteDetails)
@@ -118,62 +122,95 @@
                                  style="width: 40px; height: 40px; left: -1px;">
                                 <i class="fas fa-bus"></i>
                             </div>
-
-                            <h6 class="fw-bold mb-1">
-                                @detail.Station.StationName
-                                @if (detail.IsMajorStop)
-                                {
-                                    <span class="badge bg-danger ms-2" style="font-size: 0.7rem;">Trạm chính</span>
-                                }
-                            </h6>
+                            <h6 class="fw-bold mb-1">@detail.Station.StationName</h6>
                             <small class="text-muted d-block">@detail.Station.Address</small>
                             <small class="text-success"><i class="fas fa-clock me-1"></i> @Model.DepartureTime.AddMinutes(detail.DistanceFromStart * 2).ToString("HH:mm")</small>
                         </div>
                     }
-
-                    <div class="timeline-item mb-0 position-relative ps-5">
-                        <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-success text-white d-flex align-items-center justify-content-center"
-                             style="width: 40px; height: 40px; left: -1px;">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <h6 class="fw-bold mb-1">Kết thúc hành trình</h6>
-                        <small class="text-muted">Bạn đã đến điểm cuối.</small>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
 <script>
     // 1. Lấy dữ liệu trạm từ C#
-    var stations = @Html.Raw(stationsJson);
+    var stationsData = @Html.Raw(stationsJson);
 
-    // 2. Khởi tạo bản đồ (Tọa độ mặc định HCM)
-    var map = L.map('map').setView([10.8231, 106.6297], 12);
+    // Chuyển đổi dữ liệu trạm thành mảng LatLng của Leaflet
+    var busWaypoints = [];
+    stationsData.forEach(function(s) {
+        var coords = s.coords.split(',').map(Number);
+        if(coords.length === 2) {
+            busWaypoints.push(L.latLng(coords[0], coords[1]));
+        }
+    });
 
-    // 3. Thêm lớp bản đồ OpenStreetMap
+    // --- PHẦN JS CỦA BẠN (Đã chỉnh sửa để khớp dữ liệu) ---
+    let busRouteControl;
+
+    // Khởi tạo bản đồ (Lấy tâm là trạm đầu tiên)
+    var startPoint = busWaypoints.length > 0 ? busWaypoints[0] : [10.7712, 106.6980];
+    var map = L.map('map').setView(startPoint, 13);
+
+    // Thêm lớp nền
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // 4. Vẽ các trạm lên bản đồ
-    var markers = [];
-    stations.forEach(function(station) {
-        var coords = station.coords.split(',').map(Number);
-        if(coords.length === 2) {
-            var marker = L.marker(coords).addTo(map)
-                .bindPopup("<b>" + station.name + "</b><br>" + station.address);
-            markers.push(marker);
-        }
+    // Icon trạm xe buýt
+    var stationIcon = L.divIcon({
+        html: '<i class="fas fa-bus" style="line-height: 30px; color: white;"></i>',
+        iconSize: [30, 30],
+        className: 'bus-icon-marker'
     });
 
-    // 5. Hàm tính khoảng cách (Haversine Formula)
-    function getDistance(lat1, lon1, lat2, lon2) {
+    // Vẽ đường đi của XE BUÝT (Màu vàng/cam) đi qua tất cả các trạm
+    if (busWaypoints.length > 0) {
+        busRouteControl = L.Routing.control({
+            waypoints: busWaypoints, // Dùng danh sách trạm thật
+            lineOptions: {
+                styles: [{
+                    color: '#ffb606', // Màu vàng xe buýt
+                    weight: 6,
+                    opacity: 0.8
+                }]
+            },
+            router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile: 'car' // Xe buýt chạy đường ô tô
+            }),
+            createMarker: function (i, wp, nWps) {
+                // Tạo marker tại mỗi trạm
+                return L.marker(wp.latLng, {icon: stationIcon})
+                    .bindPopup('<b>Trạm:</b> ' + stationsData[i].name);
+            },
+            addWaypoints: false,
+            draggableWaypoints: false,
+            show: false, // Ẩn hướng dẫn text của tuyến xe buýt
+            fitSelectedRoutes: true
+        }).addTo(map);
+    }
+
+    // --- LOGIC NAVIGATION (Tìm đường đi bộ) ---
+    let isNavigating = false;
+    let routingToStation = null;
+    const buttonStart = document.querySelector("[button-start]");
+    const btnToggle = document.getElementById("btn-toggle-directions");
+
+    // Tạo marker User
+    var userIcon = L.divIcon({
+        html: '<i class="fas fa-circle" style="color: #3b82f6; font-size: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></i>',
+        iconSize: [20, 20],
+        className: 'user-location-icon'
+    });
+    var userMarker = L.marker([0, 0], { icon: userIcon }); // Chưa add vào map vội
+
+    // Hàm tính khoảng cách đơn giản (Haversine) để tìm trạm gần nhất
+    function getDistanceSimple(lat1, lon1, lat2, lon2) {
         var R = 6371;
         var dLat = (lat2 - lat1) * (Math.PI / 180);
         var dLon = (lon2 - lon1) * (Math.PI / 180);
@@ -184,83 +221,122 @@
         return R * c;
     }
 
-    // 6. Xử lý khi bấm nút "Start Navigation"
-    function startNavigation() {
-        var btnLoading = document.getElementById('loading-loc');
-        var navResult = document.getElementById('nav-result');
+    if (buttonStart) {
+        buttonStart.addEventListener("click", function () {
+            if (!isNavigating) {
+                // BẮT ĐẦU TÌM ĐƯỜNG
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang định vị...';
 
-        btnLoading.classList.remove('d-none'); // Hiện loading
+                map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var userLat = position.coords.latitude;
-                var userLng = position.coords.longitude;
+                map.once('locationfound', function (e) {
+                    userMarker.setLatLng(e.latlng).addTo(map);
 
-                // Thêm marker User (Màu đỏ)
-                var userIcon = L.icon({
-                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/markers/marker-icon-red.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34]
+                    // 1. Tìm trạm gần nhất
+                    var minDist = 99999;
+                    var nearestStationLatLng = null;
+                    var nearestStationName = "";
+
+                    busWaypoints.forEach(function(wp, index) {
+                        var dist = getDistanceSimple(e.latlng.lat, e.latlng.lng, wp.lat, wp.lng);
+                        if(dist < minDist) {
+                            minDist = dist;
+                            nearestStationLatLng = wp;
+                            nearestStationName = stationsData[index].name;
+                        }
+                    });
+
+                    // 2. Vẽ đường đi bộ từ User -> Trạm gần nhất
+                    if (routingToStation) map.removeControl(routingToStation);
+
+                    routingToStation = L.Routing.control({
+                        waypoints: [e.latlng, nearestStationLatLng],
+                        lineOptions: {
+                            styles: [{
+                                color: '#3b82f6', // Màu xanh đi bộ
+                                weight: 5,
+                                opacity: 0.8,
+                                dashArray: '10, 10' // Nét đứt
+                            }]
+                        },
+                        router: L.Routing.osrmv1({
+                            profile: 'foot' // Chế độ đi bộ
+                        }),
+                        createMarker: function() { return null; }, // Không tạo marker mặc định
+                        addWaypoints: false,
+                        show: true, // Hiện bảng chỉ dẫn
+                        containerClassName: 'routing-container-custom' // Class để toggle
+                    }).addTo(map);
+
+                    // Ẩn bảng chỉ đường mặc định ban đầu (cho gọn)
+                    setTimeout(() => {
+                        const container = document.querySelector('.leaflet-right');
+                        if (container) container.classList.add('routing-hidden');
+                        if (btnToggle) btnToggle.classList.remove('d-none');
+                    }, 1000);
+
+                    // 3. Cập nhật thông tin lên giao diện
+                    routingToStation.on('routesfound', function (e) {
+                        const routes = e.routes;
+                        const summary = routes[0].summary;
+                        const distance = Math.round(summary.totalDistance); // mét
+                        const time = Math.round(summary.totalTime / 60); // phút
+
+                        // Cập nhật text trên màn hình
+                        const listDistanceSpan = document.querySelectorAll("span[distance]");
+                        listDistanceSpan.forEach(span => {
+                            span.innerText = distance >= 1000 ? (distance / 1000).toFixed(1) + " km" : distance + " m";
+                        });
+
+                        const timeSpan = document.querySelector(".time");
+                        if(timeSpan) timeSpan.innerText = time + " phút";
+
+                        alert(`Đã tìm thấy trạm gần nhất: ${nearestStationName} (${distance}m)`);
+                    });
+
+                    // Đổi trạng thái nút
+                    buttonStart.innerHTML = '<i class="fas fa-stop me-2"></i> Stop Navigation';
+                    buttonStart.classList.replace("btn-warning", "btn-danger");
+                    isNavigating = true;
+
                 });
 
-                // Xóa marker cũ nếu có (để tránh spam marker khi bấm nhiều lần)
-                map.eachLayer(function (layer) {
-                    if (layer.options.icon && layer.options.icon.options.iconUrl.includes('marker-icon-red')) {
-                        map.removeLayer(layer);
-                    }
+                map.on('locationerror', function(e) {
+                    alert("Không thể định vị: " + e.message);
+                    buttonStart.innerHTML = '<i class="fas fa-location-arrow me-2"></i> Start Navigation';
                 });
 
-                L.marker([userLat, userLng], {icon: userIcon}).addTo(map)
-                    .bindPopup("<b>Vị trí của bạn</b>").openPopup();
-
-                // Tìm trạm gần nhất
-                var minDistance = 99999;
-                var nearestStation = null;
-
-                stations.forEach(function(station) {
-                    var coords = station.coords.split(',').map(Number);
-                    var dist = getDistance(userLat, userLng, coords[0], coords[1]);
-
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        nearestStation = station;
-                    }
-                });
-
-                // Cập nhật giao diện
-                btnLoading.classList.add('d-none');
-                navResult.classList.remove('d-none');
-
-                if (nearestStation) {
-                    // Update Text
-                    document.getElementById('nearest-station-name').innerText = nearestStation.name;
-                    document.getElementById('distance-val').innerText = minDistance.toFixed(2) + " km";
-                    document.getElementById('walking-distance').innerText = (minDistance * 1000).toFixed(0) + "m";
-
-                    // --- SỬA LỖI LINK GOOGLE MAPS TẠI ĐÂY ---
-                    // Tách tọa độ trạm ra thành mảng số [Lat, Lng]
-                    var destCoords = nearestStation.coords.split(',').map(item => item.trim());
-
-                    // Link chuẩn của Google Maps: origin = User, destination = Trạm
-                    var gMapLink = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destCoords[0]},${destCoords[1]}&travelmode=walking`;
-
-                    document.getElementById('google-map-link').href = gMapLink;
-
-                    // Zoom map để thấy cả 2 điểm
-                    var bounds = L.latLngBounds([
-                        [userLat, userLng],
-                        [parseFloat(destCoords[0]), parseFloat(destCoords[1])]
-                    ]);
-                    map.fitBounds(bounds, {padding: [50, 50]});
+            } else {
+                // DỪNG TÌM ĐƯỜNG
+                map.stopLocate();
+                if (routingToStation) {
+                    map.removeControl(routingToStation);
+                    routingToStation = null;
                 }
+                if (userMarker) userMarker.removeFrom(map);
 
-            }, function(error) {
-                alert("Lỗi: Không thể lấy vị trí. Hãy bật GPS trình duyệt!");
-                btnLoading.classList.add('d-none');
-            });
-        } else {
-            alert("Trình duyệt không hỗ trợ định vị.");
-        }
+                if (btnToggle) btnToggle.classList.add('d-none');
+
+                // Zoom lại toàn cảnh tuyến xe
+                if(busRouteControl) map.fitBounds(L.latLngBounds(busWaypoints));
+
+                buttonStart.innerHTML = '<i class="fas fa-location-arrow me-2"></i> Start Navigation';
+                buttonStart.classList.replace("btn-danger", "btn-warning");
+                isNavigating = false;
+            }
+        });
+    }
+
+    // Logic nút Bật/Tắt hướng dẫn
+    if (btnToggle) {
+        btnToggle.addEventListener("click", function () {
+            const container = document.querySelector('.leaflet-right');
+            if (container) {
+                container.classList.toggle('routing-hidden');
+                this.innerHTML = container.classList.contains('routing-hidden') ?
+                    '<i class="fas fa-list-ul me-1"></i> Xem hướng dẫn đi bộ' :
+                    '<i class="fas fa-times me-1"></i> Đóng hướng dẫn';
+            }
+        });
     }
 </script>
