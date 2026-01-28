@@ -1,0 +1,103 @@
+﻿@using System.Security.Claims
+@using Public_Transport.Models.Entities
+@using System.Text.Json
+@inject Public_Transport.Services.IServices.IUserService UserService
+
+
+@{
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var currentUser = default(Public_Transport.Models.Entities.Users);
+
+    if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
+    {
+        currentUser = UserService.GetUserById(userId);
+    }
+    var pageTitle = ViewData["Title"]?.ToString();
+  
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css">
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/slick/slick.css" />
+    <link rel="stylesheet" href="/lib/slick/slick-theme.css" />
+    @RenderSection("Styles", required: false)
+    @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
+    @* <link rel="stylesheet" href="~/Fastkart.styles.css" asp-append-version="true" /> *@
+    @* <link rel="stylesheet" href="~/assets/css/style.css" /> *@
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+
+   
+    @if (!string.IsNullOrEmpty(pageTitle) && pageTitle.ToLower() != "home")
+    {
+        <section class="breadcrumb-section pt-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb-contain">
+                            <h2>@pageTitle</h2>
+                            <nav>
+                                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                                    <li class="breadcrumb-item">
+                                        <a href="/">
+                                            <i class="fa-solid fa-house"></i>
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item active">@pageTitle</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    <div class="">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <!-- My Profile Modal -->
+    <div class="modal fade" id="myProfileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">My Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="myProfileContent">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="/lib/tinymce/tinymce.min.js"></script>
+    <script src="/lib/slick/slick.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.all.min.js"></script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
+    <script src="~/js/customer.js" asp-append-version="true"></script>
+    <script src="~/assets/js/script.js"></script>
+    @RenderSection("Scripts", required: false)
+    
+</body>
+</html>
