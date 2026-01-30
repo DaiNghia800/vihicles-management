@@ -37,8 +37,10 @@
 <script src="~/js/blog-sidebar.js"></script>
 
 <script>
+    // === KHAI BÁO BIẾN TOÀN CỤC ===
+    let allBlogs = []; // ← QUAN TRỌNG: Khai báo ở đây
     let displayedBlogs = [];
-    const blogsPerPage = 4;
+    const blogsPerPage = 3;
     let currentPage = 1;
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -54,10 +56,12 @@
             const blogsRes = await fetch('/blog/api/list');
 
             if (blogsRes.ok) {
-                allBlogs = await blogsRes.json();
-                console.log('Blogs loaded:', allBlogs.length, 'items');
+                allBlogs = await blogsRes.json(); // Gán vào biến toàn cục
+                console.log('Total blogs from API:', allBlogs.length); // DEBUG
+                console.log('Blogs data:', allBlogs); // DEBUG
+
                 renderBlogList();
-                
+
                 // Load sidebar data (sử dụng hàm từ blog-sidebar.js)
                 await loadSidebarData();
             } else {
@@ -80,12 +84,18 @@
     function renderBlogList() {
         const container = document.getElementById('blogListContainer');
 
-        if (allBlogs.length === 0) {
+        if (!allBlogs || allBlogs.length === 0) {
             showNoData();
             return;
         }
 
-        displayedBlogs = allBlogs.slice(0, currentPage * blogsPerPage);
+        // Tính số blog cần hiển thị
+        const endIndex = currentPage * blogsPerPage;
+        displayedBlogs = allBlogs.slice(0, endIndex);
+
+        console.log('Current page:', currentPage); // DEBUG
+        console.log('End index:', endIndex); // DEBUG
+        console.log('Displayed blogs count:', displayedBlogs.length); // DEBUG
 
         container.innerHTML = displayedBlogs.map(blog => {
             const hasImage = blog.imageUrl && blog.imageUrl.trim() !== '';
@@ -96,13 +106,13 @@
                     <div class="img-wrapper">
                         <a href="/blog/${blog.uid}">
                             <img src="${hasImage ? blog.imageUrl : './img/driver-instructor-showing-traffiic-signs-e1627375674338.jpg'}"
-                                 alt="${blog.title}">
-                            <span class="category-badge">${blog.categoryName}</span>
+                                 alt="${escapeHtml(blog.title)}">
+                            <span class="category-badge">${escapeHtml(blog.categoryName)}</span>
                         </a>
                     </div>
                     <div class="card-body" style="padding: 1rem!important">
                         <h4 class="card-title mt-0">
-                            <a href="/blog/${blog.uid}">${blog.title}</a>
+                            <a href="/blog/${blog.uid}">${escapeHtml(blog.title)}</a>
                         </h4>
                         <div class="card-text">
                             <p>${excerpt}</p>
@@ -120,18 +130,23 @@
             `;
         }).join('');
 
+        // Hiển thị nút Load More nếu còn blog
         const loadMoreContainer = document.getElementById('loadMoreContainer');
         if (displayedBlogs.length < allBlogs.length) {
             loadMoreContainer.style.display = 'block';
+            console.log('Show Load More button:', displayedBlogs.length, '/', allBlogs.length); // DEBUG
         } else {
             loadMoreContainer.style.display = 'none';
+            console.log('Hide Load More button - All blogs displayed'); // DEBUG
         }
     }
 
     function loadMoreBlogs() {
+        console.log('=== LOAD MORE CLICKED ==='); // DEBUG
         currentPage++;
         renderBlogList();
 
+        // Scroll to first new blog
         const newBlogIndex = (currentPage - 1) * blogsPerPage;
         const blogCards = document.querySelectorAll('.blog-card');
         if (blogCards[newBlogIndex]) {
@@ -154,6 +169,13 @@
         const tmp = document.createElement('div');
         tmp.innerHTML = html;
         return tmp.textContent || tmp.innerText || '';
+    }
+
+    // Helper function để escape HTML (tránh XSS)
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 </script>
 
@@ -276,5 +298,26 @@
         width: 3rem;
         height: 3rem;
         border-width: 0.3rem;
+    }
+
+    /* FIX: Remove all overflow constraints */
+    .our-blog,
+    .list-box-card,
+    #blogListContainer,
+    .col-lg-8,
+    .col-md-8,
+    .container,
+    .row {
+        max-height: none !important;
+        overflow: visible !important;
+        height: auto !important;
+        min-height: auto !important;
+    }
+
+    /* Ensure blog cards are not hidden */
+    .blog-card {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 </style>
