@@ -196,7 +196,6 @@ namespace Public_Transport.Controllers.Admin
 
         // === BLOG CATEGORIES API ===
         [HttpGet("api/BlogCategories")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<ActionResult<IEnumerable<BlogCategories>>> GetBlogCategories()
         {
             var categories = await _blogService.GetCategoriesAdminAsync();
@@ -217,22 +216,48 @@ namespace Public_Transport.Controllers.Admin
 
         [HttpPost("api/BlogCategories")]
         [Authorize(Policy = "NoCustomer")]
-        public async Task<ActionResult<BlogCategories>> CreateBlogCategory(CreateBlogCategoryDTO createDTO)
+        public async Task<ActionResult<BlogCategories>> CreateBlogCategory([FromBody] CreateBlogCategoryDTO createDTO)
         {
-            var category = await _blogService.CreateCategoryAsync(createDTO);
-            return CreatedAtAction(nameof(GetBlogCategory), new { id = category.Uid }, category);
+            // Thêm validation
+            if (createDTO == null || string.IsNullOrWhiteSpace(createDTO.Name))
+            {
+                return BadRequest(new { message = "Category name is required" });
+            }
+
+            try
+            {
+                var category = await _blogService.CreateCategoryAsync(createDTO);
+                return CreatedAtAction(nameof(GetBlogCategory), new { id = category.Uid }, category);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while creating category", error = ex.Message });
+            }
         }
 
         [HttpPut("api/BlogCategories/{id:int}")]
         [Authorize(Policy = "NoCustomer")]
-        public async Task<IActionResult> UpdateBlogCategory(int id, CreateBlogCategoryDTO updateDTO)
+        public async Task<IActionResult> UpdateBlogCategory(int id, [FromBody] CreateBlogCategoryDTO updateDTO)
         {
-            var category = await _blogService.UpdateCategoryAsync(id, updateDTO);
-            if (category == null)
+            // Thêm validation
+            if (updateDTO == null || string.IsNullOrWhiteSpace(updateDTO.Name))
             {
-                return NotFound(new { message = "Category not found" });
+                return BadRequest(new { message = "Category name is required" });
             }
-            return Ok(new { message = "Category updated successfully" });
+
+            try
+            {
+                var category = await _blogService.UpdateCategoryAsync(id, updateDTO);
+                if (category == null)
+                {
+                    return NotFound(new { message = "Category not found" });
+                }
+                return Ok(new { message = "Category updated successfully", category });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating category", error = ex.Message });
+            }
         }
 
         [HttpDelete("api/BlogCategories/{id:int}")]
@@ -289,6 +314,12 @@ namespace Public_Transport.Controllers.Admin
                 return NotFound(new { message = "User not found" });
             }
             return Ok(user);
+        }
+        [HttpGet("admin/blog/categories")]
+        [Authorize(Policy = "NoCustomer")]
+        public IActionResult Categories()
+        {
+            return View("~/Views/Admin/Blog/Category.cshtml");
         }
     }
 }
