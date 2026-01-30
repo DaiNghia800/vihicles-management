@@ -1,0 +1,280 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["title"] = "Blog List";
+}
+
+<section class="our-blog">
+    <div class="container">
+        <div class="row">
+            <!-- Blog Posts Column -->
+            <div class="col-lg-8 col-md-8">
+                <!-- Loading indicator -->
+                <div class="text-center py-5" id="loadingBlogs" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading blogs...</p>
+                </div>
+
+                <!-- Blog Posts Container -->
+                <div class="list-box-card" id="blogListContainer">
+                    <!-- Blog posts will be loaded here -->
+                </div>
+
+                <!-- Load More Button -->
+                <div class="text-center mt-4" id="loadMoreContainer" style="display: none;">
+                    <button class="btn btn-load-more" onclick="loadMoreBlogs()">LOAD MORE</button>
+                </div>
+            </div>
+
+            <!-- Sidebar (Partial View) -->
+            @await Html.PartialAsync("_BlogSidebar")
+        </div>
+    </div>
+</section>
+
+<!-- Include shared sidebar script -->
+<script src="~/js/blog-sidebar.js"></script>
+
+<script>
+    let displayedBlogs = [];
+    const blogsPerPage = 4;
+    let currentPage = 1;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('=== BLOG LIST PAGE LOADED ===');
+        loadData();
+    });
+
+    async function loadData() {
+        console.log('=== LOADING DATA ===');
+        showLoading(true);
+
+        try {
+            const blogsRes = await fetch('/blog/api/list');
+
+            if (blogsRes.ok) {
+                allBlogs = await blogsRes.json();
+                console.log('Blogs loaded:', allBlogs.length, 'items');
+                renderBlogList();
+                
+                // Load sidebar data (sử dụng hàm từ blog-sidebar.js)
+                await loadSidebarData();
+            } else {
+                console.error('Error loading blogs - Status:', blogsRes.status);
+                showNoData();
+            }
+        } catch (error) {
+            console.error('Error loading data:', error);
+            showNoData();
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function showLoading(show) {
+        document.getElementById('loadingBlogs').style.display = show ? 'block' : 'none';
+        document.getElementById('blogListContainer').style.display = show ? 'none' : 'block';
+    }
+
+    function renderBlogList() {
+        const container = document.getElementById('blogListContainer');
+
+        if (allBlogs.length === 0) {
+            showNoData();
+            return;
+        }
+
+        displayedBlogs = allBlogs.slice(0, currentPage * blogsPerPage);
+
+        container.innerHTML = displayedBlogs.map(blog => {
+            const hasImage = blog.imageUrl && blog.imageUrl.trim() !== '';
+            const excerpt = stripHtml(blog.content).substring(0, 200) + '...';
+
+            return `
+                <article class="blog-card">
+                    <div class="img-wrapper">
+                        <a href="/blog/${blog.uid}">
+                            <img src="${hasImage ? blog.imageUrl : './img/driver-instructor-showing-traffiic-signs-e1627375674338.jpg'}"
+                                 alt="${blog.title}">
+                            <span class="category-badge">${blog.categoryName}</span>
+                        </a>
+                    </div>
+                    <div class="card-body" style="padding: 1rem!important">
+                        <h4 class="card-title mt-0">
+                            <a href="/blog/${blog.uid}">${blog.title}</a>
+                        </h4>
+                        <div class="card-text">
+                            <p>${excerpt}</p>
+                        </div>
+                        <div class="btn-bottom">
+                            <div class="btn-read">
+                                <a href="/blog/${blog.uid}" class="btn-read-more">
+                                    READ MORE
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+        const loadMoreContainer = document.getElementById('loadMoreContainer');
+        if (displayedBlogs.length < allBlogs.length) {
+            loadMoreContainer.style.display = 'block';
+        } else {
+            loadMoreContainer.style.display = 'none';
+        }
+    }
+
+    function loadMoreBlogs() {
+        currentPage++;
+        renderBlogList();
+
+        const newBlogIndex = (currentPage - 1) * blogsPerPage;
+        const blogCards = document.querySelectorAll('.blog-card');
+        if (blogCards[newBlogIndex]) {
+            blogCards[newBlogIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function showNoData() {
+        const container = document.getElementById('blogListContainer');
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fa-solid fa-exclamation-circle fa-3x text-muted mb-3"></i>
+                <h4>No blogs found</h4>
+                <p class="text-muted">Check back later for new content!</p>
+            </div>
+        `;
+    }
+
+    function stripHtml(html) {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+    }
+</script>
+
+<style>
+    /* Blog Card Styles - Chỉ giữ CSS riêng cho blog-list */
+    .blog-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .img-wrapper {
+        position: relative;
+        overflow: hidden;
+        height: 300px;
+    }
+
+    .img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+    }
+
+    .blog-card:hover .img-wrapper img {
+        transform: scale(1.05);
+    }
+
+    .category-badge {
+        position: absolute;
+        background: #ffba00;
+        color: black;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+
+    .card-title {
+        margin-bottom: 15px;
+    }
+
+    .card-title a {
+        color: #333;
+        text-decoration: none;
+        font-size: 22px;
+        font-weight: 600;
+        line-height: 1.4;
+        transition: color 0.3s;
+    }
+
+    .card-title a:hover {
+        color: #ffba00;
+    }
+
+    .card-text {
+        margin-bottom: 20px;
+    }
+
+    .card-text p {
+        color: #666;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    .btn-read-more {
+        color: #ffba00;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: gap 0.3s;
+    }
+
+    .btn-read-more:hover {
+        gap: 12px;
+    }
+
+    .btn-read-more i {
+        transition: transform 0.3s;
+    }
+
+    .btn-read-more:hover i {
+        transform: translateX(4px);
+    }
+
+    .btn-load-more {
+        background: #ffba00;
+        color: white;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-load-more:hover {
+        background: #e5a800;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 186, 0, 0.3);
+    }
+
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3rem;
+    }
+</style>

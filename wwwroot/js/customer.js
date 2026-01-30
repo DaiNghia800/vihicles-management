@@ -334,3 +334,20 @@ if (dropzoneElement) {
 }
 //end dropzone
 //end drop zone
+// Load More functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const loadMoreBtn = document.querySelector('.btn-load-more');
+    const blogCards = document.querySelectorAll('.list-box-card .blog-card');
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function () {
+
+            blogCards.forEach(function (card) {
+                card.classList.add('show');
+            });
+
+
+            loadMoreBtn.style.display = 'none';
+        });
+    }
+});

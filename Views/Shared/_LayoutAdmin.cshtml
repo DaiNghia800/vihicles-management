@@ -241,6 +241,32 @@
                                 </a>
                             </li>
                             <li class="sidebar-list">
+                                <a href="#collapseBlog" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/blog") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseBlog">
+                                    <i class="fa-solid fa-blog"></i>
+                                    <span class="text-capitalize">Blog</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/blog") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/blog") ? "show" : "")" id="collapseBlog">
+                                    <li>
+                                        <a href="/admin/blog" class="text-capitalize">
+                                            All Blogs
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/blog/create" class="text-capitalize">
+                                            Add New Blog
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/blog" target="_blank" class="text-capitalize">
+                                            View Blog Page
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
                                 <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
                                     <i class="fa-regular fa-user"></i>
                                     <span class="text-capitalize">Role</span>
