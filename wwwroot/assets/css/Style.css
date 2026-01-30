@@ -8,6 +8,7 @@
     --font-main: "Oswald", sans-serif;
     --navbar-height: 80px;
     --font-secondary: "Heebo", sans-serif;
+    --theme-color: #0baf9a;
 }
 
 * {
@@ -1132,3 +1133,403 @@ body {
 }
 
 /* end route detail */
+/* =========================================
+   SHARED LAYOUT & LOGIN SECTION
+   ========================================= */
+
+/* Cấu trúc chính của section */
+.log-in-section {
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 0;
+}
+
+    /* Hình nền chung cho cả Login và OTP */
+    .log-in-section::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-image: url(../../images/log-in-bg.png);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        z-index: -1;
+    }
+
+.container-fluid-lg {
+    padding: 0 calc(0.75rem + 148 * (100vw - 20rem) / 1600);
+}
+
+/* Container chứa ảnh */
+.log-in-section .image-contain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    /* Giữ width 90% nếu cần cho phần OTP, hoặc 100% mặc định */
+    width: 90%;
+}
+
+/* Hộp chứa Form (Box trắng xám) */
+.log-in-section .log-in-box {
+    background-color: #f8f8f8;
+    padding: calc(1rem + 34 * (100vw - 20rem) / 1600);
+    border-radius: calc(0.5rem + 4 * (100vw - 20rem) / 1600);
+    /* Các thuộc tính căn chỉnh */
+    display: flex; /* Thêm vào để hỗ trợ căn chỉnh nếu cần */
+    flex-direction: column; /* Mặc định xếp dọc */
+    justify-content: center;
+}
+
+
+.log-in-section .otp-section .log-in-box {
+    margin-left: 2.5rem;
+    align-items: center;
+}
+
+/* Tiêu đề Form */
+.log-in-section .log-in-box .log-in-title {
+    margin-bottom: calc(0.75rem + 8 * (100vw - 20rem) / 1600);
+    width: 100%; /* Đảm bảo title full width */
+}
+
+    .log-in-section .log-in-box .log-in-title h3 {
+        margin-bottom: calc(0.0625rem + 5 * (100vw - 20rem) / 1600);
+        font-size: calc(1.125rem + 3 * (100vw - 20rem) / 1600);
+        line-height: 1.2;
+        font-weight: 500;
+    }
+
+    .log-in-section .log-in-box .log-in-title h4,
+    .log-in-section .log-in-box .log-in-title h5 {
+        color: #4a5568;
+        margin-top: 0.5rem;
+    }
+
+    .log-in-section .log-in-box .log-in-title h4 {
+        font-size: calc(1.0625rem + 1 * (100vw - 20rem) / 1600);
+        line-height: 1.2;
+        font-weight: 400;
+    }
+
+    /* H5 đặc biệt cho OTP có icon gap */
+    .log-in-section .log-in-box .log-in-title h5 {
+        display: flex;
+        gap: 0.625rem;
+        font-size: calc(0.9375rem + 1 * (100vw - 20rem) / 1600);
+    }
+
+/* =========================================
+   FORM ELEMENTS
+   ========================================= */
+
+.log-in-section .log-in-form .form-control {
+    border: none;
+}
+
+.theme-form-floating .form-control,
+.theme-form-floating .form-select {
+    height: calc(3.1875rem + 3 * (100vw - 20rem) / 1600);
+    line-height: normal;
+}
+
+.theme-form-floating label {
+    font-size: calc(0.8125rem + 3 * (100vw - 20rem) / 1600);
+    color: #4a5568;
+    border: none;
+}
+
+.form-floating {
+    line-height: 2;
+}
+
+/* Checkbox & Remember Me */
+.log-in-section .log-in-box .remember-box {
+    display: flex;
+    align-items: center;
+}
+
+    .log-in-section .log-in-box .remember-box label,
+    .log-in-section .log-in-box .forgot-password {
+        font-size: 1rem;
+    }
+
+.log-in-section .log-in-box .forgot-password {
+    font-weight: 500;
+    display: block;
+}
+
+.log-in-section .log-in-box .forgot-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.log-in-section a {
+    color: #0da487;
+    transition: .5s ease;
+    text-decoration: none;
+}
+
+/* Custom Checkbox Animation */
+.checkbox_animated {
+    cursor: pointer;
+    position: relative;
+    margin-right: 1rem;
+    height: 100%;
+}
+
+    .checkbox_animated:before {
+        content: "";
+        position: absolute;
+        width: 0.75rem;
+        height: 0.375rem;
+        transition: transform .4s cubic-bezier(0.45, 1.8, 0.5, 0.75);
+        transform: rotate(-45deg) scale(0, 0);
+        left: 0.25rem;
+        top: 0.25rem;
+        z-index: 1;
+        border: 0.125rem solid #0da487;
+        border-top-style: none;
+        border-right-style: none;
+    }
+
+    .checkbox_animated:checked:before {
+        transform: rotate(-45deg) scale(1, 1);
+    }
+
+    .checkbox_animated:after {
+        content: "";
+        position: absolute;
+        width: 1.3125rem;
+        height: 1.3125rem;
+        top: -0.125rem;
+        left: 0;
+        background-color: #fff;
+        border: 0.125rem solid #ececec;
+        cursor: pointer;
+    }
+
+/* =========================================
+   BUTTON STYLES (Gộp chung)
+   ========================================= */
+
+.btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(0.4375rem + 7 * (100vw - 20rem) / 1600) calc(0.875rem + 18 * (100vw - 20rem) / 1600);
+    font-weight: 500;
+    transition: all .3s ease;
+    border: none;
+    font-size: calc(0.875rem + 4 * (100vw - 20rem) / 1600);
+    white-space: nowrap;
+}
+
+    .btn:hover {
+        color: #fff;
+    }
+
+/* Base Animation Button Style */
+.btn-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #fff;
+    border-radius: 0.3125rem;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0);
+    transition: all .3s ease;
+    position: relative;
+    border: none;
+    z-index: 0;
+    /* Default Gradient (Red/Orange) */
+    background: linear-gradient(90deg, #ff6b6b 0%, #ff4f4f 100%);
+}
+
+    .btn-animation::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 0;
+        bottom: 0;
+        left: 0;
+        z-index: -1;
+        color: #fff;
+        border-radius: 0.3125rem;
+        transition: all .3s ease;
+        /* Default Hover Background */
+        background: linear-gradient(90deg, #ff4f4f 0%, #ff6b6b 100%);
+    }
+
+    .btn-animation:hover {
+        color: #fff;
+    }
+
+        .btn-animation:hover::after {
+            top: 0;
+            height: 100%;
+        }
+
+/* Variation: Theme Process Button (Green/Teal) */
+.btn-process.btn-animation {
+    background: var(--theme-color, #0da487) !important;
+}
+
+    .btn-process.btn-animation::after {
+        background: linear-gradient(90deg, #0e947a 0%, #0da487 100%);
+    }
+
+
+/*login*/
+.log-in-section .log-in-box .other-log-in {
+    margin-top: 0.9375rem;
+    text-align: center;
+    position: relative;
+}
+
+    .log-in-section .log-in-box .other-log-in::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        height: 0.0625rem;
+        left: 0;
+        background-color: #ddd;
+        z-index: 0;
+    }
+
+    .log-in-section .log-in-box .other-log-in h6 {
+        color: #4a5568;
+        position: relative;
+        background-color: #f9f9f9;
+        padding: 0 0.875rem;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: calc(0.8125rem + 1 * (100vw - 20rem) / 1600);
+        line-height: 1.2;
+        margin: 0;
+        font-weight: 400;
+    }
+
+.log-in-section .log-in-box .log-in-button {
+    margin-top: 1.25rem;
+    padding: 0.0625rem 0;
+}
+
+    .log-in-section .log-in-box .log-in-button ul {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        gap: 0.9375rem;
+        align-items: center;
+    }
+
+        .log-in-section .log-in-box .log-in-button ul li {
+            display: block;
+            width: 100%;
+        }
+
+            .log-in-section .log-in-box .log-in-button ul li a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: calc(0.875rem + 2 * (100vw - 20rem) / 1600);
+                color: #222;
+                border-radius: 0.3125rem;
+                padding: calc(0.625rem + 6 * (100vw - 20rem) / 1600) calc(1.125rem + 12 * (100vw - 20rem) / 1600);
+                flex-wrap: wrap;
+                gap: calc(0.5rem + 2 * (100vw - 20rem) / 1600);
+                background-color: #fff;
+            }
+
+                .log-in-section .log-in-box .log-in-button ul li a img {
+                    width: calc(1.125rem + 6 * (100vw - 20rem) / 1600);
+                }
+/*end-login*/
+/*sign-up*/
+.log-in-section .log-in-box .sign-up-box {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+    .log-in-section .log-in-box .sign-up-box h4 {
+        color: #4a5568;
+        font-size: calc(0.875rem + 2 * (100vw - 20rem) / 1600);
+        margin-bottom: calc(0rem + 3 * (100vw - 20rem) / 1600);
+        line-height: 1.2;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .log-in-section .log-in-box .sign-up-box a {
+        font-weight: 500;
+        font-size: calc(0.9375rem + 2 * (100vw - 20rem) / 1600);
+        margin-bottom: -0.25rem;
+        display: block;
+    }
+/*end sign-up*/
+/*otp*/
+.log-in-section .otp-section {
+    display: flex;
+    align-items: center;
+}
+
+.log-in-section .inputs {
+    margin: calc(-0.125rem + -10 * (100vw - 20rem) / 1600);
+    display: flex;
+}
+
+    .log-in-section .inputs input {
+        margin: calc(0.125rem + 6 * (100vw - 20rem) / 1600);
+        border: none;
+        text-align: center;
+    }
+
+    .log-in-section .inputs .form-control {
+        background-color: #fff;
+        display: block;
+        width: calc(100% / 6);
+        padding: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #212529;
+        background-clip: padding-box;
+        appearance: none;
+        border-radius: .25rem;
+        transition: all .3s ease-in-out;
+    }
+
+.send-box h5 {
+    font-size: calc(0.9375rem + 1 * (100vw - 20rem) / 1600);
+    line-height: 1.2;
+    margin: 0;
+    font-weight: 400;
+    display: flex;
+    gap: 0.3125rem;
+}
+
+.send-box a {
+    color: #0da487;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.map-section {
+    width: 100%;
+}
+
+.map-box iframe {
+    width: 100%;
+    min-height: 21.875rem;
+}
+/*end-otp*/
