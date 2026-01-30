@@ -1316,27 +1316,6 @@ body {
         cursor: pointer;
     }
 
-/* =========================================
-   BUTTON STYLES (Gộp chung)
-   ========================================= */
-
-.btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: calc(0.4375rem + 7 * (100vw - 20rem) / 1600) calc(0.875rem + 18 * (100vw - 20rem) / 1600);
-    font-weight: 500;
-    transition: all .3s ease;
-    border: none;
-    font-size: calc(0.875rem + 4 * (100vw - 20rem) / 1600);
-    white-space: nowrap;
-}
-
-    .btn:hover {
-        color: #fff;
-    }
-
 /* Base Animation Button Style */
 .btn-animation {
     display: flex;
