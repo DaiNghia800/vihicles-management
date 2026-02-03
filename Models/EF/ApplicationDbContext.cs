@@ -25,6 +25,7 @@ namespace Public_Transport.Models.EF
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Trip> Trips { get; set; }
 
+        public DbSet<Driver> Drivers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
