@@ -16,7 +16,8 @@
                 <p class="card-text">
                     <strong>Route:</strong> @Model.Route.RouteName <br />
                     <strong>Vehicle:</strong> @Model.Vehicle?.LicensePlate <br />
-                    <strong>Departure:</strong> @Model.DepartureTime
+                    <strong>Departure:</strong> @Model.DepartureTime <br />
+                    <strong>Drivers:</strong> @(Model.Driver != null ? Model.Driver.User.FullName : "No Driver") <br />
                 </p>
                 <div class="alert alert-warning">
                     Warning: This action cannot be undone!

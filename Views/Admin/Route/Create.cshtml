@@ -1,0 +1,57 @@
+﻿@model Public_Transport.Models.Entities.Route
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thêm Tuyến Mới";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Thêm Tuyến Xe Mới</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="RouteName" class="form-label fw-bold">Tên Tuyến <span class="text-danger">*</span></label>
+                        <input asp-for="RouteName" class="form-control" placeholder="Ví dụ: Tuyến 01: Bến Thành - Chợ Lớn" />
+                        <span asp-validation-for="RouteName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-bold">Mô tả</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả lộ trình, các điểm đi qua chính..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="BasePrice" class="form-label fw-bold">Giá vé (VNĐ)</label>
+                            <input asp-for="BasePrice" class="form-control" type="number" min="0" step="1000" />
+                            <span asp-validation-for="BasePrice" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TotalDistance" class="form-label fw-bold">Tổng khoảng cách (km)</label>
+                            <input asp-for="TotalDistance" class="form-control" type="number" min="0" step="0.1" />
+                            <span asp-validation-for="TotalDistance" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+                        <button type="submit" class="btn btn-primary">Lưu Tuyến</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

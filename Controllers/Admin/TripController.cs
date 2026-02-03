@@ -16,20 +16,56 @@ namespace Public_Transport.Controllers.Admin
             _context = context;
         }
 
+        // GET: admin/trip
         public async Task<IActionResult> Index()
         {
             var trips = await _context.Trips
                 .Include(t => t.Route)
                 .Include(t => t.Vehicle)
+                .Include(t => t.Driver).ThenInclude(d => d.User)
                 .OrderByDescending(t => t.DepartureTime)
                 .ToListAsync();
+
+            // --- LOGIC TỰ ĐỘNG CẬP NHẬT STATUS ---
+            bool hasChanges = false;
+            var now = DateTime.Now;
+
+            foreach (var trip in trips)
+            {
+                // Chỉ xử lý các chuyến chưa Hủy (Cancelled) và chưa Hoàn thành (Completed)
+                if (trip.Status != "Cancelled" && trip.Status != "Completed")
+                {
+                    // Case 1: Đã đến giờ chạy nhưng chưa tới giờ đến -> Đổi thành Running
+                    if (trip.DepartureTime <= now && trip.ArrivalTime > now && trip.Status != "Running")
+                    {
+                        trip.Status = "Running";
+                        _context.Entry(trip).State = EntityState.Modified; // Đánh dấu để update DB
+                        hasChanges = true;
+                    }
+                    // Case 2: Đã quá giờ đến -> Đổi thành Completed
+                    else if (trip.ArrivalTime <= now && trip.Status != "Completed")
+                    {
+                        trip.Status = "Completed";
+                        _context.Entry(trip).State = EntityState.Modified;
+                        hasChanges = true;
+                    }
+                }
+            }
+
+            // Nếu có thay đổi thì lưu xuống Database luôn
+            if (hasChanges)
+            {
+                await _context.SaveChangesAsync();
+            }
+            // ---------------------------------------
+
             return View("~/Views/Admin/Trip/Index.cshtml", trips);
         }
 
+        // GET: admin/trip/create
         public IActionResult Create()
         {
-            ViewData["RouteId"] = new SelectList(_context.Routes, "RouteId", "RouteName");
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "LicensePlate");
+            LoadViewData();
             return View("~/Views/Admin/Trip/Create.cshtml");
         }
 
@@ -37,17 +73,39 @@ namespace Public_Transport.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Trip trip)
         {
+            // 1. LOGIC: Chặn tạo chuyến trong quá khứ
+            if (trip.DepartureTime <= DateTime.Now)
+            {
+                ModelState.AddModelError("DepartureTime", "The departure time must be later than the current time!");
+            }
+
+            // 2. LOGIC: Giờ đến phải sau giờ đi
+            if (trip.ArrivalTime <= trip.DepartureTime)
+            {
+                ModelState.AddModelError("ArrivalTime", "The estimated arrival time must be after the departure time!");
+            }
+
+            // 3. LOGIC: Tự động set Status khi tạo mới
+            // Người dùng không cần chọn, hệ thống tự set là "Scheduled"
+            trip.Status = "Scheduled";
+
+            // Bỏ qua validate các object quan hệ (như bài trước)
+            ModelState.Remove("Route");
+            ModelState.Remove("Vehicle");
+            ModelState.Remove("Driver");
+
             if (ModelState.IsValid)
             {
                 _context.Add(trip);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RouteId"] = new SelectList(_context.Routes, "RouteId", "RouteName", trip.RouteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "LicensePlate", trip.VehicleId);
+
+            LoadViewData(trip);
             return View("~/Views/Admin/Trip/Create.cshtml", trip);
         }
 
+        // GET: admin/trip/edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -55,11 +113,11 @@ namespace Public_Transport.Controllers.Admin
             var trip = await _context.Trips.FindAsync(id);
             if (trip == null) return NotFound();
 
-            ViewData["RouteId"] = new SelectList(_context.Routes, "RouteId", "RouteName", trip.RouteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "LicensePlate", trip.VehicleId);
+            LoadViewData(trip);
             return View("~/Views/Admin/Trip/Edit.cshtml", trip);
         }
 
+        // POST: admin/trip/edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Trip trip)
@@ -80,11 +138,11 @@ namespace Public_Transport.Controllers.Admin
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RouteId"] = new SelectList(_context.Routes, "RouteId", "RouteName", trip.RouteId);
-            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "LicensePlate", trip.VehicleId);
+            LoadViewData(trip);
             return View("~/Views/Admin/Trip/Edit.cshtml", trip);
         }
 
+        // GET: admin/trip/delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -92,12 +150,14 @@ namespace Public_Transport.Controllers.Admin
             var trip = await _context.Trips
                 .Include(t => t.Route)
                 .Include(t => t.Vehicle)
+                .Include(t => t.Driver).ThenInclude(d => d.User)
                 .FirstOrDefaultAsync(m => m.TripId == id);
             if (trip == null) return NotFound();
 
             return View("~/Views/Admin/Trip/Delete.cshtml", trip);
         }
 
+        // POST: admin/trip/delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -109,6 +169,25 @@ namespace Public_Transport.Controllers.Admin
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // Helper để load dropdown cho gọn code
+        private void LoadViewData(Trip? trip = null)
+        {
+            // Load Route
+            ViewData["RouteId"] = new SelectList(_context.Routes, "RouteId", "RouteName", trip?.RouteId);
+
+            // Load Vehicle
+            ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "LicensePlate", trip?.VehicleId);
+
+            // Load Driver (Kỹ thuật: Chọn ra User.FullName để hiển thị)
+            var drivers = _context.Drivers.Include(d => d.User)
+                .Select(d => new {
+                    d.DriverId,
+                    DisplayName = d.User.FullName + " (" + d.LicenseNumber + ")"
+                }).ToList();
+
+            ViewData["DriverId"] = new SelectList(drivers, "DriverId", "DisplayName", trip?.DriverId);
         }
     }
 }

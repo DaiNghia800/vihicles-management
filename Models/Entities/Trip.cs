@@ -21,7 +21,7 @@ namespace Public_Transport.Models.Entities
         public string Status { get; set; } 
 
 
-        public virtual Route Route { get; set; }
+        public virtual Route? Route { get; set; }
 
         public virtual Vehicle? Vehicle { get; set; }
 

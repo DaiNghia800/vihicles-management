@@ -5,59 +5,75 @@
     ViewData["Title"] = "Trip Management";
 }
 
-<div class="card card-hover">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">Trip List</h4>
-        <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Create New Trip</a>
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary fw-bold"><i class="fa-solid fa-calendar-days me-2"></i>Trip List</h5>
+        <a asp-action="Create" class="btn btn-primary btn-sm rounded-pill px-3">
+            <i class="fa-solid fa-plus me-1"></i> New Trip
+        </a>
     </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary">
                     <tr>
-                        <th>ID</th>
-                        <th>Route</th>
-                        <th>Vehicle</th>
-                        <th>Departure</th>
-                        <th>Arrival (Est.)</th>
+                        <th class="ps-4">ID</th>
+                        <th>Route Info</th>
+                        <th>Vehicle & Driver</th>
+                        <th>Schedule</th>
                         <th>Status</th>
-                        <th class="text-end">Actions</th>
+                        <th class="text-end pe-4">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>#@item.TripId</td>
+                            <td class="ps-4 text-muted small">#@item.TripId</td>
                             <td>
-                                <strong>@item.Route.RouteName</strong>
+                                <div class="fw-bold text-dark">@item.Route.RouteName</div>
+                                <small class="text-muted">Price: @item.Route.BasePrice.ToString("N0")đ</small>
                             </td>
                             <td>
-                                <span class="badge bg-info text-dark">@item.Vehicle?.LicensePlate</span>
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="fa-solid fa-bus text-secondary me-2" style="width:15px"></i>
+                                    <span class="fw-medium">@item.Vehicle?.LicensePlate</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fa-solid fa-user-tie text-secondary me-2" style="width:15px"></i>
+                                    <span class="text-muted small">
+                                        @(item.Driver?.User?.FullName ?? "No Driver")
+                                    </span>
+                                </div>
                             </td>
-                            <td>@item.DepartureTime.ToString("dd/MM HH:mm")</td>
-                            <td>@item.ArrivalTime.ToString("dd/MM HH:mm")</td>
+                            <td>
+                                <div><span class="badge bg-light text-dark border">Dep</span> @item.DepartureTime.ToString("dd/MM HH:mm")</div>
+                                <div class="mt-1"><span class="badge bg-light text-dark border">Arr</span> @item.ArrivalTime.ToString("dd/MM HH:mm")</div>
+                            </td>
                             <td>
                                 @if (item.Status == "Scheduled")
                                 {
-                                    <span class="badge bg-warning">Scheduled</span>
+                                    <span class="badge bg-warning text-dark">Scheduled</span>
                                 }
                                 else if (item.Status == "Running")
                                 {
+
                                     <span class="badge bg-primary">Running</span>
                                 }
                                 else if (item.Status == "Completed")
                                 {
+
                                     <span class="badge bg-success">Completed</span>
                                 }
                                 else
                                 {
+
                                     <span class="badge bg-secondary">@item.Status</span>
                                 }
                             </td>
-                            <td class="text-end">
-                                <a asp-action="Edit" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-warning" title="Edit"><i class="fa-solid fa-pen"></i></a>
-                                <a asp-action="Delete" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></a>
+                            <td class="text-end pe-4">
+                                <a asp-action="Edit" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-primary me-1"><i class="fa-solid fa-pen"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
                             </td>
                         </tr>
                     }

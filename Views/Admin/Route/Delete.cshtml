@@ -1,0 +1,47 @@
+﻿@model Public_Transport.Models.Entities.Route
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Xóa Tuyến xe";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fa-solid fa-triangle-exclamation me-2"></i>Xác nhận Xóa Tuyến?</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fa-solid fa-trash-can text-danger fa-4x mb-3"></i>
+                    <h4 class="text-danger">Bạn có chắc muốn xóa tuyến này?</h4>
+                    <p class="text-muted">Hành động này không thể hoàn tác!</p>
+                </div>
+
+                <div class="alert alert-light border">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-end">Tên Tuyến:</dt>
+                        <dd class="col-sm-8 fw-bold">@Model.RouteName</dd>
+
+                        <dt class="col-sm-4 text-end">Giá vé:</dt>
+                        <dd class="col-sm-8">@Model.BasePrice.ToString("N0") đ</dd>
+
+                        <dt class="col-sm-4 text-end">Khoảng cách:</dt>
+                        <dd class="col-sm-8">@Model.TotalDistance km</dd>
+
+                        <dt class="col-sm-4 text-end">Mô tả:</dt>
+                        <dd class="col-sm-8 text-muted small">@Model.Description</dd>
+                    </dl>
+                </div>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="RouteId" />
+                    <div class="d-flex justify-content-center gap-2 mt-4">
+                        <a asp-action="Index" class="btn btn-secondary px-4">Hủy bỏ</a>
+                        <button type="submit" class="btn btn-danger px-4">Xác nhận Xóa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

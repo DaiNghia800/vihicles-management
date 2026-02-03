@@ -2,56 +2,83 @@
 
 @{
     Layout = "_LayoutAdmin";
-    ViewData["Title"] = "Update Trip";
+    ViewData["Title"] = "Edit Trip";
 }
 
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h4>Update Trip #@Model.TripId</h4>
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Edit Trip #@Model.TripId</h5>
             </div>
             <div class="card-body">
                 <form asp-action="Edit">
                     <input type="hidden" asp-for="TripId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <select asp-for="RouteId" class="form-select select2" asp-items="ViewBag.RouteId">
+                        <option value="">-- Type to search Route --</option>
+                    </select>
+                    @* <div class="mb-3">
+                        <label class="form-label fw-bold">Route</label>
+                        <select asp-for="RouteId" class="form-select" asp-items="ViewBag.RouteId"></select>
+                    </div> *@
 
-                    <div class="mb-3">
-                        <label class="form-label">Route</label>
-                        <select asp-for="RouteId" class="form-control" asp-items="ViewBag.RouteId"></select>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Vehicle</label>
+                            <select asp-for="VehicleId" class="form-select" asp-items="ViewBag.VehicleId"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Driver</label>
+                            <select asp-for="DriverId" class="form-select" asp-items="ViewBag.DriverId">
+                                <option value="">-- Unassigned --</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Vehicle</label>
-                        <select asp-for="VehicleId" class="form-control" asp-items="ViewBag.VehicleId"></select>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="DepartureTime" class="form-label">Departure Time</label>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="DepartureTime" class="form-label fw-bold">Departure</label>
                             <input asp-for="DepartureTime" class="form-control" />
+                            <span asp-validation-for="DepartureTime" class="text-danger"></span>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="ArrivalTime" class="form-label">Arrival Time</label>
+                        <div class="col-md-6">
+                            <label asp-for="ArrivalTime" class="form-label fw-bold">Arrival</label>
                             <input asp-for="ArrivalTime" class="form-control" />
+                            <span asp-validation-for="ArrivalTime" class="text-danger"></span>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Status" class="form-label">Status</label>
-                        <select asp-for="Status" class="form-control">
+                    @* <div class="mb-4">
+                        <label asp-for="Status" class="form-label fw-bold">Status</label>
+                        <select asp-for="Status" class="form-select">
                             <option value="Scheduled">Scheduled</option>
                             <option value="Running">Running</option>
                             <option value="Completed">Completed</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
-                    </div>
+                    </div> *@
 
-                    <div class="d-flex justify-content-end gap-2">
-                        <a asp-action="Index" class="btn btn-secondary">Back</a>
-                        <button type="submit" class="btn btn-warning text-white">Update</button>
+                    <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                        <a asp-action="Index" class="btn btn-light border">Back</a>
+                        <button type="submit" class="btn btn-warning px-4">Save Changes</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "Searching for routes...",
+                allowClear: true,
+                width: '100%' // Fix lỗi hiển thị co cụm
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
