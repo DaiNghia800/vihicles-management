@@ -2,51 +2,76 @@
 
 @{
     Layout = "_LayoutAdmin";
-    ViewData["Title"] = "Thêm Tuyến Mới";
+    ViewData["Title"] = "Create New Route";
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Thêm Tuyến Xe Mới</h5>
-            </div>
-            <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-lg-10">
+        <form asp-action="Create" id="createRouteForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="RouteName" class="form-label fw-bold">Tên Tuyến <span class="text-danger">*</span></label>
-                        <input asp-for="RouteName" class="form-control" placeholder="Ví dụ: Tuyến 01: Bến Thành - Chợ Lớn" />
-                        <span asp-validation-for="RouteName" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Description" class="form-label fw-bold">Mô tả</label>
-                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả lộ trình, các điểm đi qua chính..."></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
-
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">1. Route Information</h5>
+                </div>
+                <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="BasePrice" class="form-label fw-bold">Giá vé (VNĐ)</label>
-                            <input asp-for="BasePrice" class="form-control" type="number" min="0" step="1000" />
-                            <span asp-validation-for="BasePrice" class="text-danger"></span>
+                            <label asp-for="RouteName" class="form-label fw-bold">Route Name <span class="text-danger">*</span></label>
+                            <input asp-for="RouteName" class="form-control" placeholder="e.g., Route 01" />
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label asp-for="TotalDistance" class="form-label fw-bold">Tổng khoảng cách (km)</label>
-                            <input asp-for="TotalDistance" class="form-control" type="number" min="0" step="0.1" />
-                            <span asp-validation-for="TotalDistance" class="text-danger"></span>
+                            <label asp-for="Description" class="form-label fw-bold">Description</label>
+                            <input asp-for="Description" class="form-control" />
                         </div>
                     </div>
-
-                    <div class="d-flex justify-content-end gap-2 border-top pt-3">
-                        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-                        <button type="submit" class="btn btn-primary">Lưu Tuyến</button>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="BasePrice" class="form-label fw-bold">Base Price (VND)</label>
+                            <input asp-for="BasePrice" class="form-control" type="number" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TotalDistance" class="form-label fw-bold">Total Distance (km)</label>
+                            <input asp-for="TotalDistance" class="form-control" type="number" step="0.1" />
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">2. Itinerary (Stations)</h5>
+                    <button type="button" class="btn btn-sm btn-light text-dark fw-bold" onclick="addStationRow()">
+                        <i class="fa-solid fa-plus"></i> Add Station
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0" id="stationsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="40%">Station Name</th>
+                                    <th width="20%">Distance from Start (km)</th>
+                                    <th width="20%">Type</th>
+                                    <th width="15%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stationList">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 text-center text-muted" id="emptyMessage">
+                        Click "Add Station" to build the route itinerary.
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mb-5">
+                <a asp-action="Index" class="btn btn-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary px-4">Create Route</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -54,4 +79,76 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Hàm thêm dòng mới
+        function addStationRow() {
+            var index = $('#stationList tr').length;
+            var stationOptions = '@Html.Raw(string.Join("", ((SelectList)ViewBag.StationId).Select(s => $"<option value=\"{s.Value}\">{s.Text}</option>")))';
+
+            var rowHtml = `
+                <tr id="row_${index}">
+                    <td class="text-center align-middle fw-bold index-cell">${index + 1}</td>
+                    <td>
+                        <select name="RouteDetails[${index}].StationId" class="form-select select2">
+                            ${stationOptions}
+                        </select>
+                        <input type="hidden" name="RouteDetails[${index}].OrderIndex" value="${index + 1}" class="order-input" />
+                    </td>
+                    <td>
+                        <input type="number" step="0.1" name="RouteDetails[${index}].DistanceFromStart" class="form-control" placeholder="0.0" />
+                    </td>
+                    <td>
+                         <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" value="true" name="RouteDetails[${index}].IsMajorStop" id="major_${index}">
+                            <input type="hidden" name="RouteDetails[${index}].IsMajorStop" value="false" />
+                            <label class="form-check-label" for="major_${index}">Major Stop</label>
+                        </div>
+                    </td>
+                    <td class="text-center align-middle">
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeRow(${index})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            $('#stationList').append(rowHtml);
+            $('#emptyMessage').hide();
+
+            // Re-init select2 nếu dùng
+            $('.select2').select2({ width: '100%' });
+        }
+
+        // Hàm xóa dòng
+        function removeRow(index) {
+            $(`#row_${index}`).remove();
+            reIndexRows();
+        }
+
+        // Hàm đánh lại số thứ tự khi xóa
+        function reIndexRows() {
+            $('#stationList tr').each(function(i, row) {
+                // Cập nhật số thứ tự hiển thị
+                $(row).find('.index-cell').text(i + 1);
+
+                // Cập nhật index trong name="" để MVC bind đúng
+                $(row).find('select, input').each(function() {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        var newName = name.replace(/RouteDetails\[\d+\]/, `RouteDetails[${i}]`);
+                        $(this).attr('name', newName);
+                    }
+                    // Cập nhật value của OrderIndex
+                    if ($(this).hasClass('order-input')) {
+                        $(this).val(i + 1);
+                    }
+                });
+            });
+
+            if ($('#stationList tr').length === 0) {
+                $('#emptyMessage').show();
+            }
+        }
+    </script>
 }

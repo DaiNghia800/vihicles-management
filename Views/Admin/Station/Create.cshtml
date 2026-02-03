@@ -1,0 +1,61 @@
+﻿@model Public_Transport.Models.Entities.Station
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Add New Station";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Add New Station</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="StationName" class="form-label fw-bold">Station Name <span class="text-danger">*</span></label>
+                        <input asp-for="StationName" class="form-control" placeholder="e.g., Ben Thanh Station" />
+                        <span asp-validation-for="StationName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label fw-bold">Address</label>
+                        <input asp-for="Address" class="form-control" placeholder="Street name, District..." />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Latitude" class="form-label fw-bold">Latitude</label>
+                            <input asp-for="Latitude" class="form-control" type="number" step="any" placeholder="10.77..." />
+                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Longitude" class="form-label fw-bold">Longitude</label>
+                            <input asp-for="Longitude" class="form-control" type="number" step="any" placeholder="106.69..." />
+                            <span asp-validation-for="Longitude" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info py-2 small">
+                        <i class="fa-solid fa-info-circle me-1"></i> Tip: You can get coordinates from Google Maps (Right click > First option).
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                        <a asp-action="Index" class="btn btn-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Station</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -73,6 +73,8 @@ namespace Public_Transport.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Trip trip)
         {
+            trip.Status = "Scheduled";
+            ModelState.Remove("Status");
             // 1. LOGIC: Chặn tạo chuyến trong quá khứ
             if (trip.DepartureTime <= DateTime.Now)
             {
