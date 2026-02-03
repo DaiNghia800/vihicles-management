@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Public_Transport.Models.Entities;
 using Public_Transport.Services.IServices;
 using System.Security.Claims;
+using Public_Transport.Helpers;
 
 namespace Public_Transport.Controllers.Admin
 {
@@ -12,11 +13,13 @@ namespace Public_Transport.Controllers.Admin
     {
         private readonly IUserService _userService;
         private readonly ILogger<UserController> _logger;
+        private readonly IUploadService _uploadService; // Inject the upload service
 
-        public UserController(IUserService userService, ILogger<UserController> logger)
+        public UserController(IUserService userService, ILogger<UserController> logger, IUploadService uploadService)
         {
             _userService = userService;
             _logger = logger;
+            _uploadService = uploadService;
         }
 
         private string GetCurrentUserEmail() => User.FindFirst(ClaimTypes.Email)?.Value ?? "Admin";
@@ -74,84 +77,74 @@ namespace Public_Transport.Controllers.Admin
         // POST: /admin/user/create
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Users model, string password, string confirmPassword)
+        public async Task<IActionResult> Create(Users model, string password, string confirmPassword, IFormFile? AvatarFile)
         {
             try
             {
-                // ✅ FIX 1: Validate required fields
-                if (string.IsNullOrWhiteSpace(model.FullName))
-                {
-                    ModelState.AddModelError("FullName", "Full name is required");
-                }
-
-                if (string.IsNullOrWhiteSpace(model.Email))
-                {
-                    ModelState.AddModelError("Email", "Email is required");
-                }
-
-                if (string.IsNullOrWhiteSpace(model.PhoneNumber))
-                {
-                    ModelState.AddModelError("PhoneNumber", "Phone number is required");
-                }
-
-                // ✅ FIX 2: Validate RoleUid
-                if (model.RoleUid <= 0)
-                {
-                    ModelState.AddModelError("RoleUid", "Please select a valid role");
-                }
-
-                // ✅ FIX 3: Validate passwords
+                // Validation
                 if (string.IsNullOrWhiteSpace(password))
                 {
-                    ModelState.AddModelError("password", "Password is required");
-                }
-                else if (password != confirmPassword)
-                {
-                    ModelState.AddModelError("confirmPassword", "Password confirmation does not match");
+                    TempData["ErrorMessage"] = "Password is required";
+                    return View("~/Views/Admin/User/Create.cshtml", model);
                 }
 
-                // ✅ FIX 4: Validate DateOfBirth
-                if (!model.DateOfBirth.HasValue)
+                if (password != confirmPassword)
                 {
-                    ModelState.AddModelError("DateOfBirth", "Date of birth is required");
-                }
-                else if (model.DateOfBirth.Value > DateTime.Today)
-                {
-                    ModelState.AddModelError("DateOfBirth", "Date of birth cannot be in the future");
+                    TempData["ErrorMessage"] = "Password and confirm password do not match";
+                    return View("~/Views/Admin/User/Create.cshtml", model);
                 }
 
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Create user validation failed. Errors: {Errors}", 
-                        string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
-
-                    var roles = await _userService.GetActiveRolesAsync();
-                    ViewBag.Roles = roles;
+                    TempData["ErrorMessage"] = "Please fill in all required fields correctly";
                     return View("~/Views/Admin/User/Create.cshtml", model);
                 }
 
-                // ✅ Create user
-                await _userService.CreateUserAdminAsync(model, password, GetCurrentUserEmail());
-                
+                // ✅ Upload avatar nếu có
+                if (AvatarFile != null && AvatarFile.Length > 0)
+                {
+                    try
+                    {
+                        var uploadResult = await _uploadService.UploadSingleImageAsync(AvatarFile);
+                        if (uploadResult != null)
+                        {
+                            model.ImgUser = uploadResult;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error uploading avatar");
+                        TempData["ErrorMessage"] = "Error uploading avatar image";
+                        return View("~/Views/Admin/User/Create.cshtml", model);
+                    }
+                }
+                else
+                {
+                    // Sử dụng avatar mặc định
+                    model.ImgUser = WebConstants.DEFAULT_AVATAR;
+                }
+
+                // Hash password
+                model.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+                // Set metadata
+                var currentUserEmail = GetCurrentUserEmail();
+                model.CreatedBy = currentUserEmail;
+                model.UpdatedBy = currentUserEmail;
+                model.CreatedAt = DateTime.Now;
+                model.UpdatedAt = DateTime.Now;
+                model.Deleted = false;
+
+                // Create user
+                await _userService.CreateUserAsync(model);
+
                 TempData["SuccessMessage"] = "User created successfully!";
-                _logger.LogInformation("User created successfully: {Email} by {Creator}", model.Email, GetCurrentUserEmail());
-                
                 return RedirectToAction("Index");
-            }
-            catch (InvalidOperationException ex)
-            {
-                _logger.LogWarning(ex, "Business logic error while creating user");
-                ModelState.AddModelError("", ex.Message);
-                var roles = await _userService.GetActiveRolesAsync();
-                ViewBag.Roles = roles;
-                return View("~/Views/Admin/User/Create.cshtml", model);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected error creating user");
-                ModelState.AddModelError("", "An unexpected error occurred while creating the user. Please try again.");
-                var roles = await _userService.GetActiveRolesAsync();
-                ViewBag.Roles = roles;
+                _logger.LogError(ex, "Error creating user");
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
                 return View("~/Views/Admin/User/Create.cshtml", model);
             }
         }
@@ -185,7 +178,7 @@ namespace Public_Transport.Controllers.Admin
         // POST: /admin/user/edit/{id}
         [HttpPost("edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Users model, string? newPassword, string? confirmPassword)
+        public async Task<IActionResult> Edit(int id, Users model, string? newPassword, string? confirmPassword, IFormFile? AvatarFile)
         {
             if (id != model.Uid)
             {
@@ -209,6 +202,27 @@ namespace Public_Transport.Controllers.Admin
 
             try
             {
+                // ✅ Upload avatar nếu có file mới
+                if (AvatarFile != null && AvatarFile.Length > 0)
+                {
+                    try
+                    {
+                        var uploadResult = await _uploadService.UploadSingleImageAsync(AvatarFile);
+                        if (uploadResult != null)
+                        {
+                            model.ImgUser = uploadResult;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error uploading avatar");
+                        TempData["ErrorMessage"] = "Error uploading avatar image";
+                        var roles = await _userService.GetActiveRolesAsync();
+                        ViewBag.Roles = roles;
+                        return View("~/Views/Admin/User/Edit.cshtml", model);
+                    }
+                }
+
                 await _userService.UpdateUserAdminAsync(id, model, newPassword, GetCurrentUserEmail());
                 TempData["SuccessMessage"] = "User information updated successfully!";
                 return RedirectToAction("Index");

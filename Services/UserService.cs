@@ -926,6 +926,11 @@ namespace Public_Transport.Services
             return passwordRegex.IsMatch(password);
         }
 
+        public Task CreateUserAsync(Users model)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

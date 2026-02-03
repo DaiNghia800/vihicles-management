@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Public_Transport.Models.Entities;
 using Public_Transport.Services.IServices;
+using Public_Transport.Helpers;
 
 namespace Public_Transport.Controllers.Admin
 {
@@ -66,32 +67,32 @@ namespace Public_Transport.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Driver model)
         {
-            if (!ModelState.IsValid)
-            {
-                var users = await _driverService.GetAvailableUsersForDriverAsync();
-                ViewBag.Users = users;
-                return View("~/Views/Admin/Driver/Create.cshtml", model);
-            }
-
             try
             {
-                await _driverService.CreateDriverAsync(model);
-                TempData["SuccessMessage"] = "Driver added successfully!";
+                if (!ModelState.IsValid)
+                {
+                    TempData["ErrorMessage"] = "Please fill in all required fields correctly";
+                    ViewBag.Users = await _driverService.GetAvailableUsersForDriverAsync();
+                    return View("~/Views/Admin/Driver/Create.cshtml", model);
+                }
+
+                // ✅ Không cần upload ảnh nữa vì sẽ lấy từ User
+                var createdDriver = await _driverService.CreateDriverAsync(model);
+
+                TempData["SuccessMessage"] = "Driver created successfully!";
                 return RedirectToAction("Index");
             }
             catch (InvalidOperationException ex)
             {
-                ModelState.AddModelError("", ex.Message);
-                var users = await _driverService.GetAvailableUsersForDriverAsync();
-                ViewBag.Users = users;
+                TempData["ErrorMessage"] = ex.Message;
+                ViewBag.Users = await _driverService.GetAvailableUsersForDriverAsync();
                 return View("~/Views/Admin/Driver/Create.cshtml", model);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating driver");
-                ModelState.AddModelError("", "An error occurred while creating the driver");
-                var users = await _driverService.GetAvailableUsersForDriverAsync();
-                ViewBag.Users = users;
+                TempData["ErrorMessage"] = "An error occurred while creating the driver";
+                ViewBag.Users = await _driverService.GetAvailableUsersForDriverAsync();
                 return View("~/Views/Admin/Driver/Create.cshtml", model);
             }
         }
@@ -136,6 +137,7 @@ namespace Public_Transport.Controllers.Admin
 
             try
             {
+                // ✅ Không cần xử lý upload ảnh nữa
                 await _driverService.UpdateDriverAsync(id, model);
                 TempData["SuccessMessage"] = "Driver information updated successfully!";
                 return RedirectToAction("Index");
@@ -172,7 +174,7 @@ namespace Public_Transport.Controllers.Admin
                 }
                 else
                 {
-                    TempData["SuccessMessage"] = "Xóa tài xế thành công!";
+                    TempData["SuccessMessage"] = "Driver deleted successfully!";
                 }
             }
             catch (InvalidOperationException ex)
@@ -182,7 +184,7 @@ namespace Public_Transport.Controllers.Admin
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting driver with ID: {DriverId}", id);
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa tài xế";
+                TempData["ErrorMessage"] = "An error occurred while deleting the driver";
             }
 
             return RedirectToAction("Index");
@@ -208,7 +210,7 @@ namespace Public_Transport.Controllers.Admin
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading license management page");
-                TempData["ErrorMessage"] = "Có lỗi xảy ra khi tải trang quản lý giấy phép";
+                TempData["ErrorMessage"] = "An error occurred while loading the license management page";
                 return RedirectToAction("Index");
             }
         }

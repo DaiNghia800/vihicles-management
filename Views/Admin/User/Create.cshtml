@@ -1,576 +1,192 @@
-﻿@model Public_Transport.Models.Entities.Users
+﻿
+@model Public_Transport.Models.Entities.Users
 @{
     Layout = "_LayoutAdmin";
-    ViewData["title"] = "Add New User";
-    var roles = ViewBag.Roles as IEnumerable<Public_Transport.Models.Entities.Roles>;
-}   
+    ViewData["title"] = "Create New User";
+}
 
-<style>
-    /* Keep existing styles */
-    .user-form-container {
-        padding: 1.25rem;
-        max-width: 60rem;
-        margin: 0 auto;
-    }
+<section class="user-area">
+    <div class="card">
+        <div class="card-header2">
+            <h5>Create New User</h5>
+        </div>
 
-    .form-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.875rem;
-    }
-
-    .form-title {
-        font-size: 1.75rem;
-        font-weight: 600;
-        color: #333;
-        margin: 0;
-    }
-
-    .back-btn {
-        padding: 0.625rem 1.25rem;
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        border-radius: 0.5rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s;
-    }
-
-        .back-btn:hover {
-            background-color: #5a6268;
-            color: white;
-        }
-
-    .form-card {
-        background: white;
-        border-radius: 0.75rem;
-        padding: 1.875rem;
-        box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.08);
-    }
-
-    .form-section {
-        margin-bottom: 2rem;
-    }
-
-    .section-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.625rem;
-        border-bottom: 0.125rem solid #14a38b;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
-        margin-bottom: 1.25rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.25rem;
-    }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: #333;
-        font-size: 0.875rem;
-    }
-
-    .required {
-        color: #dc3545;
-    }
-
-    .form-input,
-    .form-select,
-    .form-textarea {
-        width: 100%;
-        padding: 0.75rem 0.9375rem;
-        border: 0.0625rem solid #ddd;
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        transition: all 0.3s;
-    }
-
-        .form-input:focus,
-        .form-select:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: #14a38b;
-            box-shadow: 0 0 0 0.1875rem rgba(20, 163, 139, 0.1);
-        }
-
-    .form-textarea {
-        min-height: 6rem;
-        resize: vertical;
-    }
-
-    .password-strength {
-        margin-top: 0.5rem;
-        font-size: 0.8125rem;
-    }
-
-        .password-strength .strength-bar {
-            height: 0.25rem;
-            border-radius: 0.125rem;
-            background-color: #ddd;
-            margin-top: 0.25rem;
-            overflow: hidden;
-        }
-
-            .password-strength .strength-bar .strength-fill {
-                height: 100%;
-                transition: all 0.3s;
-            }
-
-        .password-strength.weak .strength-fill {
-            width: 33%;
-            background-color: #dc3545;
-        }
-
-        .password-strength.medium .strength-fill {
-            width: 66%;
-            background-color: #ffc107;
-        }
-
-        .password-strength.strong .strength-fill {
-            width: 100%;
-            background-color: #28a745;
-        }
-
-    .form-actions {
-        display: flex;
-        gap: 0.9375rem;
-        justify-content: flex-end;
-        padding-top: 1.25rem;
-        border-top: 0.0625rem solid #dee2e6;
-    }
-
-    .btn {
-        padding: 0.75rem 1.875rem;
-        border: none;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-
-    .btn-primary {
-        background-color: #14a38b;
-        color: white;
-    }
-
-        .btn-primary:hover {
-            background-color: #0f8570;
-        }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-    }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-    .text-danger {
-        color: #dc3545;
-        font-size: 0.8125rem;
-        margin-top: 0.3125rem;
-        display: block;
-    }
-
-    .password-requirements {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
-        .password-requirements h6 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .password-requirements ul {
-            margin: 0;
-            padding-left: 1.25rem;
-            font-size: 0.8125rem;
-            color: #666;
-        }
-
-            .password-requirements ul li {
-                margin-bottom: 0.25rem;
-            }
-
-    /* ✅ THÊM: Style cho validation errors */
-    .validation-summary-errors {
-        background-color: #f8d7da;
-        border: 1px solid #f5c6cb;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-        .validation-summary-errors ul {
-            margin: 0;
-            padding-left: 1.25rem;
-            color: #721c24;
-        }
-
-    .input-validation-error {
-        border-color: #dc3545 !important;
-    }
-</style>
-
-<div class="user-form-container">
-    <div class="form-header">
-        <h1 class="form-title">Add New User</h1>
-        <a href="/admin/user" class="back-btn">
-            ← Back to List
-        </a>
-    </div>
-
-    <div class="form-card">
-        @* ✅ Hiển thị validation summary *@
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div asp-validation-summary="All" class="validation-summary-errors"></div>
-        }
-
-        <form asp-action="Create" method="post" id="createUserForm">
+        <form asp-action="Create" method="post" enctype="multipart/form-data" class="theme-form">
             @Html.AntiForgeryToken()
 
-            <!-- Personal Information -->
-            <div class="form-section">
-                <h3 class="section-title">Personal Information</h3>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="FullName" class="form-label">
-                            Full Name <span class="required">*</span>
-                        </label>
-                        <input asp-for="FullName"
-                               id="FullName"
-                               class="form-input"
-                               placeholder="Enter full name..."
-                               required />
-                        <span asp-validation-for="FullName" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Email" class="form-label">
-                            Email <span class="required">*</span>
-                        </label>
-                        <input asp-for="Email"
-                               id="Email"
-                               type="email"
-                               class="form-input"
-                               placeholder="Enter email..."
-                               required />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="phoneNumberInput" class="form-label">
-                            Phone Number <span class="required">*</span>
-                        </label>
-                        <input asp-for="PhoneNumber"
-                               class="form-input"
-                               id="phoneNumberInput"
-                               placeholder="0901234567"
-                               maxlength="10"
-                               required />
-                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="dateOfBirth" class="form-label">
-                            Date of Birth <span class="required">*</span>
-                        </label>
-                        <input asp-for="DateOfBirth"
-                               type="date"
-                               class="form-input"
-                               id="dateOfBirth"
-                               max="@DateTime.Today.ToString("yyyy-MM-dd")"
-                               required />
-                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                        <small class="text-muted d-block mt-1" id="ageDisplay"></small>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="RoleUid" class="form-label">
-                            Role <span class="required">*</span>
-                        </label>
-                        <select asp-for="RoleUid"
-                                class="form-select js-example-basic-single"
-                                id="RoleUid"
-                                name="RoleUid"
-                                required>
-                            <option value="">-- Select Role --</option>
-                            @if (roles != null)
-                            {
-                                @foreach (var role in roles)
-                                {
-                                    <option value="@role.Uid">@role.RoleName</option>
-                                }
-                            }
-                        </select>
-                        <span asp-validation-for="RoleUid" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Address" class="form-label">
-                            Address
-                        </label>
-                        <input asp-for="Address"
-                               id="Address"
-                               class="form-input"
-                               placeholder="Enter address..." />
-                        <span asp-validation-for="Address" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Account Security -->
-            <div class="form-section">
-                <h3 class="section-title">Account Security</h3>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="password" class="form-label">
-                            Password <span class="required">*</span>
-                        </label>
-                        <input type="password"
-                               id="password"
-                               name="password"
-                               class="form-input"
-                               placeholder="Enter password..."
-                               required
-                               onkeyup="checkPasswordStrength()" />
-                        <span class="text-danger" id="passwordError"></span>
-
-                        <div id="passwordStrength" class="password-strength" style="display:none;">
-                            <div class="strength-bar">
-                                <div class="strength-fill"></div>
+            <div class="row">
+                <!-- ✅ THÊM: Upload Avatar Section -->
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6 class="mb-3">User Avatar</h6>
+                            <div class="avatar-upload-container mb-3">
+                                <img id="avatarPreview"
+                                     src="https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png"
+                                     alt="Avatar Preview"
+                                     class="rounded-circle"
+                                     style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #f0f0f0;">
                             </div>
-                            <span class="strength-text"></span>
+                            <div class="form-group">
+                                <label for="avatarUpload" class="btn btn-primary btn-sm">
+                                    <i class="fa fa-upload me-2"></i>Choose Avatar
+                                </label>
+                                <input type="file"
+                                       id="avatarUpload"
+                                       name="AvatarFile"
+                                       accept="image/*"
+                                       class="d-none">
+                                <small class="form-text text-muted d-block mt-2">
+                                    Max file size: 5MB. Accepted formats: JPG, PNG, GIF
+                                </small>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="confirmPassword" class="form-label">
-                            Confirm Password <span class="required">*</span>
-                        </label>
-                        <input type="password"
-                               id="confirmPassword"
-                               name="confirmPassword"
-                               class="form-input"
-                               placeholder="Confirm password..."
-                               required
-                               onkeyup="validatePasswordMatch()" />
-                        <span class="text-danger" id="confirmPasswordError"></span>
-                    </div>
                 </div>
 
-                <div class="password-requirements">
-                    <h6>Password Requirements:</h6>
-                    <ul>
-                        <li>At least 6 characters long</li>
-                        <li>Contains at least one uppercase letter (A-Z)</li>
-                        <li>Contains at least one lowercase letter (a-z)</li>
-                        <li>Contains at least one number (0-9)</li>
-                        <li>Contains at least one special character (!@@#$%^&*)</li>
-                    </ul>
+                <!-- Full Name -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="FullName" class="form-control" placeholder="Full Name" />
+                        <label asp-for="FullName" class="form-label-title">Full Name <span class="text-danger">*</span></label>
+                    </div>
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="Email" class="form-control" placeholder="Email" type="email" />
+                        <label asp-for="Email" class="form-label-title">Email <span class="text-danger">*</span></label>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" />
+                        <label asp-for="PhoneNumber" class="form-label-title">Phone Number <span class="text-danger">*</span></label>
+                    </div>
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="DateOfBirth" class="form-control" type="date" />
+                        <label asp-for="DateOfBirth" class="form-label-title">Date of Birth <span class="text-danger">*</span></label>
+                    </div>
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                </div>
+
+                <!-- Address -->
+                <div class="col-12 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="Address" class="form-control" placeholder="Address" />
+                        <label asp-for="Address" class="form-label-title">Address</label>
+                    </div>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <!-- ✅ FIX: Role - Đổi từ ViewBag.RoleList thành ViewBag.Roles -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label-title">Role <span class="text-danger">*</span></label>
+                    <select asp-for="RoleUid" class="form-control js-example-basic-single">
+                        <option value="">-- Select Role --</option>
+                        @if (ViewBag.Roles != null)
+                        {
+                            @foreach (var role in ViewBag.Roles)
+                            {
+                                <option value="@role.Uid">@role.RoleName</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="RoleUid" class="text-danger"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="password" name="Password" class="form-control" placeholder="Password" />
+                        <label class="form-label-title">Password <span class="text-danger">*</span></label>
+                    </div>
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="password" name="ConfirmPassword" class="form-control" placeholder="Confirm Password" />
+                        <label class="form-label-title">Confirm Password <span class="text-danger">*</span></label>
+                    </div>
+                    <span class="text-danger"></span>
                 </div>
             </div>
 
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <a href="/admin/user" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary" id="submitBtn">Create User</button>
+            <div class="text-end mt-4">
+                <a asp-action="Index" class="btn btn-secondary me-2">
+                    <i class="fa fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-save me-2"></i>Create User
+                </button>
             </div>
         </form>
     </div>
-</div>
+</section>
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validation.unobtrusive.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
 
     <script>
+        // ✅ Avatar Upload Preview
         $(document).ready(function() {
-            // ✅ Khởi tạo Select2 TRƯỚC
-            $('.js-example-basic-single').select2({
-                width: '100%',
-                placeholder: '-- Select Role --',
-                allowClear: false
+            $('#avatarUpload').on('change', function(e) {
+                const file = e.target.files[0];
+
+                if (file) {
+                    // Validate file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Too Large',
+                            text: 'Avatar file must be less than 5MB'
+                        });
+                        $(this).val('');
+                        return;
+                    }
+
+                    // Validate file type
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    if (!allowedTypes.includes(file.type)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid File Type',
+                            text: 'Only JPG, PNG, and GIF images are allowed'
+                        });
+                        $(this).val('');
+                        return;
+                    }
+
+                    // Preview image
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#avatarPreview').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
-
-            // ✅ Đảm bảo Select2 trigger change event cho validation
-            $('#RoleUid').on('select2:select', function (e) {
-                $(this).valid(); // Trigger validation
-            });
-        });
-
-        // Validate password match
-        function validatePasswordMatch() {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorSpan = document.getElementById('confirmPasswordError');
-            const confirmInput = document.getElementById('confirmPassword');
-
-            if (confirmPassword && password !== confirmPassword) {
-                errorSpan.textContent = 'Password confirmation does not match';
-                confirmInput.classList.add('input-validation-error');
-            } else {
-                errorSpan.textContent = '';
-                confirmInput.classList.remove('input-validation-error');
-            }
-        }
-
-        // Calculate age display
-        function calculateAge() {
-            const dobInput = document.getElementById('dateOfBirth');
-            const ageDisplay = document.getElementById('ageDisplay');
-
-            if (!dobInput || !dobInput.value) {
-                if (ageDisplay) ageDisplay.textContent = '';
-                return;
-            }
-
-            const dob = new Date(dobInput.value);
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const monthDiff = today.getMonth() - dob.getMonth();
-
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-                age--;
-            }
-
-            ageDisplay.textContent = 'Age: ' + age + ' years old';
-            ageDisplay.classList.remove('text-danger', 'text-warning');
-            ageDisplay.classList.add('text-muted');
-        }
-
-        function checkPasswordStrength() {
-            const password = document.getElementById('password').value;
-            const strengthDiv = document.getElementById('passwordStrength');
-            const strengthText = strengthDiv.querySelector('.strength-text');
-
-            if (password.length === 0) {
-                strengthDiv.style.display = 'none';
-                return;
-            }
-
-            strengthDiv.style.display = 'block';
-
-            let strength = 0;
-            if (password.length >= 6) strength++;
-            if (/[a-z]/.test(password)) strength++;
-            if (/[A-Z]/.test(password)) strength++;
-            if (/[0-9]/.test(password)) strength++;
-            if (/[\W_]/.test(password)) strength++;
-
-            strengthDiv.className = 'password-strength';
-
-            if (strength <= 2) {
-                strengthDiv.classList.add('weak');
-                strengthText.textContent = 'Weak password';
-                strengthText.style.color = '#dc3545';
-            } else if (strength <= 4) {
-                strengthDiv.classList.add('medium');
-                strengthText.textContent = 'Medium password';
-                strengthText.style.color = '#ffc107';
-            } else {
-                strengthDiv.classList.add('strong');
-                strengthText.textContent = 'Strong password';
-                strengthText.style.color = '#28a745';
-            }
-        }
-
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            const dobInput = document.getElementById('dateOfBirth');
-            const phoneInput = document.getElementById('phoneNumberInput');
-            const createForm = document.getElementById('createUserForm');
-
-            if (dobInput) {
-                dobInput.addEventListener('change', calculateAge);
-            }
 
             // Phone number validation
-            if (phoneInput) {
-                phoneInput.addEventListener('input', function(e) {
-                    this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
-                });
-            }
-
-            // ✅ Form validation before submit
-            if (createForm) {
-                createForm.addEventListener('submit', function(e) {
-                    const password = document.getElementById('password').value;
-                    const confirmPassword = document.getElementById('confirmPassword').value;
-                    const dateOfBirth = document.getElementById('dateOfBirth').value;
-                    const roleUid = $('#RoleUid').val(); // ✅ Lấy giá trị từ Select2
-
-                    let hasError = false;
-
-                    // ✅ Validate role selection
-                    if (!roleUid || roleUid === '') {
-                        e.preventDefault();
-                        $('#RoleUid').next('.text-danger').text('Please select a role');
-                        $('#RoleUid').addClass('input-validation-error');
-                        hasError = true;
-                    }
-
-                    // Validate password match
-                    if (password !== confirmPassword) {
-                        e.preventDefault();
-                        document.getElementById('confirmPasswordError').textContent = 'Password confirmation does not match';
-                        document.getElementById('confirmPassword').classList.add('input-validation-error');
-                        hasError = true;
-                    }
-
-                    // Validate date of birth
-                    if (!dateOfBirth) {
-                        e.preventDefault();
-                        alert('Please select date of birth');
-                        hasError = true;
-                    }
-
-                    // Validate password strength
-                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
-                    if (!passwordRegex.test(password)) {
-                        e.preventDefault();
-                        document.getElementById('passwordError').textContent =
-                            'Password must contain at least 6 characters, including uppercase, lowercase, number and special character';
-                        document.getElementById('password').classList.add('input-validation-error');
-                        hasError = true;
-                    }
-
-                    if (hasError) {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                });
-            }
+            $('input[name="PhoneNumber"]').on('input', function() {
+                let value = $(this).val();
+                value = value.replace(/[^0-9]/g, '');
+                if (value.length > 10) {
+                    value = value.substring(0, 10);
+                }
+                $(this).val(value);
+            });
         });
     </script>
 }

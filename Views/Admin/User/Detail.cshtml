@@ -1,4 +1,5 @@
-﻿@model Public_Transport.Models.Entities.Users
+﻿
+@model Public_Transport.Models.Entities.Users
 @{
     Layout = "_LayoutAdmin";
     ViewData["title"] = "User Details";
@@ -51,6 +52,7 @@
 
         .btn-secondary:hover {
             background-color: #5a6268;
+            color: white;
         }
 
     .btn-primary {
@@ -60,6 +62,7 @@
 
         .btn-primary:hover {
             background-color: #0f8570;
+            color: white;
         }
 
     .detail-card {
@@ -83,6 +86,7 @@
             border: 4px solid white;
             margin-bottom: 1rem;
             object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .user-header .user-name {
@@ -122,6 +126,10 @@
     .info-item {
         display: flex;
         flex-direction: column;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        border-left: 3px solid #14a38b;
     }
 
         .info-item .label {
@@ -146,18 +154,21 @@
     }
 
     .role-admin {
-        background-color: #d4edda;
-        color: #155724;
+        background-color: #d1f2eb;
+        color: #0f8570;
+        border: 1px solid #14a38b;
     }
 
     .role-staff {
         background-color: #cfe2ff;
         color: #084298;
+        border: 1px solid #0d6efd;
     }
 
     .role-customer {
         background-color: #fff3cd;
         color: #856404;
+        border: 1px solid #ffc107;
     }
 
     .status-badge {
@@ -169,22 +180,31 @@
     }
 
     .status-active {
-        background-color: #d4edda;
-        color: #155724;
+        background-color: #d1f2eb;
+        color: #0f8570;
+        border: 1px solid #14a38b;
     }
 
     .status-inactive {
         background-color: #f8d7da;
         color: #721c24;
+        border: 1px solid #dc3545;
+    }
+
+    .info-icon {
+        color: #14a38b;
+        margin-right: 0.5rem;
     }
 </style>
 
 <div class="user-detail-container">
     <div class="header-section">
-        <h1 class="page-title">User Details</h1>
+        <h1 class="page-title">
+            <i class="fa-solid fa-user-circle info-icon"></i>User Details
+        </h1>
         <div class="header-actions">
             <a href="/admin/user" class="btn btn-secondary">
-                ← Back to List
+                <i class="fa-solid fa-arrow-left"></i> Back to List
             </a>
             <a href="/admin/user/edit/@Model.Uid" class="btn btn-primary">
                 <i class="fa-solid fa-edit"></i> Edit User
@@ -195,33 +215,51 @@
     <div class="detail-card">
         <!-- User Header -->
         <div class="user-header">
-            <img src="@(string.IsNullOrEmpty(Model.ImgUser) ? "/images/default-avatar.png" : Model.ImgUser)" 
-                 alt="@Model.FullName" 
+            <img src="@(string.IsNullOrEmpty(Model.ImgUser) ? "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png" : Model.ImgUser)"
+                 alt="@Model.FullName"
                  class="user-avatar" />
             <div class="user-name">@Model.FullName</div>
-            <div class="user-email">@Model.Email</div>
+            <div class="user-email">
+                <i class="fa-solid fa-envelope me-2"></i>@Model.Email
+            </div>
         </div>
 
         <!-- User Body -->
         <div class="user-body">
             <!-- Personal Information -->
             <div class="info-section">
-                <h3 class="section-title">Personal Information</h3>
+                <h3 class="section-title">
+                    <i class="fa-solid fa-address-card info-icon"></i>Personal Information
+                </h3>
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="label">Full Name</span>
+                        <span class="label">
+                            <i class="fa-solid fa-user info-icon"></i>Full Name
+                        </span>
                         <span class="value">@Model.FullName</span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Email</span>
+                        <span class="label">
+                            <i class="fa-solid fa-envelope info-icon"></i>Email
+                        </span>
                         <span class="value">@Model.Email</span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Phone Number</span>
+                        <span class="label">
+                            <i class="fa-solid fa-phone info-icon"></i>Phone Number
+                        </span>
                         <span class="value">@Model.PhoneNumber</span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Address</span>
+                        <span class="label">
+                            <i class="fa-solid fa-calendar info-icon"></i>Date of Birth
+                        </span>
+                        <span class="value">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                    </div>
+                    <div class="info-item" style="grid-column: 1 / -1;">
+                        <span class="label">
+                            <i class="fa-solid fa-location-dot info-icon"></i>Address
+                        </span>
                         <span class="value">@(string.IsNullOrEmpty(Model.Address) ? "N/A" : Model.Address)</span>
                     </div>
                 </div>
@@ -229,10 +267,14 @@
 
             <!-- Account Information -->
             <div class="info-section">
-                <h3 class="section-title">Account Information</h3>
+                <h3 class="section-title">
+                    <i class="fa-solid fa-id-badge info-icon"></i>Account Information
+                </h3>
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="label">Role</span>
+                        <span class="label">
+                            <i class="fa-solid fa-user-tag info-icon"></i>Role
+                        </span>
                         <span class="value">
                             <span class="role-badge role-@(Model.Role?.RoleName?.ToLower() ?? "default")">
                                 @(Model.Role?.RoleName ?? "N/A")
@@ -240,27 +282,38 @@
                         </span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Status</span>
+                        <span class="label">
+                            <i class="fa-solid fa-circle-check info-icon"></i>Status
+                        </span>
                         <span class="value">
                             <span class="status-badge status-@(Model.Deleted ? "inactive" : "active")">
+                                <i class="fa-solid fa-circle me-1"></i>
                                 @(Model.Deleted ? "Inactive" : "Active")
                             </span>
                         </span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Created Date</span>
+                        <span class="label">
+                            <i class="fa-solid fa-clock info-icon"></i>Created Date
+                        </span>
                         <span class="value">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Last Updated</span>
+                        <span class="label">
+                            <i class="fa-solid fa-clock info-icon"></i>Last Updated
+                        </span>
                         <span class="value">@Model.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Created By</span>
+                        <span class="label">
+                            <i class="fa-solid fa-user-plus info-icon"></i>Created By
+                        </span>
                         <span class="value">@(Model.CreatedBy ?? "N/A")</span>
                     </div>
                     <div class="info-item">
-                        <span class="label">Updated By</span>
+                        <span class="label">
+                            <i class="fa-solid fa-user-pen info-icon"></i>Updated By
+                        </span>
                         <span class="value">@(Model.UpdatedBy ?? "N/A")</span>
                     </div>
                 </div>

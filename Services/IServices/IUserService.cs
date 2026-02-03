@@ -40,6 +40,7 @@ namespace Public_Transport.Services.IServices
         // Validation methods
         Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null);
         bool ValidatePassword(string password);
+        Task CreateUserAsync(Users model);
     }
 }
 

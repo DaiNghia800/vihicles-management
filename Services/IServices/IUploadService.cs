@@ -3,5 +3,6 @@
     public interface IUploadService
     {
         Task<string> UploadImageAsync(IFormFile file);
+        Task<string> UploadSingleImageAsync(IFormFile profileImageFile);
     }
 }

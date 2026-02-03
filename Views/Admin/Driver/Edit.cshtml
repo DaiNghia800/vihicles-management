@@ -81,6 +81,25 @@
             color: #333;
         }
 
+    /* ✅ CSS cho Profile Display */
+    .profile-display-section {
+        text-align: center;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-image-display {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #14a38b;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+
     .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -173,6 +192,20 @@
     </div>
 
     <div class="form-card">
+        <!-- ✅ Driver Profile Image (From User) -->
+        <div class="profile-display-section">
+            <img src="@Model.ProfileImage" 
+                 alt="@Model.User?.FullName" 
+                 class="profile-image-display" />
+            <p class="text-muted small mb-0">
+                <i class="fa fa-info-circle me-1"></i>
+                Profile image is linked to user account: <strong>@Model.User?.FullName</strong>
+            </p>
+            <p class="text-muted small">
+                To update this image, please edit the user's profile in User Management
+            </p>
+        </div>
+
         <!-- Driver User Information (Read-only) -->
         <div class="info-display">
             <div class="info-label">Driver Name</div>
@@ -205,11 +238,11 @@
                         </label>
                         <select asp-for="LicenseType" class="form-select">
                             <option value="">-- Select Type --</option>
-                            <option value="B1">B1 - Xe mô tô 2 bánh</option>
-                            <option value="B2">B2 - Xe ô tô dưới 9 chỗ</option>
-                            <option value="C">C - Xe tải</option>
-                            <option value="D">D - Xe khách</option>
-                            <option value="E">E - Xe container</option>
+                            <option value="B1">B1 - Motorcycle</option>
+                            <option value="B2">B2 - Car under 9 seats</option>
+                            <option value="C">C - Truck</option>
+                            <option value="D">D - Bus</option>
+                            <option value="E">E - Container</option>
                         </select>
                         <span asp-validation-for="LicenseType" class="text-danger"></span>
                     </div>
@@ -257,4 +290,22 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Validate license expiry date
+            $('input[name="LicenseExpiry"]').on('change', function() {
+                const expiryDate = new Date($(this).val());
+                const today = new Date();
+                
+                if (expiryDate <= today) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid License Expiry',
+                        text: 'License expiry date must be in the future'
+                    });
+                }
+            });
+        });
+    </script>
 }

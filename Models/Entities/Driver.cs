@@ -43,5 +43,9 @@ namespace Public_Transport.Models.Entities
 
         // Navigation property for trips
         public virtual ICollection<Trip>? Trips { get; set; }
+
+        // ✅ Computed property để lấy ảnh từ User
+        [NotMapped]
+        public string ProfileImage => User?.ImgUser ?? "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png";
     }
 }
