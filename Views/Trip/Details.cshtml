@@ -130,12 +130,14 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // --- STEP 1: Fetch Data ---
         var routeData = @Html.Raw(Json.Serialize(Model.Route.RouteDetails.Select(x => new {
             name = x.Station.StationName,
             address = x.Station.Address,
             lat = x.Station.Latitude,
             lng = x.Station.Longitude,
-            order = x.OrderIndex
+            order = x.OrderIndex,
+            isMajor = x.IsMajorStop 
         })));
 
         if (!routeData || routeData.length === 0) {
@@ -143,86 +145,127 @@
             return;
         }
 
-        var startPoint = routeData[0]; 
-        var endPoint = routeData[routeData.length - 1];
-
+        // --- STEP 2: Init Map ---
         if (typeof L === 'undefined') {
             console.error("Leaflet library not loaded!");
             return;
         }
 
+        // Set initial view to the first station
+        var startPoint = routeData[0];
         var map = L.map('map').setView([startPoint.lat, startPoint.lng], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
+        // --- STEP 3: Draw Markers (Major vs Minor) & Bus Route ---
         var waypoints = [];
         
         routeData.forEach(function (station) {
             var latLng = L.latLng(station.lat, station.lng);
             waypoints.push(latLng);
 
-            L.marker(latLng).addTo(map)
-                .bindPopup(`<b>Station ${station.order}:</b><br>${station.name}<br><i>${station.address}</i>`);
+            // LOGIC: Differentiate Major vs Minor Stops
+            if (station.isMajor === true) {
+                // MAJOR STOP: Standard Blue Pin
+                L.marker(latLng).addTo(map)
+                    .bindPopup(`<b style="color:#d35400">★ MAJOR STOP</b><br><b>${station.name}</b><br><i>${station.address}</i>`);
+            } else {
+                // MINOR STOP: Small White Dot
+                L.circleMarker(latLng, {
+                    radius: 6,
+                    fillColor: "#ffffff",
+                    color: "#333",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 1
+                }).addTo(map)
+                .bindPopup(`<b>Station #${station.order}:</b><br>${station.name}`);
+            }
         });
 
-        let globalBusDistance = 0; 
-
+        // Draw the Bus Route (Yellow Line)
         if (typeof L.Routing !== 'undefined') {
-            var busControl = L.Routing.control({
+            L.Routing.control({
                 waypoints: waypoints,
                 lineOptions: {
-                    styles: [{ color: '#FFBA00', weight: 6, opacity: 0.8 }]
+                    styles: [{ color: '#FFBA00', weight: 6, opacity: 0.8 }] // Yellow for Bus
                 },
-                createMarker: function () { return null; },
+                createMarker: function () { return null; }, // Hide default routing markers
                 addWaypoints: false,
                 draggableWaypoints: false,
                 show: false,
                 fitSelectedRoutes: true
             }).addTo(map);
-
-            busControl.on('routesfound', function (e) {
-                globalBusDistance = e.routes[0].summary.totalDistance;
-            });
         }
 
+        // --- STEP 4: Smart Navigation Logic ---
         let isNavigating = false;
         let routingToStation = null;
+        let userMarker = null;
         const buttonStart = document.querySelector("[button-start]");
         const btnToggle = document.getElementById("btn-toggle-directions");
 
         if (buttonStart) {
             buttonStart.addEventListener("click", function () {
                 if (!isNavigating) {
-                    alert("Locating your position...");
+                    // Start Navigation
+                    alert("Locating you and finding the nearest station...");
 
                     map.locate({ setView: true, watch: true, enableHighAccuracy: true });
 
                     map.once('locationfound', function (e) {
                         const userLocation = e.latlng;
-                        const startStationLatLng = L.latLng(startPoint.lat, startPoint.lng);
 
-                        if (routingToStation) map.removeControl(routingToStation);
+                        // Algorithm: Find Nearest Station
+                        let nearestStation = null;
+                        let minDistance = Infinity;
 
-                        routingToStation = L.Routing.control({
-                            waypoints: [userLocation, startStationLatLng],
-                            lineOptions: {
-                                styles: [{ color: '#3b82f6', weight: 5, opacity: 0.8, dashArray: '10, 10' }]
-                            },
-                            router: L.Routing.osrmv1({ profile: 'foot' }),
-                            createMarker: function () { return null; },
-                            addWaypoints: false,
-                            show: true
-                        }).addTo(map);
+                        routeData.forEach(function (station) {
+                            var stationLatLng = L.latLng(station.lat, station.lng);
+                            var dist = userLocation.distanceTo(stationLatLng); // Leaflet built-in method (meters)
+                            
+                            if (dist < minDistance) {
+                                minDistance = dist;
+                                nearestStation = station;
+                            }
+                        });
 
+                        if (nearestStation) {
+                            const destLatLng = L.latLng(nearestStation.lat, nearestStation.lng);
+
+                            if (routingToStation) map.removeControl(routingToStation);
+
+                            // Draw Walking Route (Blue Dashed Line)
+                            routingToStation = L.Routing.control({
+                                waypoints: [userLocation, destLatLng],
+                                lineOptions: {
+                                    styles: [{ color: '#3b82f6', weight: 5, opacity: 0.8, dashArray: '10, 10' }]
+                                },
+                                router: L.Routing.osrmv1({ profile: 'foot' }), // Walking profile
+                                createMarker: function () { return null; },
+                                addWaypoints: false,
+                                show: true // Show instructions
+                            }).addTo(map);
+
+                            // Notify User
+                            L.popup()
+                                .setLatLng(userLocation)
+                                .setContent(`<b>You are here</b><br>Nearest Station: <b>${nearestStation.name}</b><br>Distance: ${Math.round(minDistance)}m`)
+                                .openOn(map);
+
+                            // Draw User Marker
+                            if (userMarker) map.removeLayer(userMarker);
+                            userMarker = L.marker(userLocation).addTo(map);
+                        }
+
+                        // Show Toggle Button
                         setTimeout(() => {
                             const container = document.querySelector('.leaflet-right');
                             if (container) container.classList.add('routing-hidden');
                             btnToggle.classList.remove('d-none');
                         }, 1000);
-                        
-                        L.marker(userLocation).addTo(map).bindPopup("You are here").openPopup();
                     });
 
                     this.innerHTML = '<i class="fas fa-stop-circle me-2"></i> STOP NAVIGATION';
@@ -230,12 +273,16 @@
                     isNavigating = true;
 
                 } else {
+                    // Stop Navigation
                     map.stopLocate();
                     if (routingToStation) {
                         map.removeControl(routingToStation);
                         routingToStation = null;
                     }
-                    map.setView([startPoint.lat, startPoint.lng], 13);
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+                    map.setView([startPoint.lat, startPoint.lng], 13); // Reset view
                     
                     btnToggle.classList.add('d-none');
                     this.innerHTML = '<i class="fas fa-location-arrow me-2"></i> NAVIGATE TO STATION';
@@ -245,6 +292,7 @@
             });
         }
 
+        // Toggle Instructions Panel
         if (btnToggle) {
             btnToggle.addEventListener("click", function () {
                 const container = document.querySelector('.leaflet-right');

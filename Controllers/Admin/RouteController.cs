@@ -38,19 +38,54 @@ namespace Public_Transport.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Public_Transport.Models.Entities.Route route)
         {
-            // Logic: Chúng ta sẽ nhận list RouteDetails từ form luôn
+            // 1. Xóa validate cho các danh sách lớn (quan hệ 1-n)
             ModelState.Remove("Trips");
-
-            // Xóa validate RouteDetails để tự check tay (nếu cần)
-            // Vì MVC binding list đôi khi báo lỗi ảo
             ModelState.Remove("RouteDetails");
+
+            // 2. [FIX QUAN TRỌNG] Xóa lỗi validate cho từng dòng chi tiết
+            // Phải dùng .ToList() để tạo bản sao danh sách Keys, tránh lỗi "Collection was modified"
+            var keys = ModelState.Keys.ToList();
+
+            foreach (var key in keys)
+            {
+                // Tìm các lỗi liên quan đến RouteDetails
+                if (key.Contains("RouteDetails["))
+                {
+                    // Bỏ qua lỗi bắt buộc phải có object Route và Station (vì mình chỉ gửi ID)
+                    // Lỗi "The value '' is invalid" thường do nó cố bind object rỗng
+                    if (key.EndsWith(".Route") || key.EndsWith(".Station") || key.EndsWith(".StationId"))
+                    {
+                        // Chỉ xóa lỗi nếu thực sự StationId đã có giá trị (tức là đã chọn trạm)
+                        // Nhưng để an toàn cho case này, ta xóa hết các lỗi binding object con
+                        if (key.EndsWith(".Route") || key.EndsWith(".Station"))
+                        {
+                            ModelState.Remove(key);
+                        }
+                    }
+                }
+            }
+
+            // 3. DEBUG: Nếu vẫn lỗi, đoạn này sẽ in tên trường bị lỗi ra cửa sổ Output của Visual Studio
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("=== DANH SÁCH LỖI VALIDATION ===");
+                foreach (var key in ModelState.Keys)
+                {
+                    var errors = ModelState[key].Errors;
+                    foreach (var error in errors)
+                    {
+                        // Nhìn vào đây em sẽ biết chính xác trường nào đang bị lỗi
+                        Console.WriteLine($"Key: {key} - Error: {error.ErrorMessage}");
+                    }
+                }
+                Console.WriteLine("=================================");
+            }
 
             if (ModelState.IsValid)
             {
-                // Kiểm tra nếu người dùng có nhập danh sách trạm
+                // 4. Logic gán ngược Route cho RouteDetails
                 if (route.RouteDetails != null && route.RouteDetails.Count > 0)
                 {
-                    // Gán RouteId cho từng chi tiết (dù EF tự làm nhưng gán cho chắc)
                     foreach (var detail in route.RouteDetails)
                     {
                         detail.Route = route;
@@ -62,7 +97,7 @@ namespace Public_Transport.Controllers.Admin
                 return RedirectToAction(nameof(Index));
             }
 
-            // Nếu lỗi, load lại dropdown trạm
+            // Load lại dropdown nếu lỗi
             ViewData["StationId"] = new SelectList(_context.Stations, "StationId", "StationName");
             return View("~/Views/Admin/Route/Create.cshtml", route);
         }
@@ -88,41 +123,63 @@ namespace Public_Transport.Controllers.Admin
         }
 
         // POST: Edit
+        // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Public_Transport.Models.Entities.Route route)
         {
             if (id != route.RouteId) return NotFound();
 
+            // 1. Xóa validate danh sách lớn
             ModelState.Remove("Trips");
             ModelState.Remove("RouteDetails");
+
+            // 2. [FIX QUAN TRỌNG] Xóa lỗi validate chi tiết (Giống hệt bên Create)
+            var keys = ModelState.Keys.ToList();
+            foreach (var key in keys)
+            {
+                if (key.Contains("RouteDetails["))
+                {
+                    // Bỏ qua lỗi null object hoặc lỗi rỗng distance
+                    if (key.EndsWith(".Route") ||
+                        key.EndsWith(".Station") ||
+                        key.EndsWith(".StationId") ||
+                        key.EndsWith(".DistanceFromStart"))
+                    {
+                        ModelState.Remove(key);
+                    }
+                }
+            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // 1. Update thông tin cơ bản của Route
+                    // 3. Lấy dữ liệu cũ từ DB (Bao gồm cả chi tiết trạm)
                     var routeInDb = await _context.Routes
                         .Include(r => r.RouteDetails)
                         .FirstOrDefaultAsync(r => r.RouteId == id);
 
                     if (routeInDb == null) return NotFound();
 
+                    // 4. Update thông tin cơ bản
                     routeInDb.RouteName = route.RouteName;
                     routeInDb.Description = route.Description;
                     routeInDb.BasePrice = route.BasePrice;
                     routeInDb.TotalDistance = route.TotalDistance;
 
-                    // 2. Xử lý RouteDetails (Xóa cũ thêm mới - Cách đơn giản nhất)
-                    // Xóa hết chi tiết cũ
+                    // 5. Update danh sách trạm (Chiến thuật: Xóa hết cũ -> Thêm mới)
+
+                    // Xóa danh sách cũ trong DB
                     _context.RouteDetails.RemoveRange(routeInDb.RouteDetails);
 
-                    // Thêm chi tiết mới từ form
+                    // Thêm danh sách mới từ Form gửi lên
                     if (route.RouteDetails != null)
                     {
                         foreach (var detail in route.RouteDetails)
                         {
-                            detail.RouteId = id; // Gán ID thủ công
+                            detail.RouteId = id; // Gán đúng ID của Route hiện tại
+                            detail.Route = routeInDb; // Gán object để EF hiểu
                             _context.RouteDetails.Add(detail);
                         }
                     }
@@ -136,6 +193,19 @@ namespace Public_Transport.Controllers.Admin
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            // DEBUG: In lỗi ra Output nếu vẫn không update được
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("=== EDIT VALIDATION ERRORS ===");
+                foreach (var key in ModelState.Keys)
+                {
+                    foreach (var err in ModelState[key].Errors)
+                        Console.WriteLine($"{key}: {err.ErrorMessage}");
+                }
+            }
+
+            // Load lại dropdown nếu lỗi
             ViewData["StationId"] = new SelectList(_context.Stations, "StationId", "StationName");
             return View("~/Views/Admin/Route/Edit.cshtml", route);
         }
