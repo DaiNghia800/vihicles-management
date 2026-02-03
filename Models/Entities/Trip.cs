@@ -1,5 +1,4 @@
-﻿using Public_Transport.Models.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Public_Transport.Models.Entities
@@ -12,20 +11,23 @@ namespace Public_Transport.Models.Entities
         [ForeignKey("Route")]
         public int RouteId { get; set; }
 
-        // DriverId liên kết với bảng Users (Role Driver) hoặc bảng Drivers riêng tùy bạn
-        // Ở đây mình tạm để User (nếu bạn chưa tách bảng Driver riêng)
-        public int? DriverId { get; set; }
-
         [ForeignKey("Vehicle")]
         public int? VehicleId { get; set; }
 
-        public DateTime DepartureTime { get; set; } // Giờ chạy thực tế
+        public DateTime DepartureTime { get; set; } 
         public DateTime ArrivalTime { get; set; }
-        public string Status { get; set; } // Scheduled, Running, Completed
 
-        // Relationship
+        [StringLength(20)]
+        public string Status { get; set; } 
+
+
         public virtual Route Route { get; set; }
-        public virtual Vehicle Vehicle { get; set; }
-        // public virtual User Driver { get; set; } // Uncomment nếu đã có bảng User
+
+        public virtual Vehicle? Vehicle { get; set; }
+
+        public int? DriverId { get; set; }
+
+        [ForeignKey("DriverId")]
+        public virtual Driver? Driver { get; set; }
     }
 }

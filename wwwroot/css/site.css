@@ -1,7 +1,34 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&family=Oswald:wght@200..700&display=swap');
+
 
 :root {
     --theme-color: #0da487;
+    --brand-yellow: #FFBA00;
+    --brand-dark: #130C00;
+    --text-white: #ffffff;
+    --text-gray: #cccccc;
+    --font-main: "Oswald", sans-serif;
+    --navbar-height: 80px;
+    --font-secondary: "Heebo", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none !important;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+body {
+    font-family: var(--font-main) !important;
+    color: var(--brand-dark);
 }
 
 @font-face {

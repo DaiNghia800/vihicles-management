@@ -78,22 +78,30 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("NoCustomer", policy =>
-
+    options.AddPolicy("NoPassenger", policy => 
     {
-        // 2. Yêu cầu người dùng phải đăng nhập
         policy.RequireAuthenticatedUser();
-        // 3. Yêu cầu người dùng KHÔNG CÓ vai trò "Customer"
         policy.RequireAssertion(context =>
-            !context.User.IsInRole(WebConstants.ROLE_CUSTOMER));
+            !context.User.IsInRole(WebConstants.ROLE_PASSENGER)); 
     });
 });
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
+
+// Database Context
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), 
+    ServiceLifetime.Scoped);
+
+// ✅ === ĐĂNG KÝ SERVICES ===
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
-builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddScoped<IBlogService, BlogService>();
+
+// ✅ === THÊM MỚI: MoMo Payment Service ===
+builder.Services.AddScoped<MoMoService>();
+
+// ✅ === Cloudinary Settings ===
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 var app = builder.Build();
 
@@ -101,7 +109,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -115,9 +122,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AdminAccessMiddleware>();
 app.UseSession();
+
 app.MapControllerRoute(
-      name: "Admin",
-      pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+    name: "Admin",
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

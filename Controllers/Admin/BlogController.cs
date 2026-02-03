@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace Public_Transport.Controllers.Admin
 {
-    [Authorize(Policy = "NoCustomer")]
+    [Authorize(Policy = "NoPassenger")]
     public class BlogController : Controller
     {
         private readonly IBlogService _blogService;

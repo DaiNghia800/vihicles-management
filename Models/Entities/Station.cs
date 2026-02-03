@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Public_Transport.Models.Entities 
+namespace Public_Transport.Models.Entities
 {
     public class Station
     {
@@ -9,12 +10,18 @@ namespace Public_Transport.Models.Entities
 
         [Required]
         [StringLength(100)]
-        public string StationName { get; set; } 
+        public string StationName { get; set; }
 
+        [StringLength(255)]
         public string Address { get; set; }
-        public string Coordinates { get; set; } 
 
-        // Relationship
-        public ICollection<RouteDetail> RouteDetails { get; set; }
+
+        // [Column(TypeName = "varchar(50)")]
+        // public string Coordinates { get; set; } 
+
+        public double Latitude { get; set; }  
+        public double Longitude { get; set; } 
+
+        public virtual ICollection<RouteDetail>? RouteDetails { get; set; }
     }
 }

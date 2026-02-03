@@ -6,7 +6,7 @@ using Public_Transport.Services.IServices;
 
 namespace Public_Transport.Controllers.Admin
 {
-    [Authorize(Policy = "NoCustomer")]
+    [Authorize(Policy = "NoPassenger")]
     [Route("admin/settings")]
     public class SettingController : Controller
     {

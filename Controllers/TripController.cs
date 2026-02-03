@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Public_Transport.Models.EF;
 using Microsoft.EntityFrameworkCore;
+using Public_Transport.Models.EF;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Public_Transport.Controllers
 {
@@ -13,29 +15,37 @@ namespace Public_Transport.Controllers
             _context = context;
         }
 
-        // TRANG 1: Danh sách các chuyến (Ghép với HTML Routes của bạn)
         public async Task<IActionResult> Index()
         {
             var trips = await _context.Trips
                 .Include(t => t.Route)
                 .Include(t => t.Vehicle)
-                .OrderBy(t => t.DepartureTime) // Sắp xếp chuyến sắp chạy lên trước
+                .OrderBy(t => t.DepartureTime)
                 .ToListAsync();
 
             return View(trips);
         }
 
-        // TRANG 2: Chi tiết chuyến đi (Ghép với HTML Route Detail)
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int? id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var trip = await _context.Trips
                 .Include(t => t.Vehicle)
+                .Include(t => t.Driver)
                 .Include(t => t.Route)
-                .ThenInclude(r => r.RouteDetails.OrderBy(rd => rd.OrderIndex)) // Lấy danh sách trạm
-                .ThenInclude(rd => rd.Station)
+
+                    .ThenInclude(r => r.RouteDetails.OrderBy(rd => rd.OrderIndex))
+                        .ThenInclude(rd => rd.Station)
                 .FirstOrDefaultAsync(m => m.TripId == id);
 
-            if (trip == null) return NotFound();
+            if (trip == null)
+            {
+                return NotFound();
+            }
 
             return View(trip);
         }

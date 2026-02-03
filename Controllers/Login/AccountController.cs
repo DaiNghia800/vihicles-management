@@ -33,7 +33,7 @@ namespace Public_Transport.Controllers.Login
                 {
                     return Redirect("/admin/dashboard");
                 }
-                else if (userRole == WebConstants.ROLE_CUSTOMER)
+                else if (userRole == WebConstants.ROLE_PASSENGER) // ✅ Đổi từ ROLE_CUSTOMER
                 {
                     return Redirect("/");
                 }
@@ -83,7 +83,8 @@ namespace Public_Transport.Controllers.Login
                     };
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimIdentity), authProperties);
                     //await _cartService.MergeSessionCartToDatabase(accounts.Uid);
-                    string redirectUrl = (accounts.Role.RoleName == WebConstants.ROLE_CUSTOMER) ? "/" : "/admin/dashboard";
+                    // ✅ Đổi từ ROLE_CUSTOMER
+                    string redirectUrl = (accounts.Role.RoleName == WebConstants.ROLE_PASSENGER) ? "/" : "/admin/dashboard";
                     return Json(new { status = WebConstants.SUCCESS, success = true, message = "Log in successfully", redirectUrl = redirectUrl });
                 }
                 else
@@ -234,7 +235,8 @@ namespace Public_Transport.Controllers.Login
                     authProperties);
                 //await _cartService.MergeSessionCartToDatabase(user.Uid);
                 // 7. Redirect dựa trên Role
-                string redirectUrl = user.Role.RoleName == WebConstants.ROLE_CUSTOMER
+                // ✅ Đổi từ ROLE_CUSTOMER
+                string redirectUrl = user.Role.RoleName == WebConstants.ROLE_PASSENGER
                     ? "/" 
                     : "/admin/dashboard";
 

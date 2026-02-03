@@ -233,12 +233,10 @@ namespace Public_Transport.Services
 
         public async Task<IEnumerable<UserDTO>> GetBlogAuthorsAsync()
         {
-            // === SỬA LỖI LOGIC Ở ĐÂY ===
-            // Thay vì "Admin", hãy dùng hằng số WebConstants.ROLE_ADMIN
-            // Hoặc, để khớp với policy "NoCustomer", chúng ta sẽ lấy BẤT KỲ AI không phải là "Customer"
+            // Lấy tất cả users KHÔNG PHẢI là Passenger
             return await _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Deleted == false && u.Role.RoleName != WebConstants.ROLE_CUSTOMER)
+                .Where(u => u.Deleted == false && u.Role.RoleName != WebConstants.ROLE_PASSENGER) 
                 .Select(u => new UserDTO
                 {
                     Uid = u.Uid,

@@ -19,7 +19,8 @@ function loginAccount(userInput) {
         dataType: 'json',
         success: function (res) {
             Swal.close();
-            if (res.status === 'success' && res.success === true) {
+            // Fixed: Only check res.success which is always a boolean
+            if (res.success === true) {
                 Swal.fire({
                     icon: "success",
                     title: "Login Successful!",

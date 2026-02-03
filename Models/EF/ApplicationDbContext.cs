@@ -31,6 +31,8 @@ namespace Public_Transport.Models.EF
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
+        public DbSet<Driver> Drivers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

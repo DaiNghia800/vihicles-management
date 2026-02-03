@@ -1,15 +1,20 @@
 ﻿@model Public_Transport.Models.Entities.Trip
-
 @{
-    ViewData["Title"] = "Chi tiết lộ trình";
+    ViewData["Title"] = "Trip Detail: " + (Model.Route?.RouteName ?? "Unknown");
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section class="routes-1 position-relative" style="height: 250px; background: #333;">
+<section class="routes-1 position-relative" style="height: 300px; background: url('/assets/images/bus.jpg') no-repeat center center/cover;">
+    <div class="bg-overlay position-absolute bg-black opacity-75 start-0 top-0 w-100 h-100"></div>
     <div class="container mx-auto position-relative z-1 h-100">
         <div class="d-flex justify-content-center align-items-center h-100">
             <div>
-                <h2 class="text-center text-white">ROUTE DETAIL</h2>
-                <p class="text-center text-white-50">@Model.Route.RouteName</p>
+                <h2 class="text-center text-white">TRIP DETAILS</h2>
+                <ul class="d-flex justify-content-center gap-1 list-unstyled">
+                    <li><a href="/" class="text-white fs-6 fw-light font-secondary text-decoration-none">Home</a></li>
+                    <li><span class="color-primary text-white mx-2"><i class="fa-solid fa-angle-right"></i></span></li>
+                    <li><span class="text-white fs-6 fw-light font-secondary">@Model.Route.RouteName</span></li>
+                </ul>
             </div>
         </div>
     </div>
@@ -20,64 +25,285 @@
         <div class="row">
             <div class="col-lg-8">
                 <h2 class="fw-bold mb-3">@Model.Route.RouteName</h2>
-                <p class="text-muted">Vehicle: @Model.Vehicle?.LicensePlate | Type: @Model.Vehicle?.VehicleType</p>
+                <p class="text-muted">@Model.Route.Description</p>
 
-                <h4 class="fw-bold mb-4 mt-5">Timeline (Các trạm dừng)</h4>
+                <div class="rounded-4 overflow-hidden mb-4 bg-light shadow-sm" style="height: 400px; position: relative;">
+                    <div id="map" class="w-100 h-100"></div>
+                </div>
 
-                <div class="timeline ps-3 border-start border-2 border-warning">
-
-                    @foreach (var detail in Model.Route.RouteDetails)
-                    {
-                        <div class="timeline-item mb-5 position-relative ps-4">
-                            <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-warning border border-4 border-white"
-                                 style="width: 20px; height: 20px; left: -1px;"></div>
-
-                            <h6 class="fw-bold mb-1">
-                                @if (detail.IsMajorStop)
-                                {
-                                    <span class="badge bg-danger me-2">Trạm chính</span>
-                                }
-                                @detail.Station.StationName
-                            </h6>
-                            <small class="text-muted d-block mb-2">@detail.Station.Address</small>
-
-                            <div class="p-2 bg-light rounded small text-secondary">
-                                <i class="fas fa-clock text-warning me-1"></i>
-                                Dự kiến đến: @Model.DepartureTime.AddMinutes(detail.DistanceFromStart * 2).ToString("HH:mm")
-                            </div>
+                <h4 class="fw-bold mb-4">Detailed Itinerary</h4>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon bg-success text-white">
+                            <i class="fas fa-play"></i>
                         </div>
+                        <h6 class="fw-bold mb-0">Departure</h6>
+                        <small class="text-muted">
+                            <i class="fa-solid fa-clock me-1"></i> @Model.DepartureTime.ToString("HH:mm dd/MM/yyyy")
+                        </small>
+                    </div>
+
+                    @if (Model.Route.RouteDetails != null)
+                    {
+                        foreach (var item in Model.Route.RouteDetails)
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-icon @(item.IsMajorStop ? "bg-warning text-white" : "")">
+                                    @if (item.IsMajorStop) { <i class="fas fa-star"></i> }
+                                    else { <i class="fas fa-map-marker-alt"></i> }
+                                </div>
+
+                                <h6 class="fw-bold mb-0">@item.Station.StationName</h6>
+                                
+                                <small class="text-muted d-block">
+                                    @if(item.DistanceFromStart > 0) { <span>From start: @item.DistanceFromStart km</span> }
+                                    else { <span>Start Point</span> }
+                                </small>
+                                <small class="text-secondary" style="font-size: 0.85rem;">
+                                    <i class="fa-solid fa-location-dot me-1"></i> @item.Station.Address
+                                </small>
+                            </div>
+                        }
                     }
 
+                    <div class="timeline-item">
+                        <div class="timeline-icon bg-danger text-white">
+                            <i class="fas fa-flag-checkered"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Arrival</h6>
+                        <small class="text-muted">Est. Arrival: @Model.ArrivalTime.ToString("HH:mm")</small>
+                    </div>
                 </div>
             </div>
 
             <div class="col-lg-4">
-                <div class="card p-4 mb-4 shadow-sm border-0 rounded-4">
+                <div class="card p-4 mb-4 shadow-sm border-0">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="fw-bold text-warning mb-0">Summary</h4>
-                        <span class="badge bg-success rounded-pill">Active</span>
+                        <h4 class="fw-bold text-warning mb-0">Information</h4>
+                        <span class="badge bg-success rounded-pill">
+                            @(Model.Vehicle?.VehicleType ?? "Bus")
+                        </span>
                     </div>
                     <hr>
                     <div class="row g-3 text-center mb-4">
                         <div class="col-6">
-                            <small class="text-muted d-block">Departure</small>
-                            <span class="fw-bold text-dark">@Model.DepartureTime.ToString("HH:mm")</span>
+                            <small class="text-muted d-block">Fare</small>
+                            <span class="fw-bold"><i class="fas fa-ticket-alt text-warning"></i> @Model.Route.BasePrice.ToString("N0") VND</span>
                         </div>
                         <div class="col-6">
-                            <small class="text-muted d-block">Price</small>
-                            <span class="fw-bold text-warning">@Model.Route.BasePrice.ToString("N0") đ</span>
-                        </div>
-                        <div class="col-12 mt-3">
                             <small class="text-muted d-block">Total Distance</small>
-                            <span class="fw-bold text-dark">@Model.Route.TotalDistance km</span>
+                            <span class="fw-bold"><i class="fas fa-road text-warning"></i> @Model.Route.TotalDistance km</span>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted d-block">Status</small>
+                            <span class="fw-bold text-success">@Model.Status</span>
                         </div>
                     </div>
 
-                    <a href="/Trip" class="btn btn-outline-secondary w-100 rounded-pill">
-                        <i class="fa-solid fa-arrow-left me-2"></i> Quay lại danh sách
-                    </a>
+                    <div class="d-grid gap-2 mt-3">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <button type="button" id="btn-booking" class="btn btn-primary fw-bold rounded-pill py-2 shadow-sm" data-trip-id="@Model.TripId">
+                                <i class="fas fa-credit-card me-2"></i> BOOK & PAY NOW
+                            </button>
+                        }
+                        else
+                        {
+                            <a href="/login" class="btn btn-primary fw-bold rounded-pill py-2 shadow-sm text-white text-decoration-none">
+                                <i class="fas fa-sign-in-alt me-2"></i> LOGIN TO BOOK
+                            </a>
+                        }
+                        
+                        <button type="button" button-start class="btn btn-warning fw-bold rounded-pill py-2 shadow-sm text-white">
+                            <i class="fas fa-location-arrow me-2"></i> NAVIGATE TO STATION
+                        </button>
+                        <button type="button" id="btn-toggle-directions" class="btn btn-outline-secondary btn-sm rounded-pill d-none py-2">
+                            <i class="fas fa-list-ul me-1"></i> View Instructions
+                        </button>
+                    </div>
                 </div>
+
+                @if (Model.Driver != null)
+                {
+                    <div class="card p-4 shadow-sm border-0">
+                        <h6 class="fw-bold mb-3">Assigned Driver</h6>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-3 me-3"><i class="fas fa-user-tie fa-lg text-secondary"></i></div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">@Model.Driver.User?.FullName</h6>
+                                <small class="text-muted">License: @Model.Driver.LicenseNumber (@Model.Driver.ExperienceYears years exp)</small>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var routeData = @Html.Raw(Json.Serialize(Model.Route.RouteDetails.Select(x => new {
+            name = x.Station.StationName,
+            address = x.Station.Address,
+            lat = x.Station.Latitude,
+            lng = x.Station.Longitude,
+            order = x.OrderIndex
+        })));
+
+        if (!routeData || routeData.length === 0) {
+            console.error("No station data found!");
+            return;
+        }
+
+        var startPoint = routeData[0]; 
+        var endPoint = routeData[routeData.length - 1];
+
+        if (typeof L === 'undefined') {
+            console.error("Leaflet library not loaded!");
+            return;
+        }
+
+        var map = L.map('map').setView([startPoint.lat, startPoint.lng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        var waypoints = [];
+        
+        routeData.forEach(function (station) {
+            var latLng = L.latLng(station.lat, station.lng);
+            waypoints.push(latLng);
+
+            L.marker(latLng).addTo(map)
+                .bindPopup(`<b>Station ${station.order}:</b><br>${station.name}<br><i>${station.address}</i>`);
+        });
+
+        let globalBusDistance = 0; 
+
+        if (typeof L.Routing !== 'undefined') {
+            var busControl = L.Routing.control({
+                waypoints: waypoints,
+                lineOptions: {
+                    styles: [{ color: '#FFBA00', weight: 6, opacity: 0.8 }]
+                },
+                createMarker: function () { return null; },
+                addWaypoints: false,
+                draggableWaypoints: false,
+                show: false,
+                fitSelectedRoutes: true
+            }).addTo(map);
+
+            busControl.on('routesfound', function (e) {
+                globalBusDistance = e.routes[0].summary.totalDistance;
+            });
+        }
+
+        let isNavigating = false;
+        let routingToStation = null;
+        const buttonStart = document.querySelector("[button-start]");
+        const btnToggle = document.getElementById("btn-toggle-directions");
+
+        if (buttonStart) {
+            buttonStart.addEventListener("click", function () {
+                if (!isNavigating) {
+                    alert("Locating your position...");
+
+                    map.locate({ setView: true, watch: true, enableHighAccuracy: true });
+
+                    map.once('locationfound', function (e) {
+                        const userLocation = e.latlng;
+                        const startStationLatLng = L.latLng(startPoint.lat, startPoint.lng);
+
+                        if (routingToStation) map.removeControl(routingToStation);
+
+                        routingToStation = L.Routing.control({
+                            waypoints: [userLocation, startStationLatLng],
+                            lineOptions: {
+                                styles: [{ color: '#3b82f6', weight: 5, opacity: 0.8, dashArray: '10, 10' }]
+                            },
+                            router: L.Routing.osrmv1({ profile: 'foot' }),
+                            createMarker: function () { return null; },
+                            addWaypoints: false,
+                            show: true
+                        }).addTo(map);
+
+                        setTimeout(() => {
+                            const container = document.querySelector('.leaflet-right');
+                            if (container) container.classList.add('routing-hidden');
+                            btnToggle.classList.remove('d-none');
+                        }, 1000);
+                        
+                        L.marker(userLocation).addTo(map).bindPopup("You are here").openPopup();
+                    });
+
+                    this.innerHTML = '<i class="fas fa-stop-circle me-2"></i> STOP NAVIGATION';
+                    this.classList.replace("btn-warning", "btn-danger");
+                    isNavigating = true;
+
+                } else {
+                    map.stopLocate();
+                    if (routingToStation) {
+                        map.removeControl(routingToStation);
+                        routingToStation = null;
+                    }
+                    map.setView([startPoint.lat, startPoint.lng], 13);
+                    
+                    btnToggle.classList.add('d-none');
+                    this.innerHTML = '<i class="fas fa-location-arrow me-2"></i> NAVIGATE TO STATION';
+                    this.classList.replace("btn-danger", "btn-warning");
+                    isNavigating = false;
+                }
+            });
+        }
+
+        if (btnToggle) {
+            btnToggle.addEventListener("click", function () {
+                const container = document.querySelector('.leaflet-right');
+                if (container) {
+                    container.classList.toggle('routing-hidden');
+                }
+            });
+        }
+
+        // Booking with MoMo Payment Integration
+        const btnBooking = document.getElementById("btn-booking");
+        if (btnBooking) {
+            btnBooking.addEventListener("click", async function () {
+                const tripId = this.getAttribute("data-trip-id");
+                const originalText = this.innerHTML;
+                
+                // Disable button and show loading
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Processing...';
+
+                try {
+                    const response = await fetch('/payment/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ tripId: parseInt(tripId) })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        // Redirect to MoMo payment page
+                        window.location.href = result.paymentUrl;
+                    } else {
+                        alert(result.message || 'Payment creation failed. Please try again.');
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                    }
+                } catch (error) {
+                    console.error('Error creating payment:', error);
+                    alert('An error occurred. Please try again later.');
+                    this.disabled = false;
+                    this.innerHTML = originalText;
+                }
+            });
+        }
+    });
+</script>

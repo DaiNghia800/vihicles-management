@@ -1,0 +1,35 @@
+﻿@model Public_Transport.Models.Entities.Trip
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Delete Trip";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4>Confirm Delete?</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title text-danger">Are you sure you want to delete this trip?</h5>
+                <p class="card-text">
+                    <strong>Route:</strong> @Model.Route.RouteName <br />
+                    <strong>Vehicle:</strong> @Model.Vehicle?.LicensePlate <br />
+                    <strong>Departure:</strong> @Model.DepartureTime
+                </p>
+                <div class="alert alert-warning">
+                    Warning: This action cannot be undone!
+                </div>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="TripId" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -85,7 +85,7 @@ namespace Public_Transport.Controllers.Admin
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi tải danh sách thanh toán", error = ex.Message });
+                return StatusCode(500, new { message = "Error loading payment list", error = ex.Message });
             }
         }
 
@@ -142,14 +142,14 @@ namespace Public_Transport.Controllers.Admin
 
                 if (payment == null)
                 {
-                    return NotFound(new { message = "Không tìm thấy thanh toán" });
+                    return NotFound(new { message = "Payment not found" });
                 }
 
                 return Ok(payment);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi tải chi tiết thanh toán", error = ex.Message });
+                return StatusCode(500, new { message = "Error loading payment detail", error = ex.Message });
             }
         }
 
@@ -162,17 +162,273 @@ namespace Public_Transport.Controllers.Admin
                 var payment = await _context.Payments.FindAsync(id);
                 if (payment == null)
                 {
-                    return NotFound(new { message = "Không tìm thấy thanh toán" });
+                    return NotFound(new { message = "Payment not found" });
                 }
 
                 payment.Status = request.Status;
                 await _context.SaveChangesAsync();
 
-                return Ok(new { message = "Cập nhật trạng thái thành công" });
+                return Ok(new { message = "Status updated successfully" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi cập nhật trạng thái", error = ex.Message });
+                return StatusCode(500, new { message = "Error updating status", error = ex.Message });
+            }
+        }
+
+        // API: Đánh dấu vé đã sử dụng
+        [HttpPut("api/mark-ticket-used/{ticketId}")]
+        public async Task<IActionResult> MarkTicketAsUsed(int ticketId)
+        {
+            try
+            {
+                var ticket = await _context.Tickets
+                    .Include(t => t.Trip)
+                    .FirstOrDefaultAsync(t => t.TicketId == ticketId);
+
+                if (ticket == null)
+                {
+                    return NotFound(new { message = "Ticket not found" });
+                }
+
+                // Kiểm tra trạng thái hiện tại
+                if (ticket.Status == "Used")
+                {
+                    return BadRequest(new { message = "This ticket has already been used" });
+                }
+
+                if (ticket.Status == "Cancelled")
+                {
+                    return BadRequest(new { message = "Cannot mark a cancelled ticket as used" });
+                }
+
+                if (ticket.Status != "Paid")
+                {
+                    return BadRequest(new { message = "Only paid tickets can be marked as used" });
+                }
+
+                // Kiểm tra xem chuyến đi đã diễn ra chưa
+                if (ticket.Trip.DepartureTime > DateTime.Now)
+                {
+                    return BadRequest(new { message = "Trip has not departed yet, cannot mark ticket as used" });
+                }
+
+                // Cập nhật trạng thái
+                ticket.Status = "Used";
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Ticket marked as used successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error updating ticket status", error = ex.Message });
+            }
+        }
+
+        // API: Lấy danh sách tickets với filter VÀ PAGINATION
+        [HttpGet("api/tickets")]
+        public async Task<IActionResult> GetTickets(
+            [FromQuery] string status = null,
+            [FromQuery] DateTime? fromDate = null,
+            [FromQuery] DateTime? toDate = null,
+            [FromQuery] string searchTerm = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var query = _context.Tickets
+                    .Include(t => t.User)
+                    .Include(t => t.Trip)
+                        .ThenInclude(tr => tr.Route)
+                    .Include(t => t.Trip)
+                        .ThenInclude(tr => tr.Vehicle)
+                    .Include(t => t.Payment)
+                    .AsQueryable();
+
+                // Lọc theo status
+                if (!string.IsNullOrEmpty(status))
+                {
+                    query = query.Where(t => t.Status == status);
+                }
+
+                // Lọc theo khoảng thời gian
+                if (fromDate.HasValue)
+                {
+                    query = query.Where(t => t.BookingDate >= fromDate.Value);
+                }
+
+                if (toDate.HasValue)
+                {
+                    query = query.Where(t => t.BookingDate <= toDate.Value);
+                }
+
+                // Tìm kiếm theo tên khách hàng hoặc email
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    searchTerm = searchTerm.ToLower();
+                    query = query.Where(t =>
+                        t.User.FullName.ToLower().Contains(searchTerm) ||
+                        t.User.Email.ToLower().Contains(searchTerm) ||
+                        t.TicketId.ToString().Contains(searchTerm));
+                }
+
+                // Đếm tổng số tickets
+                var totalItems = await query.CountAsync();
+
+                // Lấy tickets theo trang
+                var tickets = await query
+                    .OrderByDescending(t => t.BookingDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(t => new
+                    {
+                        t.TicketId,
+                        t.Price,
+                        t.Status,
+                        t.BookingDate,
+                        Customer = new
+                        {
+                            t.User.FullName,
+                            t.User.Email,
+                            t.User.PhoneNumber
+                        },
+                        Trip = new
+                        {
+                            t.Trip.TripId,
+                            RouteName = t.Trip.Route.RouteName,
+                            t.Trip.DepartureTime,
+                            t.Trip.ArrivalTime,
+                            VehicleType = t.Trip.Vehicle != null ? t.Trip.Vehicle.VehicleType : "N/A",
+                            LicensePlate = t.Trip.Vehicle != null ? t.Trip.Vehicle.LicensePlate : "N/A"
+                        },
+                        Payment = t.Payment != null ? new
+                        {
+                            t.Payment.PaymentMethod,
+                            t.Payment.Status,
+                            t.Payment.PaymentDate
+                        } : null
+                    })
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    tickets,
+                    pagination = new
+                    {
+                        currentPage = page,
+                        pageSize,
+                        totalItems,
+                        totalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error loading ticket list", error = ex.Message });
+            }
+        }
+
+        // API: Scan QR Code và đánh dấu vé đã sử dụng
+        [HttpPost("api/scan-ticket/{ticketId}")]
+        public async Task<IActionResult> ScanTicket(int ticketId)
+        {
+            try
+            {
+                var ticket = await _context.Tickets
+                    .Include(t => t.User)
+                    .Include(t => t.Trip)
+                        .ThenInclude(tr => tr.Route)
+                    .Include(t => t.Trip)
+                        .ThenInclude(tr => tr.Vehicle)
+                    .FirstOrDefaultAsync(t => t.TicketId == ticketId);
+
+                if (ticket == null)
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "Ticket does not exist"
+                    });
+                }
+
+                // Kiểm tra trạng thái
+                if (ticket.Status == "Used")
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "This ticket has already been used",
+                        ticket = new
+                        {
+                            ticket.TicketId,
+                            ticket.Status,
+                            CustomerName = ticket.User.FullName,
+                            RouteName = ticket.Trip.Route.RouteName
+                        }
+                    });
+                }
+
+                if (ticket.Status == "Cancelled")
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "This ticket has been cancelled",
+                        ticket = new
+                        {
+                            ticket.TicketId,
+                            ticket.Status,
+                            CustomerName = ticket.User.FullName
+                        }
+                    });
+                }
+
+                if (ticket.Status != "Paid")
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "Ticket has not been paid",
+                        ticket = new
+                        {
+                            ticket.TicketId,
+                            ticket.Status,
+                            CustomerName = ticket.User.FullName
+                        }
+                    });
+                }
+
+                // Đánh dấu vé đã sử dụng
+                ticket.Status = "Used";
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Ticket verified successfully",
+                    ticket = new
+                    {
+                        ticket.TicketId,
+                        ticket.Status,
+                        CustomerName = ticket.User.FullName,
+                        CustomerEmail = ticket.User.Email,
+                        RouteName = ticket.Trip.Route.RouteName,
+                        DepartureTime = ticket.Trip.DepartureTime,
+                        VehicleType = ticket.Trip.Vehicle?.VehicleType,
+                        LicensePlate = ticket.Trip.Vehicle?.LicensePlate,
+                        Price = ticket.Price
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Error processing ticket",
+                    error = ex.Message
+                });
             }
         }
 
@@ -212,7 +468,7 @@ namespace Public_Transport.Controllers.Admin
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi khi tải thống kê", error = ex.Message });
+                return StatusCode(500, new { message = "Error loading statistics", error = ex.Message });
             }
         }
     }

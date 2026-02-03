@@ -1,7 +1,7 @@
 ﻿//View My Profile Modal
 function viewMyProfile(userId) {
     $.ajax({
-        url: '/customer/get-my-profile',
+        url: '/passenger/get-my-profile',
         type: 'GET',
         data: { id: userId },
         success: function (response) {
@@ -36,7 +36,7 @@ function viewSettings(userId) {
 
     // Load settings form
     $.ajax({
-        url: '/customer/get-settings',
+        url: '/passenger/get-settings',
         type: 'GET',
         data: { id: userId },
         success: function (response) {
@@ -111,7 +111,7 @@ $(document).ready(function () {
         const formData = new FormData(form[0]);
 
         $.ajax({
-            url: '/customer/update-profile',
+            url: '/passenger/update-profile',
             type: 'POST',
             data: formData,
             processData: false,

@@ -8,15 +8,16 @@ using System.Security.Claims;
 namespace Public_Transport.Controllers.Client
 {
     [Authorize]
-    [Route("/customer")]
-    public class CustomerController : Controller
+    [Route("/passenger")] // ✅ Đổi route từ /customer
+    public class PassengerController : Controller // ✅ Đổi tên class
     {
         private readonly IUserService _userService;
 
-        public CustomerController(IUserService userService)
+        public PassengerController(IUserService userService)
         {
             _userService = userService;
         }
+
         [HttpGet("get-my-profile")]
         public IActionResult GetMyProfile()
         {
@@ -28,7 +29,7 @@ namespace Public_Transport.Controllers.Client
                 return NotFound("User not found.");
             }
 
-            return PartialView("~/Views/Customer/MyProfile.cshtml", user);
+            return PartialView("~/Views/Passenger/MyProfile.cshtml", user); // ✅ Đổi path
         }
 
         [HttpGet("profile/{id}")]
@@ -55,7 +56,7 @@ namespace Public_Transport.Controllers.Client
             var allRoles = _userService.GetAllRoles();
             ViewData["RolesList"] = new SelectList(allRoles, "Uid", "RoleName", user.RoleUid);
 
-            return View("~/Views/Customer/ProfileSetting.cshtml", model);
+            return View("~/Views/Passenger/ProfileSetting.cshtml", model); // ✅ Đổi path
         }
 
         [HttpPost("profile/edit/{id}")]
@@ -67,23 +68,20 @@ namespace Public_Transport.Controllers.Client
                 return BadRequest("ID không khớp");
             }
 
-            // Nếu không nhập password mới, bỏ qua validation password
             if (string.IsNullOrEmpty(model.Password))
             {
                 ModelState.Remove(nameof(model.Password));
                 ModelState.Remove(nameof(model.ConfirmPassword));
             }
 
-            // Tải lại RolesList phòng trường hợp phải trả về View
             var allRoles = _userService.GetAllRoles();
             ViewData["RolesList"] = new SelectList(allRoles, "Uid", "RoleName", model.RoleUid);
 
             if (!ModelState.IsValid)
             {
-                return View("~/Views/Customer/ProfileSetting.cshtml", model);
+                return View("~/Views/Passenger/ProfileSetting.cshtml", model); // ✅ Đổi path
             }
 
-            // Gọi Service để update
             var (success, errorMessage) = await _userService.UpdateUserAsync(model);
 
             if (success)
@@ -94,7 +92,7 @@ namespace Public_Transport.Controllers.Client
             else
             {
                 ModelState.AddModelError(string.Empty, errorMessage);
-                return View("~/Views/Customer/ProfileSetting.cshtml", model);
+                return View("~/Views/Passenger/ProfileSetting.cshtml", model); // ✅ Đổi path
             }
         }
     }

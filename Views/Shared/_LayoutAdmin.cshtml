@@ -32,6 +32,7 @@
     <link rel="stylesheet" href="/lib/slick/slick.css" />
     <link rel="stylesheet" href="/lib/slick/slick-theme.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>@ViewBag.title</title>
 </head>
 <body>
@@ -150,13 +151,16 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/admin/orders" style="cursor:pointer;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-archive">
-                                            <polyline points="21 8 21 21 3 21 3 8"></polyline>
-                                            <rect x="1" y="3" width="22" height="5"></rect>
-                                            <line x1="10" y1="12" x2="14" y2="12"></line>
+                                    <a href="/admin/tickets" style="cursor:pointer;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-ticket">
+                                            <path d="M13.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.5L13.5 2z"></path>
+                                            <polyline points="13 2 13 9 20 9"></polyline>
+                                            <path d="M8 13h2"></path>
+                                            <path d="M8 17h2"></path>
+                                            <path d="M14 13h2"></path>
+                                            <path d="M14 17h2"></path>
                                         </svg>
-                                        <span>Orders</span>
+                                        <span>Tickets</span>
                                     </a>
                                 </li>
                                 <li>
@@ -261,14 +265,24 @@
                                     </li>
                                 </ul>
                             </li>
-                            <!-- === THÊM MỚI: Payment Management Menu === -->
                             <li class="sidebar-list">
                                 <a href="/admin/payment" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/payment") ? "active" : "")">
                                     <i class="fa-solid fa-credit-card"></i>
                                     <span class="text-capitalize">Payments</span>
                                 </a>
                             </li>
-                            <!-- === KẾT THÚC THÊM MỚI === -->
+                            <li class="sidebar-list">
+                                <a href="/admin/tickets" class="sidebar-link @(Context.Request.Path == "/admin/tickets" ? "active" : "")">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span class="text-capitalize">Tickets</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="/admin/trip/index" class="sidebar-link @(Context.Request.Path == "/admin/trip/index" ? "active" : "")">
+                                    <i class="fa-regular fa-house"></i>
+                                    <span class="text-capitalize">Trips</span>
+                                </a>
+                            </li>
                             <li class="sidebar-list">
                                 <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
                                     <i class="fa-regular fa-user"></i>

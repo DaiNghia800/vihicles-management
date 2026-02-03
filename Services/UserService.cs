@@ -275,14 +275,13 @@ namespace Public_Transport.Services
                 }
 
                 // 2. Tạo user mới
-                var customerRole = await _context.Roles
-                    .FirstOrDefaultAsync(r => r.RoleName == WebConstants.ROLE_CUSTOMER);
+                var passengerRole = await _context.Roles //  Đổi tên biến
+                    .FirstOrDefaultAsync(r => r.RoleName == WebConstants.ROLE_PASSENGER); //  Đổi từ ROLE_CUSTOMER
 
-                if (customerRole == null)
+                if (passengerRole == null)
                 {
-                    throw new Exception("Role 'Customer' not found.");
+                    throw new Exception("Role 'Passenger' not found."); //  Đổi message
                 }
-
 
                 string createdByValue = provider switch
                 {
@@ -295,8 +294,8 @@ namespace Public_Transport.Services
                 {
                     FullName = fullName ?? email,
                     Email = email,
-                    RoleUid = customerRole.Uid,
-                    PasswordHash = $"EXTERNAL_LOGIN_{provider.ToUpper()}_{Guid.NewGuid()}", // Thêm provider vào hash
+                    RoleUid = passengerRole.Uid, //  Đổi tên biến
+                    PasswordHash = $"EXTERNAL_LOGIN_{provider.ToUpper()}_{Guid.NewGuid()}",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     CreatedBy = createdByValue,
@@ -308,7 +307,7 @@ namespace Public_Transport.Services
                 await _context.Users.AddAsync(newUser);
                 await _context.SaveChangesAsync();
 
-                newUser.Role = customerRole;
+                newUser.Role = passengerRole; //  Đổi tên biến
                 return newUser;
             }
             catch (Exception ex)
@@ -350,19 +349,19 @@ namespace Public_Transport.Services
                 }
 
                 // 2. Tạo user mới
-                var customerRole = await _context.Roles
-                    .FirstOrDefaultAsync(r => r.RoleName == WebConstants.ROLE_CUSTOMER);
+                var passengerRole = await _context.Roles //  Đổi tên biến
+                    .FirstOrDefaultAsync(r => r.RoleName == WebConstants.ROLE_PASSENGER); //  Đổi từ ROLE_CUSTOMER
 
-                if (customerRole == null)
+                if (passengerRole == null)
                 {
-                    return (null, "System error: Role 'Customer' not found.");
+                    return (null, "System error: Role 'Passenger' not found."); //  Đổi message
                 }
 
                 var newUser = new Users
                 {
                     FullName = model.FullName,
                     Email = model.Email,
-                    RoleUid = customerRole.Uid,
+                    RoleUid = passengerRole.Uid, //  Đổi tên biến
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
@@ -375,7 +374,7 @@ namespace Public_Transport.Services
                 await _context.Users.AddAsync(newUser);
                 await _context.SaveChangesAsync();
 
-                newUser.Role = customerRole;
+                newUser.Role = passengerRole;   
                 return (newUser, null);
             }
             catch (Exception ex)

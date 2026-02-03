@@ -1,221 +1,355 @@
-﻿//using Public_Transport.Models.EF;
-//using Public_Transport.Models.Entities;
-//using Public_Transport.Services;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Cors.Infrastructure;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using Newtonsoft.Json;
-//using Public_Transport.Models.EF;
-//using Public_Transport.Services;
-//using System.Linq;
-//using System.Security.Claims;
-//using System.Security.Cryptography;
-//using System.Text;
+﻿using Public_Transport.Models.EF;
+using Public_Transport.Models.Entities;
+using Public_Transport.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
-//namespace Public_Transport.Controllers
-//{
-//    [Route("payment")]
-//    [Authorize]
-//    public class PaymentClientController : Controller
-//    {
-//        private readonly MoMoService _momoService;
-//        private readonly IConfiguration _config;
-//        private readonly ILogger<PaymentClientController> _logger;
-//        private readonly ApplicationDbContext _context;
-       
-//        public PaymentClientController(
-//            MoMoService momoService,
-//            IConfiguration config,
-//            ILogger<PaymentClientController> logger,
-//            ApplicationDbContext context)
-           
-//        {
-//            _momoService = momoService;
-//            _config = config;
-//            _logger = logger;
-//            _context = context;
-           
-//        }
+namespace Public_Transport.Controllers.Client
+{
+    [Route("payment")]
+    [Authorize]
+    public class PaymentClientController : Controller
+    {
+        private readonly MoMoService _momoService;
+        private readonly IConfiguration _config;
+        private readonly ILogger<PaymentClientController> _logger;
+        private readonly ApplicationDbContext _context;
 
-//        [HttpGet("momo")]
-//        public async Task<IActionResult> PayWithMoMo([FromQuery] string addressId)
-//        {
-//            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-//            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
-//            {
-//                return RedirectToAction("Login", "Account");
-//            }
-//            //var cartItems = await _cartService.GetCartItemsAsync();
-//            //if (cartItems == null || !cartItems.Any())
-//            //{
-//            //    return RedirectToAction("Index", "Cart");
-//            //}
+        public PaymentClientController(
+            MoMoService momoService,
+            IConfiguration config,
+            ILogger<PaymentClientController> logger,
+            ApplicationDbContext context)
+        {
+            _momoService = momoService;
+            _config = config;
+            _logger = logger;
+            _context = context;
+        }
 
-//            //long subtotal = await _cartService.GetSubtotalAsync();
-//            long shippingFee = 25000;
-//            long couponDiscount = 10000;
-//            long finalTotal = subtotal + shippingFee - couponDiscount;
+        [HttpPost("create")]
+        public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("CreatePayment called with TripId: {TripId}", request.TripId);
 
-//            //var newOrder = new Order
-//            //{
-//            //    OrderDate = DateTime.Now,
-//            //    Status = "Pending_Payment",
-//            //    TotalAmount = (decimal)finalTotal,
-//            //    PaymentMethod = "MoMo",
-//            //    ShippingAddress = addressId,
-//            //    UserUid = userId
-//            //};
+                var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+                {
+                    _logger.LogWarning("User not authenticated");
+                    return Unauthorized(new { message = "User not authenticated" });
+                }
 
-//            //foreach (var item in cartItems)
-//            //{
-//            //    _context.OrderItem.Add(new OrderItem
-//            //    {
-//            //        Order = newOrder,
-//            //        ProductUid = item.ProductId,
-//            //        Quantity = item.Quantity,
-//            //        PriceAtPurchase = item.Price
-//            //    });
-//            //}
+                _logger.LogInformation("User authenticated: UserId = {UserId}", userId);
 
-//            await _context.SaveChangesAsync();
+                // Kiểm tra Trip có tồn tại không
+                var trip = await _context.Trips
+                    .Include(t => t.Route)
+                    .Include(t => t.Vehicle)
+                    .FirstOrDefaultAsync(t => t.TripId == request.TripId);
 
-//            string orderId = $"{newOrder.Uid}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+                if (trip == null)
+                {
+                    return NotFound(new { message = "Trip not found" });
+                }
 
-//            string orderInfo = "Payment for order #" + orderId;
-//            long paymentAmount = finalTotal;
+                // Tạo Ticket trước
+                var ticket = new Ticket
+                {
+                    TripId = request.TripId,
+                    UserId = userId,
+                    Price = trip.Route.BasePrice,
+                    Status = "Booked",
+                    BookingDate = DateTime.Now
+                };
 
-//            var payUrl = await _momoService.CreatePaymentAsync(paymentAmount, orderId, orderInfo);
-//            _logger.LogInformation("Redirecting to MoMo PayUrl: {url}", payUrl);
+                _context.Tickets.Add(ticket);
+                await _context.SaveChangesAsync(); // ✅ Lưu ticket để có TicketId
 
-//            return Redirect(payUrl);
-//        }
+                // ✅ TẠO ORDERID NGAY SAU KHI CÓ TICKETID
+                string orderId = $"TICKET_{ticket.TicketId}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
 
-//        [HttpGet("return")]
-//        public async Task<IActionResult> PaymentReturn()
-//        {
-//            var query = Request.Query;
-//            string resultCode = query["resultCode"].ToString();
-//            string orderIdFromMoMo = query["orderId"].ToString();
+                // ✅ Tạo Payment record với TransactionRef đầy đủ
+                var payment = new Payment
+                {
+                    TicketId = ticket.TicketId,
+                    Amount = trip.Route.BasePrice,
+                    PaymentMethod = "Momo",
+                    TransactionRef = orderId,  // ✅ Gán ngay từ đầu
+                    Status = "Pending",
+                    PaymentDate = DateTime.Now
+                };
 
-//            Order order = null;
+                _context.Payments.Add(payment);
+                await _context.SaveChangesAsync(); // ✅ Lưu payment với đầy đủ thông tin
 
-//            var mainOrderId = orderIdFromMoMo.Split('_')[0];
-//            if (long.TryParse(mainOrderId, out long dbOrderId))
-//            {
-//                order = await _context.Order
-//                    .Include(o => o.OrderItems)
-//                    .ThenInclude(oi => oi.Product)
-//                    .FirstOrDefaultAsync(o => o.Uid == dbOrderId);
-//            }
+                // Tạo link thanh toán MoMo
+                string orderInfo = $"Payment for Trip {trip.Route.RouteName} - Ticket #{ticket.TicketId}";
+                long paymentAmount = (long)trip.Route.BasePrice;
 
+                var payUrl = await _momoService.CreatePaymentAsync(paymentAmount, orderId, orderInfo);
 
-//            if (resultCode == "0")
-//            {
-//                ViewBag.Result = "Payment successful!";
-//                if (order != null)
-//                {
-//                    if (order.Status != "Paid")
-//                    {
-//                        order.Status = "Paid";
+                _logger.LogInformation("Created payment for Ticket {TicketId}, PayUrl: {url}", ticket.TicketId, payUrl);
 
-//                        _context.Order.Update(order);
-//                        await _context.SaveChangesAsync();
-//                    }
-//                    await _cartService.ClearCartAsync();
-//                }
-//            }
-//            else
-//            {
-//                ViewBag.Result = "Payment failed or cancelled.";
-//                ViewBag.Message = query["message"];
-//                if (order != null) order.Status = "Failed";
-//            }
+                return Ok(new
+                {
+                    success = true,
+                    paymentUrl = payUrl,
+                    ticketId = ticket.TicketId,
+                    paymentId = payment.PaymentId
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating payment for TripId: {TripId}", request.TripId);
+                return StatusCode(500, new
+                {
+                    message = "Error creating payment",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace // Remove in production
+                });
+            }
+        }
 
-//            ViewBag.OrderId = query["orderId"];
-//            ViewBag.Amount = query["amount"];
+        [HttpGet("return")]
+        [AllowAnonymous]
+        public async Task<IActionResult> PaymentReturn()
+        {
+            var query = Request.Query;
+            string resultCode = query["resultCode"].ToString();
+            string orderIdFromMoMo = query["orderId"].ToString();
 
-//            return View("Result", order);
-//        }
+            Payment payment = null;
 
-//        [HttpPost("notify")]
-//        [AllowAnonymous]
-//        public async Task<IActionResult> PaymentNotify()
-//        {
-//            using var reader = new StreamReader(Request.Body, Encoding.UTF8);
-//            var body = await reader.ReadToEndAsync();
+            // Tìm payment theo TransactionRef
+            if (!string.IsNullOrEmpty(orderIdFromMoMo))
+            {
+                payment = await _context.Payments
+                    .Include(p => p.Ticket)
+                        .ThenInclude(t => t.Trip)
+                            .ThenInclude(tr => tr.Route)
+                    .Include(p => p.Ticket)
+                        .ThenInclude(t => t.User)
+                    .FirstOrDefaultAsync(p => p.TransactionRef == orderIdFromMoMo);
+            }
 
-//            _logger.LogInformation("MoMo Notify Received: {body}", body);
-//            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(body);
-//            if (data == null)
-//            {
-//                return BadRequest(new { message = "Invalid JSON" });
-//            }
+            if (resultCode == "0")
+            {
+                ViewBag.Result = "Payment successful!";
+                ViewBag.Success = true;
 
-//            var secretKey = _config["MoMo:SecretKey"];
-//            var accessKey = _config["MoMo:AccessKey"];
+                if (payment != null && payment.Status != "Success")
+                {
+                    payment.Status = "Success";
+                    payment.Ticket.Status = "Paid";
 
-//            var rawHash =
-//                $"accessKey={accessKey}" +
-//                $"&amount={data["amount"]}" +
-//                $"&extraData={data["extraData"]}" +
-//                $"&message={data["message"]}" +
-//                $"&orderId={data["orderId"]}" +
-//                $"&orderInfo={data["orderInfo"]}" +
-//                $"&orderType={data["orderType"]}" +
-//                $"&partnerCode={data["partnerCode"]}" +
-//                $"&payType={data["payType"]}" +
-//                $"&requestId={data["requestId"]}" +
-//                $"&responseTime={data["responseTime"]}" +
-//                $"&resultCode={data["resultCode"]}" +
-//                $"&transId={data["transId"]}";
+                    _context.Payments.Update(payment);
+                    await _context.SaveChangesAsync();
 
-//            var mySignature = CreateSignature(secretKey, rawHash);
-//            var momoSig = data["signature"]?.ToString();
+                    _logger.LogInformation("Payment {PaymentId} completed successfully", payment.PaymentId);
+                }
+            }
+            else
+            {
+                ViewBag.Result = "Payment failed or cancelled.";
+                ViewBag.Success = false;
+                ViewBag.Message = query["message"];
 
-//            _logger.LogInformation("Data string to be hashed: {raw}", rawHash);
-//            _logger.LogInformation("My Signature: {sig}", mySignature);
-//            _logger.LogInformation("MoMo Signature: {sig}", momoSig);
+                if (payment != null)
+                {
+                    payment.Status = "Failed";
+                    payment.Ticket.Status = "Cancelled";
+                    await _context.SaveChangesAsync();
+                }
+            }
 
-//            if (mySignature == momoSig && data["resultCode"]?.ToString() == "0")
-//            {
-//                _logger.LogInformation("MoMo signature verified!");
+            ViewBag.OrderId = query["orderId"];
+            ViewBag.Amount = query["amount"];
 
-//                string orderIdStr = data["orderId"]?.ToString();
-//                var mainOrderId = orderIdStr?.Split('_')[0];
-//                if (long.TryParse(mainOrderId, out long dbOrderId))
-//                {
-//                    var order = await _context.Order.FirstOrDefaultAsync(o => o.Uid == dbOrderId);
+            return View("~/Views/Payment/Result.cshtml", payment);
+        }
 
-//                    if (order != null && order.Status == "Pending_Payment")
-//                    {
-//                        order.Status = "Paid";
-//                        await _context.SaveChangesAsync();
-//                        _logger.LogInformation("Order {OrderId} status updated to Paid.", dbOrderId);
-//                    }
-//                    else if (order != null)
-//                    {
-//                        _logger.LogWarning("Order {OrderId} already processed or status is not Pending. Status: {Status}", dbOrderId, order.Status);
-//                    }
-//                }
+        [HttpPost("notify")]
+        [AllowAnonymous]
+        public async Task<IActionResult> PaymentNotify()
+        {
+            using var reader = new StreamReader(Request.Body, Encoding.UTF8);
+            var body = await reader.ReadToEndAsync();
 
-//                return Ok(new { message = "Payment verified successfully" });
-//            }
-//            else
-//            {
-//                _logger.LogWarning("Invalid signature or payment failed!");
-//                return BadRequest(new { message = "Invalid signature" });
-//            }
-//        }
+            _logger.LogInformation("MoMo Notify Received: {body}", body);
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(body);
 
-//        private static string CreateSignature(string key, string data)
-//        {
-//            var encoding = new UTF8Encoding();
-//            byte[] keyByte = encoding.GetBytes(key);
-//            byte[] messageBytes = encoding.GetBytes(data);
-//            using var hmacsha256 = new HMACSHA256(keyByte);
-//            byte[] hashMessage = hmacsha256.ComputeHash(messageBytes);
-//            return BitConverter.ToString(hashMessage).Replace("-", "").ToLower();
-//        }
-//    }
-//}
+            if (data == null)
+            {
+                return BadRequest(new { message = "Invalid JSON" });
+            }
+
+            var secretKey = _config["MoMo:SecretKey"];
+            var accessKey = _config["MoMo:AccessKey"];
+
+            var rawHash =
+                $"accessKey={accessKey}" +
+                $"&amount={data["amount"]}" +
+                $"&extraData={data["extraData"]}" +
+                $"&message={data["message"]}" +
+                $"&orderId={data["orderId"]}" +
+                $"&orderInfo={data["orderInfo"]}" +
+                $"&orderType={data["orderType"]}" +
+                $"&partnerCode={data["partnerCode"]}" +
+                $"&payType={data["payType"]}" +
+                $"&requestId={data["requestId"]}" +
+                $"&responseTime={data["responseTime"]}" +
+                $"&resultCode={data["resultCode"]}" +
+                $"&transId={data["transId"]}";
+
+            var mySignature = CreateSignature(secretKey, rawHash);
+            var momoSig = data["signature"]?.ToString();
+
+            _logger.LogInformation("My Signature: {sig}", mySignature);
+            _logger.LogInformation("MoMo Signature: {sig}", momoSig);
+
+            if (mySignature == momoSig && data["resultCode"]?.ToString() == "0")
+            {
+                _logger.LogInformation("MoMo signature verified!");
+
+                string orderIdStr = data["orderId"]?.ToString();
+                var payment = await _context.Payments
+                    .Include(p => p.Ticket)
+                    .FirstOrDefaultAsync(p => p.TransactionRef == orderIdStr);
+
+                if (payment != null && payment.Status == "Pending")
+                {
+                    payment.Status = "Success";
+                    payment.Ticket.Status = "Paid";
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Payment {PaymentId} status updated to Success via IPN.", payment.PaymentId);
+                }
+
+                return Ok(new { message = "Payment verified successfully" });
+            }
+            else
+            {
+                _logger.LogWarning("Invalid signature or payment failed!");
+                return BadRequest(new { message = "Invalid signature" });
+            }
+        }
+
+        private static string CreateSignature(string key, string data)
+        {
+            var encoding = new UTF8Encoding();
+            byte[] keyByte = encoding.GetBytes(key);
+            byte[] messageBytes = encoding.GetBytes(data);
+            using var hmacsha256 = new HMACSHA256(keyByte);
+            byte[] hashMessage = hmacsha256.ComputeHash(messageBytes);
+            return BitConverter.ToString(hashMessage).Replace("-", "").ToLower();
+        }
+        [HttpPost("retry/{ticketId}")]
+        public async Task<IActionResult> RetryPayment(int ticketId)
+        {
+            try
+            {
+                var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out int userId))
+                {
+                    return Unauthorized(new { message = "User not authenticated" });
+                }
+
+                // Lấy ticket và kiểm tra quyền sở hữu
+                var ticket = await _context.Tickets
+                    .Include(t => t.Trip)
+                        .ThenInclude(tr => tr.Route)
+                    .Include(t => t.Payment)
+                    .FirstOrDefaultAsync(t => t.TicketId == ticketId && t.UserId == userId);
+
+                if (ticket == null)
+                {
+                    return NotFound(new { message = "Ticket not found" });
+                }
+
+                // Kiểm tra trạng thái ticket
+                if (ticket.Status != "Booked")
+                {
+                    return BadRequest(new { message = "Only booked tickets can be paid" });
+                }
+
+                // Kiểm tra xem chuyến đi đã qua chưa
+                if (ticket.Trip.DepartureTime <= DateTime.Now)
+                {
+                    return BadRequest(new { message = "Cannot pay for past trips" });
+                }
+
+                // Kiểm tra xem đã có payment chưa
+                Payment payment;
+                if (ticket.Payment != null)
+                {
+                    // Nếu đã có payment nhưng failed/pending, update nó
+                    payment = ticket.Payment;
+                    if (payment.Status == "Success")
+                    {
+                        return BadRequest(new { message = "This ticket has already been paid" });
+                    }
+
+                    // Update payment status về Pending
+                    payment.Status = "Pending";
+                    payment.PaymentDate = DateTime.Now;
+                }
+                else
+                {
+                    // Tạo payment mới
+                    string orderId = $"TICKET_{ticket.TicketId}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+
+                    payment = new Payment
+                    {
+                        TicketId = ticket.TicketId,
+                        Amount = ticket.Price,
+                        PaymentMethod = "Momo",
+                        TransactionRef = orderId,
+                        Status = "Pending",
+                        PaymentDate = DateTime.Now
+                    };
+
+                    _context.Payments.Add(payment);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Tạo link thanh toán MoMo
+                string orderInfo = $"Payment for Trip {ticket.Trip.Route.RouteName} - Ticket #{ticket.TicketId}";
+                long paymentAmount = (long)ticket.Price;
+
+                var payUrl = await _momoService.CreatePaymentAsync(paymentAmount, payment.TransactionRef, orderInfo);
+
+                _logger.LogInformation("Retry payment for Ticket {TicketId}, PayUrl: {url}", ticket.TicketId, payUrl);
+
+                return Ok(new
+                {
+                    success = true,
+                    paymentUrl = payUrl,
+                    ticketId = ticket.TicketId,
+                    paymentId = payment.PaymentId
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrying payment for TicketId: {TicketId}", ticketId);
+                return StatusCode(500, new
+                {
+                    message = "Error processing payment",
+                    error = ex.Message
+                });
+            }
+        }
+    }
+
+    public class CreatePaymentRequest
+    {
+        public int TripId { get; set; }
+    }
+}

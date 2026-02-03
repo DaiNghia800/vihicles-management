@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Public_Transport.Helpers;
-using Public_Transport.Helpers;
 
 namespace Public_Transport.Middleware
 {
@@ -25,8 +24,8 @@ namespace Public_Transport.Middleware
                 {
                     var userRole = context.User.FindFirst(ClaimTypes.Role)?.Value;
 
-                    // Nếu là Customer thì redirect đến Access Denied
-                    if (userRole == WebConstants.ROLE_CUSTOMER)
+                    
+                    if (userRole == WebConstants.ROLE_PASSENGER)
                     {
                         context.Response.Redirect("/access-denied");
                         return;
