@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="DTOs\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\lib\bootstrap\" />
     <Folder Include="wwwroot\lib\bootstrap\dist\js\" />

@@ -1,53 +1,63 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
-    --theme-color: #0da487;
+    --theme-color: #FFBA00;
+    --theme-hover: #E5A800;
+    --theme-light: #FFF3CC;
 }
 
+/* Override màu chủ đạo */
+.btn-primary,
+.sidebar-link.active,
+.section-title::after {
+    background-color: var(--theme-color) !important;
+    border-color: var(--theme-color) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--theme-hover) !important;
+}
+
+.text-primary,
+.link-primary {
+    color: var(--theme-color) !important;
+}
+
+.sidebar-link.active {
+    background-color: rgba(255, 186, 0, 0.1) !important;
+    border-left: 4px solid var(--theme-color);
+}
+
+/* Đã chuyển sang dùng Google Fonts */
+/*
 @font-face {
     font-family: "Public Sans";
-    src: url('../../lib/font/Public_Sans/static/PublicSans-Regular.ttf') format('truetype');
+    src: url('/lib/font/Public_Sans/static/PublicSans-Regular.ttf') format('truetype');
     font-weight: 400;
-    font-style: normal;
 }
 
 @font-face {
     font-family: "Public Sans";
-    src: url('../../lib/font/Public_Sans/static/PublicSans-Medium.ttf') format('truetype');
+    src: url('/lib/font/Public_Sans/static/PublicSans-Medium.ttf') format('truetype');
     font-weight: 500;
-    font-style: normal;
 }
 
 @font-face {
-    font-family: 'Public Sans';
-    src: url('../../lib/font/Public_Sans/static/PublicSans-SemiBold.ttf') format('truetype');
+    font-family: "Public Sans";
+    src: url('/lib/font/Public_Sans/static/PublicSans-SemiBold.ttf') format('truetype');
     font-weight: 600;
-    font-style: normal;
 }
 
 @font-face {
-    font-family: 'Public Sans';
-    src: url('../../lib/font/Public_Sans/static/PublicSans-Bold.ttf') format('truetype');
+    font-family: "Public Sans";
+    src: url('/lib/font/Public_Sans/static/PublicSans-Bold.ttf') format('truetype');
     font-weight: 700;
-    font-style: normal;
 }
+*/
 
-@font-face {
-    font-family: 'Public Sans';
-    src: url('../../lib/font/Public_Sans/static/PublicSans-ExtraBold.ttf') format('truetype');
-    font-weight: 800;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Public Sans';
-    src: url('../../lib/font/Public_Sans/static/PublicSans-Black.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-}
-
+/* ✅ DÙNG GOOGLE FONTS ĐÃ LOAD TỪ <head> */
 body {
-    font-family: "Public Sans", sans-serif;
+    font-family: 'Public Sans', sans-serif;
     font-size: 0.875rem;
     color: #4a5568;
     position: relative;
@@ -1533,11 +1543,11 @@ header.close {
     transition: 0.4s;
 }
 
-.switch input:checked + .switch-state {
+switch input:checked + .switch-state {
     background-color: var(--theme-color);
 }
 
-.switch input:checked + .switch-state:before {
+switch input:checked + .switch-state:before {
     transform: translateX(1.625rem);
 }
 /*end switch */
@@ -2470,7 +2480,7 @@ h5.card-title {
 
 .log-in-section .log-in-box .log-in-title h3 {
     margin-bottom: calc(0.0625rem + 5*(100vw - 20rem)/1600);
-    font-size: calc(1.125rem + 3*(100vw - 20rem)/1600);
+    font-size: calc(1.125rem + 3*(100vw - 20rem) / 1600);
 }
 
 .log-in-section .log-in-box .log-in-title h5 {
@@ -2478,7 +2488,7 @@ h5.card-title {
     gap: 0.625rem;
     color: #4a5568;
     margin-top: 0.5rem;
-    font-size: calc(0.9375rem + 1*(100vw - 20rem)/1600);
+    font-size: calc(0.9375rem + 1*(100vw - 20rem) / 1600);
 }
 
 .log-in-section .inputs {
@@ -2583,18 +2593,351 @@ h5.card-title {
     height: 100%;
 }
 
-/* End otp */
+.log-in-section .log-in-box .other-log-in {
+    margin-top: 0.9375rem;
+    text-align: center;
+    position: relative;
+}
 
-.custom-bus-icon {
-    background-color: #198754; 
-    border: 2px solid #ffffff;
-    border-radius: 50%;
+.log-in-section .log-in-box .other-log-in::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 100%;
+    height: 0.0625rem;
+    left: 0;
+    background-color: #ddd;
+    z-index: 0;
+}
+
+.log-in-section .log-in-box .other-log-in h6 {
+    color: #4a5568;
+    position: relative;
+    background-color: #f9f9f9;
+    padding: 0 0.875rem;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: calc(0.8125rem + 1 * (100vw - 20rem) / 1600);
+    line-height: 1.2;
+    margin: 0;
+    font-weight: 400;
+}
+
+.log-in-section .log-in-box .log-in-button {
+    margin-top: 1.25rem;
+    padding: 0.0625rem 0;
+}
+
+.log-in-section .log-in-box .log-in-button ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    gap: 0.9375rem;
+    align-items: center;
+}
+
+.log-in-section .log-in-box .log-in-button ul li {
+    display: block;
+    width: 100%;
+}
+
+.log-in-section .log-in-box .log-in-button ul li a {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-    transition: all 0.3s;
-    padding: 10px;
+    font-size: calc(0.875rem + 2 * (100vw - 20rem) / 1600);
+    color: #222;
+    border-radius: 0.3125rem;
+    padding: calc(0.625rem + 6 * (100vw - 20rem) / 1600) calc(1.125rem + 12 * (100vw - 20rem) / 1600);
+    flex-wrap: wrap;
+    gap: calc(0.5rem + 2 * (100vw - 20rem) / 1600);
+    background-color: #fff;
 }
 
+.log-in-section .log-in-box .log-in-button ul li a img {
+    width: calc(1.125rem + 6 * (100vw - 20rem) / 1600);
+}
 
+.log-in-section .log-in-box .sign-up-box {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+.log-in-section .log-in-box .sign-up-box h4 {
+    color: #4a5568;
+    font-size: calc(0.875rem + 2 * (100vw - 20rem) / 1600);
+    margin-bottom: calc(0rem + 3 * (100vw - 20rem) / 1600);
+    line-height: 1.2;
+    margin: 0;
+    font-weight: 400;
+}
+
+.log-in-section .log-in-box .sign-up-box a {
+    font-weight: 500;
+    font-size: calc(0.9375rem + 2 * (100vw - 20rem) / 1600);
+    margin-bottom: -0.25rem;
+    display: block;
+}
+/*End Log-in*/
+/* Otp */
+.log-in-section .otp-section {
+    /* display: -webkit-box;
+  display: -ms-flexbox; */
+    display: flex;
+    /* -webkit-box-align: center;
+  -ms-flex-align: center; */
+    align-items: center;
+}
+
+.log-in-section {
+    overflow-x: hidden;
+    /* display: -webkit-box; */
+    /* display: -ms-flexbox; */
+    display: flex;
+    /* -webkit-box-align: center; */
+    /* -ms-flex-align: center; */
+    align-items: center;
+    position: relative;
+    z-index: 0;
+}
+
+.log-in-section::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: url("../images/log-in-bg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1;
+}
+
+.log-in-section .image-contain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 100%;
+}
+
+.log-in-section .log-in-box {
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f8f8;
+    padding: calc(1rem + 34*(100vw - 20rem)/1600);
+    border-radius: calc(0.5rem + 4*(100vw - 20rem)/1600);
+    margin-left: 2.5rem;
+}
+
+.log-in-section .log-in-box .log-in-title {
+    margin-bottom: calc(0.75rem + 8*(100vw - 20rem)/1600);
+}
+
+.log-in-section .log-in-box .log-in-title h3 {
+    margin-bottom: calc(0.0625rem + 5*(100vw - 20rem)/1600);
+    font-size: calc(1.125rem + 3*(100vw - 20rem) / 1600);
+}
+
+.log-in-section .log-in-box .log-in-title h5 {
+    display: flex;
+    gap: 0.625rem;
+    color: #4a5568;
+    margin-top: 0.5rem;
+    font-size: calc(0.9375rem + 1*(100vw - 20rem) / 1600);
+}
+
+.log-in-section .inputs {
+    margin: calc(-0.125rem + -10*(100vw - 20rem)/1600);
+    display: flex;
+}
+
+.log-in-section .inputs input {
+    margin: calc(0.125rem + 6*(100vw - 20rem)/1600);
+    border: none;
+    text-align: center;
+}
+
+.log-in-section .inputs .form-control {
+    background-color: #fff;
+    font-size: 0.875rem;
+    display: block;
+    width: calc(100%/6);
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    appearance: none;
+    border-radius: .25rem;
+    /* aspect-ratio: 1/1; */
+    transition: all .3s ease-in-out;
+}
+
+.send-box h5 {
+    font-size: calc(0.9375rem + 1*(100vw - 20rem)/1600);
+    line-height: 1.2;
+    margin: 0;
+    font-weight: 400;
+    display: flex;
+    gap: 0.3125rem;
+}
+
+.send-box a {
+    color: #0da487;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-1 {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: calc(0.4375rem + 7*(100vw - 20rem)/1600) calc(0.875rem + 18*(100vw - 20rem)/1600);
+    font-weight: 500;
+    background: rgba(0, 0, 0, 0);
+    transition: all .3s ease;
+    position: relative;
+    border: none;
+    font-size: calc(0.875rem + 4*(100vw - 20rem)/1600);
+    z-index: 0;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    color: #fff;
+}
+
+.btn-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #fff;
+    border-radius: 0.3125rem;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0);
+    transition: all .3s ease;
+    position: relative;
+    background: #ff6b6b;
+    background: linear-gradient(90deg, #ff6b6b 0%, #ff4f4f 100%);
+    border: none;
+    z-index: 0;
+}
+
+.btn-animation::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    color: #fff;
+    border-radius: 0.3125rem;
+    background: #ff4f4f;
+    background: linear-gradient(90deg, #ff4f4f 0%, #ff6b6b 100%);
+    transition: all .3s ease;
+}
+
+.btn-animation:hover::after {
+    top: 0;
+    height: 100%;
+}
+
+.log-in-section .log-in-box .other-log-in {
+    margin-top: 0.9375rem;
+    text-align: center;
+    position: relative;
+}
+
+.log-in-section .log-in-box .other-log-in::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 100%;
+    height: 0.0625rem;
+    left: 0;
+    background-color: #ddd;
+    z-index: 0;
+}
+
+.log-in-section .log-in-box .other-log-in h6 {
+    color: #4a5568;
+    position: relative;
+    background-color: #f9f9f9;
+    padding: 0 0.875rem;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: calc(0.8125rem + 1 * (100vw - 20rem) / 1600);
+    line-height: 1.2;
+    margin: 0;
+    font-weight: 400;
+}
+
+.log-in-section .log-in-box .log-in-button {
+    margin-top: 1.25rem;
+    padding: 0.0625rem 0;
+}
+
+.log-in-section .log-in-box .log-in-button ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    gap: 0.9375rem;
+    align-items: center;
+}
+
+.log-in-section .log-in-box .log-in-button ul li {
+    display: block;
+    width: 100%;
+}
+
+.log-in-section .log-in-box .log-in-button ul li a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(0.875rem + 2 * (100vw - 20rem) / 1600);
+    color: #222;
+    border-radius: 0.3125rem;
+    padding: calc(0.625rem + 6 * (100vw - 20rem) / 1600) calc(1.125rem + 12 * (100vw - 20rem) / 1600);
+    flex-wrap: wrap;
+    gap: calc(0.5rem + 2 * (100vw - 20rem) / 1600);
+    background-color: #fff;
+}
+
+.log-in-section .log-in-box .log-in-button ul li a img {
+    width: calc(1.125rem + 6 * (100vw - 20rem) / 1600);
+}
+
+.log-in-section .log-in-box .sign-up-box {
+    margin-top: 1.25rem;
+    text-align: center;
+}
+
+.log-in-section .log-in-box .sign-up-box h4 {
+    color: #4a5568;
+    font-size: calc(0.875rem + 2 * (100vw - 20rem) / 1600);
+    margin-bottom: calc(0rem + 3 * (100vw - 20rem) / 1600);
+    line-height: 1.2;
+    margin: 0;
+    font-weight: 400;
+}
+
+.log-in-section .log-in-box .sign-up-box a {
+    font-weight: 500;
+    font-size: calc(0.9375rem + 2 * (100vw - 20rem) / 1600);
+    margin-bottom: -0.25rem;
+    display: block;
+}
+/*End Log-in*/

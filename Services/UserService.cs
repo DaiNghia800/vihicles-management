@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.DotNet.Scaffolding.Shared;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Crypto.Generators;
 using Public_Transport.Helpers;
 using Public_Transport.Models.EF;
 using Public_Transport.Models.Entities;
 using Public_Transport.Models.ViewModels;
 using Public_Transport.Services.IServices;
-using System;
 using System.Net;
 using System.Net.Mail;
 using System.Text.Json;
@@ -22,25 +17,30 @@ namespace Public_Transport.Services
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
         private readonly IUploadService _uploadService;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IUploadService uploadService)
+        public UserService(
+            ApplicationDbContext context, 
+            IWebHostEnvironment webHostEnvironment, 
+            IConfiguration configuration, 
+            IUploadService uploadService,
+            ILogger<UserService> logger)
         {
             _context = context;
             _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
             _uploadService = uploadService;
+            _logger = logger;
         }
 
         public async Task<PaginatedList<Users>> GetAllUsersAsync(int pageIndex, int pageSize)
         {
-            // 1. Tạo IQueryable (chưa gọi CSDL)
             var query = _context.Users
                                 .Where(u => u.Deleted == false)
-                                .Include(u => u.Role) // (Nên Include Role ở đây)
+                                .Include(u => u.Role)
                                 .AsNoTracking()
-                                .OrderBy(u => u.FullName); // Bắt buộc phải OrderBy
+                                .OrderBy(u => u.FullName);
 
-            // 2. Gọi hàm CreateAsync để thực thi truy vấn
             return await PaginatedList<Users>.CreateAsync(query, pageIndex, pageSize);
         }
 
@@ -55,7 +55,7 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error getting user by ID: {UserId}", id);
                 return null;
             }
         }
@@ -70,10 +70,9 @@ namespace Public_Transport.Services
                     return false;
                 }
 
-                // XỬ LÝ ẢNH - HỖ TRỢ NHIỀU ẢNH
+                // XỬ LÝ ẢNH
                 var imageUrls = new List<string>();
 
-                // Parse ảnh cũ từ JSON
                 if (!string.IsNullOrEmpty(userModel.ImgUser))
                 {
                     try
@@ -82,12 +81,10 @@ namespace Public_Transport.Services
                     }
                     catch
                     {
-                        // Nếu format cũ (string đơn), convert sang array
                         imageUrls.Add(userModel.ImgUser);
                     }
                 }
 
-                // Upload ảnh mới
                 if (imgFiles != null && imgFiles.Any())
                 {
                     foreach (var file in imgFiles)
@@ -100,9 +97,7 @@ namespace Public_Transport.Services
                     }
                 }
 
-                // Lưu dưới dạng JSON array
                 existingUser.ImgUser = imageUrls.Count > 0 ? JsonSerializer.Serialize(imageUrls) : "[]";
-
                 existingUser.FullName = userModel.FullName;
                 existingUser.Email = userModel.Email;
                 existingUser.PhoneNumber = userModel.PhoneNumber;
@@ -118,10 +113,11 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error updating user: {UserId}", userModel.Uid);
                 return false;
             }
         }
+
         public List<Roles> GetAllRoles()
         {
             try
@@ -130,10 +126,11 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error getting all roles");
                 return new List<Roles>();
             }
         }
+
         public async Task<bool> DeleteUser(int userId)
         {
             try
@@ -150,7 +147,7 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error deleting user: {UserId}", userId);
                 return false;
             }
         }
@@ -159,7 +156,6 @@ namespace Public_Transport.Services
         {
             try
             {
-                // 1. Tìm user với email này
                 var existingUser = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == model.Email && u.Deleted == false);
 
@@ -168,7 +164,6 @@ namespace Public_Transport.Services
                     if (existingUser.PasswordHash == null ||
                         existingUser.PasswordHash.StartsWith("EXTERNAL_LOGIN_"))
                     {
-                        // Cho phép admin thêm password cho user này
                         existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
                         existingUser.FullName = model.FullName;
                         existingUser.PhoneNumber = model.PhoneNumber;
@@ -195,7 +190,6 @@ namespace Public_Transport.Services
                     }
                 }
 
-                // 2. Tạo user mới
                 var newUser = new Users
                 {
                     FullName = model.FullName,
@@ -203,7 +197,9 @@ namespace Public_Transport.Services
                     PhoneNumber = model.PhoneNumber,
                     Address = model.Address,
                     RoleUid = model.RoleUid,
-                    ImgUser = model.ImgUser,
+                    ImgUser = string.IsNullOrWhiteSpace(model.ImgUser) || model.ImgUser == "[]" 
+                        ? WebConstants.DEFAULT_AVATAR 
+                        : model.ImgUser,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
@@ -212,23 +208,14 @@ namespace Public_Transport.Services
                     Deleted = false
                 };
 
-                if (string.IsNullOrWhiteSpace(model.ImgUser) || model.ImgUser == "[]")
-                {
-                    newUser.ImgUser = WebConstants.DEFAULT_AVATAR;
-                }
-                else
-                {
-                    newUser.ImgUser = model.ImgUser;
-                }
                 await _context.Users.AddAsync(newUser);
-
                 await _context.SaveChangesAsync();
 
                 return (true, null);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error creating user");
                 return (false, "A system error occurred. Please try again.");
             }
         }
@@ -237,12 +224,10 @@ namespace Public_Transport.Services
         {
             try
             {
-
                 var user = _context.Users
                     .Include(u => u.Role)
                     .FirstOrDefault(u => u.Email == username.ToLower().Trim() && u.Deleted == false);
 
-                //kiểm tra user tồn tại và verify password bằng BCrypt
                 if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
                 {
                     return user;
@@ -252,10 +237,11 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error during login for user: {Username}", username);
                 return null;
             }
         }
+
         public async Task<Users> FindOrCreateExternalUserAsync(
             string email,
             string fullName,
@@ -264,7 +250,6 @@ namespace Public_Transport.Services
         {
             try
             {
-                // 1. Tìm user bằng email
                 var user = await _context.Users
                                      .Include(u => u.Role)
                                      .FirstOrDefaultAsync(u => u.Email == email && u.Deleted == false);
@@ -274,7 +259,6 @@ namespace Public_Transport.Services
                     return user;
                 }
 
-                // 2. Tạo user mới
                 var customerRole = await _context.Roles
                     .FirstOrDefaultAsync(r => r.RoleName == WebConstants.ROLE_CUSTOMER);
 
@@ -282,7 +266,6 @@ namespace Public_Transport.Services
                 {
                     throw new Exception("Role 'Customer' not found.");
                 }
-
 
                 string createdByValue = provider switch
                 {
@@ -296,7 +279,7 @@ namespace Public_Transport.Services
                     FullName = fullName ?? email,
                     Email = email,
                     RoleUid = customerRole.Uid,
-                    PasswordHash = $"EXTERNAL_LOGIN_{provider.ToUpper()}_{Guid.NewGuid()}", // Thêm provider vào hash
+                    PasswordHash = $"EXTERNAL_LOGIN_{provider.ToUpper()}_{Guid.NewGuid()}",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     CreatedBy = createdByValue,
@@ -313,26 +296,24 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in FindOrCreateExternalUserAsync: {ex.Message}");
+                _logger.LogError(ex, "Error in FindOrCreateExternalUserAsync for email: {Email}", email);
                 throw;
             }
         }
+
         public async Task<(Users User, string ErrorMessage)> RegisterUserAsync(RegisterViewModel model)
         {
             try
             {
-                // 1. Tìm user với email này
                 var existingUser = await _context.Users
                     .Include(u => u.Role)
                     .FirstOrDefaultAsync(u => u.Email == model.Email && u.Deleted == false);
 
                 if (existingUser != null)
                 {
-                    //  Kiểm tra xem user này có phải từ external login không
                     if (existingUser.PasswordHash == null ||
                         existingUser.PasswordHash.StartsWith("EXTERNAL_LOGIN_"))
                     {
-                        //  Cho phép user tự link password
                         existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
                         existingUser.FullName = model.FullName;
                         existingUser.UpdatedAt = DateTime.Now;
@@ -349,7 +330,6 @@ namespace Public_Transport.Services
                     }
                 }
 
-                // 2. Tạo user mới
                 var customerRole = await _context.Roles
                     .FirstOrDefaultAsync(r => r.RoleName == WebConstants.ROLE_CUSTOMER);
 
@@ -380,7 +360,7 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error registering user");
                 return (null, "A system error occurred. Please try again.");
             }
         }
@@ -397,11 +377,9 @@ namespace Public_Transport.Services
                     return (false, "Email does not exist in the system");
                 }
 
-                // Tạo OTP ngẫu nhiên 6 chữ số
                 var random = new Random();
                 var otpCode = random.Next(100000, 999999).ToString();
 
-                // Lưu OTP và thời gian hết hạn (5 phút)
                 user.OtpCode = otpCode;
                 user.OtpExpiry = DateTime.Now.AddMinutes(5);
                 user.UpdatedAt = DateTime.Now;
@@ -410,14 +388,13 @@ namespace Public_Transport.Services
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
 
-                // Gửi email
                 await SendOtpEmailAsync(email, otpCode, user.FullName);
 
                 return (true, "OTP code has been sent to your email");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GenerateOtpAsync: {ex.Message}");
+                _logger.LogError(ex, "Error in GenerateOtpAsync for email: {Email}", email);
                 return (false, "An error occurred while sending the OTP code");
             }
         }
@@ -453,7 +430,7 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in VerifyOtpAsync: {ex.Message}");
+                _logger.LogError(ex, "Error in VerifyOtpAsync for email: {Email}", email);
                 return (false, "An error occurred while authenticating OTP");
             }
         }
@@ -462,7 +439,6 @@ namespace Public_Transport.Services
         {
             try
             {
-                // Xác thực OTP trước
                 var (isValid, message) = await VerifyOtpAsync(email, otpCode);
                 if (!isValid)
                 {
@@ -477,9 +453,8 @@ namespace Public_Transport.Services
                     return (false, "Email does not exist");
                 }
 
-                // Cập nhật mật khẩu mới
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-                user.OtpCode = null; // Xóa OTP sau khi sử dụng
+                user.OtpCode = null;
                 user.OtpExpiry = null;
                 user.UpdatedAt = DateTime.Now;
                 user.UpdatedBy = "System";
@@ -491,7 +466,7 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ResetPasswordAsync: {ex.Message}");
+                _logger.LogError(ex, "Error in ResetPasswordAsync for email: {Email}", email);
                 return (false, "An error occurred while resetting your password.");
             }
         }
@@ -500,8 +475,6 @@ namespace Public_Transport.Services
         {
             try
             {
-                Console.WriteLine("=== BẮT ĐẦU GỬI EMAIL ===");
-
                 var smtpServer = _configuration["EmailSettings:SmtpServer"];
                 var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]);
                 var senderEmail = _configuration["EmailSettings:SenderEmail"];
@@ -535,25 +508,12 @@ namespace Public_Transport.Services
                 };
 
                 mailMessage.To.Add(toEmail);
-
                 await smtpClient.SendMailAsync(mailMessage);
-
-            }
-            catch (SmtpException smtpEx)
-            {
-                Console.WriteLine(" SMTP ERROR!");
-                Console.WriteLine($"Status Code: {smtpEx.StatusCode}");
-                Console.WriteLine($"Message: {smtpEx.Message}");
-                Console.WriteLine($"Inner Exception: {smtpEx.InnerException?.Message}");
-                Console.WriteLine($"Stack Trace: {smtpEx.StackTrace}");
-                throw new Exception($"Error sending email: {smtpEx.Message}", smtpEx);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" GENERAL ERROR!");
-                Console.WriteLine($"Error: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                throw;
+                _logger.LogError(ex, "Error sending OTP email to: {Email}", toEmail);
+                throw new Exception($"Error sending email: {ex.Message}", ex);
             }
         }
 
@@ -570,9 +530,11 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error getting permissions for role: {RoleId}", roleId);
                 return new List<string>();
             }
         }
+
         public async Task<bool> UpdateProfile(ProfileUpdateViewModel model)
         {
             try
@@ -583,7 +545,6 @@ namespace Public_Transport.Services
                     return false;
                 }
 
-                // Cập nhật Full Name
                 if (!string.IsNullOrEmpty(model.FullName))
                 {
                     existingUser.FullName = model.FullName.Trim();
@@ -604,12 +565,10 @@ namespace Public_Transport.Services
                     existingUser.Address = model.Address;
                 }
 
-                // Xử lý upload ảnh
                 if (model.Photo != null && model.Photo.Length > 0)
                 {
                     var imageUrls = new List<string>();
 
-                    // Parse ảnh cũ
                     if (!string.IsNullOrEmpty(existingUser.ImgUser))
                     {
                         try
@@ -622,14 +581,12 @@ namespace Public_Transport.Services
                         }
                     }
 
-                    // Thêm ảnh mới
                     var newUrl = await _uploadService.UploadImageAsync(model.Photo);
                     imageUrls.Add(newUrl);
 
                     existingUser.ImgUser = JsonSerializer.Serialize(imageUrls);
                 }
 
-                // Chỉ cập nhật mật khẩu nếu có nhập
                 if (!string.IsNullOrEmpty(model.Password))
                 {
                     existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
@@ -645,10 +602,11 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error updating profile for user: {UserId}", model.Uid);
                 return false;
             }
         }
+
         public async Task<(bool Success, string ErrorMessage)> UpdateUserAsync(UserCreateViewModel model)
         {
             try
@@ -659,14 +617,9 @@ namespace Public_Transport.Services
                     return (false, "User not found");
                 }
 
-                if (string.IsNullOrWhiteSpace(model.ImgUser) || model.ImgUser == "[]")
-                {
-                    existingUser.ImgUser = WebConstants.DEFAULT_AVATAR;
-                }
-                else
-                {
-                    existingUser.ImgUser = model.ImgUser;
-                }
+                existingUser.ImgUser = string.IsNullOrWhiteSpace(model.ImgUser) || model.ImgUser == "[]"
+                    ? WebConstants.DEFAULT_AVATAR
+                    : model.ImgUser;
 
                 existingUser.FullName = model.FullName;
                 existingUser.Email = model.Email;
@@ -689,10 +642,290 @@ namespace Public_Transport.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Error updating user: {UserId}", model.Uid);
                 return (false, "A system error occurred. Please try again.");
             }
         }
 
+        #region NEW METHODS for Admin User Management
+
+        public async Task<(IEnumerable<Users> Users, int TotalCount)> GetUsersWithFiltersAsync(
+            string? searchTerm,
+            int? roleFilter,
+            int pageIndex,
+            int pageSize)
+        {
+            try
+            {
+                var query = _context.Users
+                    .Include(u => u.Role)
+                    .Where(u => !u.Deleted)
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(u =>
+                        u.FullName.Contains(searchTerm) ||
+                        u.Email.Contains(searchTerm) ||
+                        u.PhoneNumber.Contains(searchTerm));
+                }
+
+                if (roleFilter.HasValue)
+                {
+                    query = query.Where(u => u.RoleUid == roleFilter.Value);
+                }
+
+                var totalCount = await query.CountAsync();
+                var users = await query
+                    .OrderByDescending(u => u.CreatedAt)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                return (users, totalCount);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting users with filters");
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<Roles>> GetActiveRolesAsync()
+        {
+            try
+            {
+                return await _context.Roles
+                    .Where(r => !r.Deleted)
+                    .OrderBy(r => r.RoleName)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting active roles");
+                throw;
+            }
+        }
+
+        public async Task<Users?> GetUserByIdWithRoleAsync(int id)
+        {
+            try
+            {
+                return await _context.Users
+                    .Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Uid == id && !u.Deleted);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user by id with role: {UserId}", id);
+                throw;
+            }
+        }
+
+        // ✅ FIX: Thêm DateOfBirth vào CreateUserAdminAsync
+        public async Task<Users> CreateUserAdminAsync(Users user, string password, string currentUserEmail)
+        {
+            try
+            {
+                if (await IsEmailExistsAsync(user.Email))
+                {
+                    throw new InvalidOperationException("Email already exists in the system");
+                }
+
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    throw new InvalidOperationException("Password is required");
+                }
+
+                if (!ValidatePassword(password))
+                {
+                    throw new InvalidOperationException("Password must be at least 6 characters, including uppercase, lowercase, number and special character");
+                }
+
+                // ✅ Validate DateOfBirth
+                if (!user.DateOfBirth.HasValue)
+                {
+                    throw new InvalidOperationException("Date of birth is required");
+                }
+
+                if (user.DateOfBirth.Value > DateTime.Today)
+                {
+                    throw new InvalidOperationException("Date of birth cannot be in the future");
+                }
+
+                // Validate age (optional - tuỳ yêu cầu)
+                var age = DateTime.Today.Year - user.DateOfBirth.Value.Year;
+                if (user.DateOfBirth.Value.Date > DateTime.Today.AddYears(-age)) age--;
+                
+                if (age < 16)
+                {
+                    throw new InvalidOperationException("User must be at least 16 years old");
+                }
+
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+                user.CreatedAt = DateTime.Now;
+                user.UpdatedAt = DateTime.Now;
+                user.CreatedBy = currentUserEmail;
+                user.UpdatedBy = currentUserEmail;
+                user.Deleted = false;
+
+                // ✅ DateOfBirth đã được gán từ model binding, không cần gán lại
+
+                if (string.IsNullOrWhiteSpace(user.ImgUser))
+                {
+                    user.ImgUser = WebConstants.DEFAULT_AVATAR;
+                }
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("User created successfully with ID: {UserId} by {CreatedBy}", user.Uid, currentUserEmail);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating user");
+                throw;
+            }
+        }
+
+        // ✅ FIX: Thêm DateOfBirth vào UpdateUserAdminAsync
+        public async Task<Users> UpdateUserAdminAsync(int id, Users model, string? newPassword, string currentUserEmail)
+        {
+            try
+            {
+                var existingUser = await _context.Users.FindAsync(id);
+                if (existingUser == null || existingUser.Deleted)
+                {
+                    throw new KeyNotFoundException($"User with ID {id} not found");
+                }
+
+                if (await IsEmailExistsAsync(model.Email, id))
+                {
+                    throw new InvalidOperationException("Email already exists in the system");
+                }
+
+                if (!string.IsNullOrWhiteSpace(newPassword))
+                {
+                    if (!ValidatePassword(newPassword))
+                    {
+                        throw new InvalidOperationException("Password must be at least 6 characters, including uppercase, lowercase, number and special character");
+                    }
+                    existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                }
+
+                // ✅ Update DateOfBirth nếu có
+                if (model.DateOfBirth.HasValue)
+                {
+                    if (model.DateOfBirth.Value > DateTime.Today)
+                    {
+                        throw new InvalidOperationException("Date of birth cannot be in the future");
+                    }
+                    existingUser.DateOfBirth = model.DateOfBirth;
+                }
+
+                existingUser.FullName = model.FullName;
+                existingUser.Email = model.Email;
+                existingUser.PhoneNumber = model.PhoneNumber;
+                existingUser.Address = model.Address;
+                existingUser.RoleUid = model.RoleUid;
+                existingUser.UpdatedAt = DateTime.Now;
+                existingUser.UpdatedBy = currentUserEmail;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("User updated successfully with ID: {UserId} by {UpdatedBy}", id, currentUserEmail);
+                return existingUser;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating user with ID: {UserId}", id);
+                throw;
+            }
+        }
+
+        public async Task<bool> SoftDeleteUserAsync(int id, string currentUserEmail)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null || user.Deleted)
+                {
+                    return false;
+                }
+
+                user.Deleted = true;
+                user.UpdatedAt = DateTime.Now;
+                user.UpdatedBy = currentUserEmail;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("User soft deleted with ID: {UserId} by {DeletedBy}", id, currentUserEmail);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error soft deleting user with ID: {UserId}", id);
+                throw;
+            }
+        }
+
+        public async Task<bool> ToggleUserStatusAsync(int id, string currentUserEmail)
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.Deleted = !user.Deleted;
+                user.UpdatedAt = DateTime.Now;
+                user.UpdatedBy = currentUserEmail;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("User status toggled for ID: {UserId}, New Status: {IsActive} by {UpdatedBy}", 
+                    id, !user.Deleted, currentUserEmail);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error toggling user status for ID: {UserId}", id);
+                throw;
+            }
+        }
+
+        public async Task<bool> IsEmailExistsAsync(string email, int? excludeUserId = null)
+        {
+            try
+            {
+                var query = _context.Users.Where(u => u.Email == email && !u.Deleted);
+
+                if (excludeUserId.HasValue)
+                {
+                    query = query.Where(u => u.Uid != excludeUserId.Value);
+                }
+
+                return await query.AnyAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking email exists");
+                throw;
+            }
+        }
+
+        public bool ValidatePassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+                return false;
+
+            var passwordRegex = new System.Text.RegularExpressions.Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$");
+            return passwordRegex.IsMatch(password);
+        }
+
+        #endregion
     }
 }

@@ -10,26 +10,42 @@ using Public_Transport.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// Add services to the container
+builder.Services.AddControllersWithViews(options =>
+{
+    // Tắt implicit required validation cho non-nullable value types
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
+
+// ✅ FIX: Configure Cookie Policy
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => true;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always; // ← Bắt buộc HTTPS
+});
+
+// Configure session
 builder.Services.AddSession(options =>
 {
-    options.Cookie.IsEssential = true;
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.IdleTimeout = TimeSpan.FromHours(3);
-    options.Cookie.Name = "public-transport.session";
+    options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← Bắt buộc HTTPS
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
+
+// Configure authentication cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.ExpireTimeSpan = TimeSpan.FromHours(3);
-        options.LoginPath = "/login";
-        options.AccessDeniedPath = "/access-denied";
+        options.LoginPath = "/login";  // ← ĐÃ ĐỔI: từ "/Account/Login" thành "/login"
+        options.AccessDeniedPath = "/access-denied";  // ← ĐÃ ĐỔI: từ "/Account/AccessDenied" thành "/access-denied"
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);
+        options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.IsEssential = true;
-        options.SlidingExpiration = false;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← Bắt buộc HTTPS
+        options.Cookie.SameSite = SameSiteMode.Lax;
     })
     .AddCookie("External", options =>
     {
@@ -71,12 +87,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         facebookOptions.Fields.Add("last_name");
     });
 
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.CheckConsentNeeded = context => true;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-});
-
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("NoCustomer", policy =>
@@ -93,30 +103,26 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
+builder.Services.AddScoped<IDriverService, DriverService>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseHsts(); // ← Bắt buộc HTTPS
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // ← Redirect HTTP sang HTTPS
 app.UseStaticFiles();
 
-app.UseRouting();
-app.UseStatusCodePagesWithReExecute("/Home/NotFoundPage");
+app.UseCookiePolicy(); // ← Áp dụng Cookie Policy
 
+app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<AdminAccessMiddleware>();
-app.UseSession();
-app.MapControllerRoute(
-      name: "Admin",
-      pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

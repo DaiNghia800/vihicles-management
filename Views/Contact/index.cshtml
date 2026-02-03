@@ -1,0 +1,164 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Public Transport Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/site.css">
+</head>
+
+<body>
+
+    <section class="page-header position-relative d-flex align-items-center justify-content-center">
+        <div class="bg-overlay"></div>
+
+        <div class="container position-relative z-index-1 text-center">
+            <h2 class="text-white fw-bold display-4 mb-3">Contact Us</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="#" class="text-white text-decoration-none hover-yellow">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active text-custom" aria-current="page">Contact</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <section class="contact-section py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h5 class="text-custom text-uppercase fw-bold mb-2">Get in Touch</h5>
+                <h2 class="fw-bold display-6 mb-3">Public Transport Management Center</h2>
+                <p class="text-muted mx-auto" style="max-width: 600px;">
+                    We are here to assist you with bus schedules, metro routes, and smart card services. Reach out to us for any inquiries or support.
+                </p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+
+                <div class="col">
+                    <div class="contact-card h-100 bg-white p-4 p-lg-5 rounded shadow-sm text-center">
+                        <div class="icon-box-circle mb-4 mx-auto">
+                            <i class="fas fa-map-marker-alt fa-2x"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Headquarters</h3>
+                        <p class="text-muted mb-0">
+                            450-451 Le Van Viet Street,<br>
+                            Tang Nhon Phu A Ward,<br>
+                            Thu Duc City, Ho Chi Minh City
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="contact-card h-100 bg-white p-4 p-lg-5 rounded shadow-sm text-center">
+                        <div class="icon-box-circle mb-4 mx-auto">
+                            <i class="fas fa-headset fa-2x"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Support Hotline</h3>
+                        <p class="text-muted mb-0">
+                            (+84) 28 3896 2018<br>
+                            (+84) 28 3736 0564
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="contact-card h-100 bg-white p-4 p-lg-5 rounded shadow-sm text-center">
+                        <div class="icon-box-circle mb-4 mx-auto">
+                            <i class="fas fa-envelope-open-text fa-2x"></i>
+                        </div>
+                        <h3 class="h4 fw-bold mb-3">Email Inquiries</h3>
+                        <p class="text-muted mb-0">
+                            info@utc2.edu.vn<br>
+                            support@transport.vn
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-form-section py-5 bg-light">
+        <div class="container">
+
+            <div class="bg-white shadow rounded overflow-hidden">
+                <div class="row g-0">
+
+                    <div class="col-lg-6">
+                        <div class="map-container h-100">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.4206639906!2d106.79635131533454!3d10.855574792267841!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175273967895369%3A0x5c264c751295b92e!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBHaWFvIHRow7RuZyBW4bqtbiB04bqjaSAtIFBow6JuIGhp4buHdSB04bqhaSBUcC4gSOG7kyBDaMOtIE1pbmg!5e0!3m2!1svi!2s!4v1626943829452!5m2!1svi!2s"
+                                    width="100%"
+                                    height="100%"
+                                    style="border:0; min-height: 500px;"
+                                    allowfullscreen=""
+                                    loading="lazy">
+                            </iframe>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="p-4 p-md-5">
+                            <h3 class="fw-bold mb-4">Send Us A Message</h3>
+                            <p class="text-muted mb-4">Have questions about bus routes, ticket prices, or lost items? Fill out the form below.</p>
+
+                            <form action="#">
+                                <div class="row g-3">
+
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control bg-light border-0" id="name" placeholder="Your Name">
+                                            <label for="name">Full Name</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control bg-light border-0" id="email" placeholder="Your Email">
+                                            <label for="email">Email Address</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control bg-light border-0" id="subject" placeholder="Subject">
+                                            <label for="subject">Topic (e.g., Bus Route 53)</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <textarea class="form-control bg-light border-0" placeholder="Message" id="message" style="height: 150px"></textarea>
+                                            <label for="message">Describe your issue or question</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mt-4">
+                                        <button class="btn btn-custom-primary w-100 py-3 fw-bold" type="submit">
+                                            Submit Inquiry
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
