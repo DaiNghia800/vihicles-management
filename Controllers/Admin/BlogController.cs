@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace Public_Transport.Controllers.Admin
 {
+    [Authorize(Policy = "NoCustomer")]
     public class BlogController : Controller
     {
         private readonly IBlogService _blogService;
@@ -18,91 +19,55 @@ namespace Public_Transport.Controllers.Admin
             _uploadService = uploadService;
         }
 
-        // === PUBLIC ROUTES (đặt TRƯỚC các route admin để tránh conflict) ===
-        [HttpGet("blog")]
-        public IActionResult Index()
-        {
-            return View("~/Views/Blog/blog-list.cshtml");
-        }
-
-        [HttpGet("blog/{id:int}")] // Thêm constraint :int để chỉ match với số
-        public IActionResult Detail(int id)
-        {
-            if (id <= 0)
-            {
-                return RedirectToAction("Index");
-            }
-
-            ViewData["BlogId"] = id;
-            return View("~/Views/Blog/blog-detail.cshtml");
-        }
-
-        [HttpGet("blog/api/list")]
-        public async Task<IActionResult> GetBlogsPublic()
-        {
-            var blogs = await _blogService.GetBlogsPublicAsync();
-            return Ok(blogs);
-        }
-
-        [HttpGet("blog/api/detail/{id:int}")]
-        public async Task<IActionResult> GetBlogDetailPublic(int id)
-        {
-            var blog = await _blogService.GetBlogDetailPublicAsync(id);
-            if (blog == null)
-            {
-                return NotFound(new { message = "Blog not found" });
-            }
-            return Ok(blog);
-        }
-
-        [HttpGet("blog/api/categories")]
-        public async Task<IActionResult> GetCategoriesPublic()
-        {
-            var categories = await _blogService.GetCategoriesPublicAsync();
-            return Ok(categories);
-        }
-
-        // === ADMIN ROUTES ===
+        // === ADMIN VIEWS ===
         [HttpGet("admin/blog")]
-        [Authorize(Policy = "NoCustomer")]
         public IActionResult IndexAdmin()
         {
             return View("~/Views/Admin/Blog/Index.cshtml");
         }
 
         [HttpGet("admin/blog/create")]
-        [Authorize(Policy = "NoCustomer")]
         public IActionResult Create()
         {
             return View("~/Views/Admin/Blog/Create.cshtml");
         }
 
         [HttpGet("admin/blog/edit/{id:int}")]
-        [Authorize(Policy = "NoCustomer")]
         public IActionResult Edit(int id)
         {
             ViewData["BlogId"] = id;
             return View("~/Views/Admin/Blog/Create.cshtml");
         }
 
+        [HttpGet("admin/blog/categories")]
+        public IActionResult Categories()
+        {
+            return View("~/Views/Admin/Blog/Category.cshtml");
+        }
+
+        // === ADMIN API ENDPOINTS ===
+
         [HttpPost("admin/blog/api/upload-image")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
                 return BadRequest(new { message = "No file provided" });
             }
+
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
             if (!allowedExtensions.Contains(extension))
             {
                 return BadRequest(new { message = "Invalid file type. Only images are allowed." });
             }
+
             if (file.Length > 5 * 1024 * 1024)
             {
                 return BadRequest(new { message = "File size exceeds 5MB limit" });
             }
+
             try
             {
                 var imageUrl = await _uploadService.UploadImageAsync(file);
@@ -115,7 +80,6 @@ namespace Public_Transport.Controllers.Admin
         }
 
         [HttpGet("admin/blog/api/list")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<ActionResult<IEnumerable<BlogPostDTO>>> GetBlogsAdmin()
         {
             var blogs = await _blogService.GetBlogsAdminAsync();
@@ -123,7 +87,6 @@ namespace Public_Transport.Controllers.Admin
         }
 
         [HttpGet("admin/blog/api/detail/{id:int}")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<ActionResult<BlogPostDTO>> GetBlogAdmin(int id)
         {
             var blog = await _blogService.GetBlogAdminAsync(id);
@@ -135,7 +98,6 @@ namespace Public_Transport.Controllers.Admin
         }
 
         [HttpPost("admin/blog/create")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<ActionResult<BlogPosts>> CreateBlog([FromBody] CreateBlogDTO createDTO)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -160,7 +122,6 @@ namespace Public_Transport.Controllers.Admin
         }
 
         [HttpPut("admin/blog/api/update/{id:int}")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<IActionResult> UpdateBlog(int id, [FromBody] CreateBlogDTO updateDTO)
         {
             try
@@ -183,7 +144,6 @@ namespace Public_Transport.Controllers.Admin
         }
 
         [HttpDelete("admin/blog/api/delete/{id:int}")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<IActionResult> DeleteBlog(int id)
         {
             var success = await _blogService.DeleteBlogAsync(id);
@@ -195,15 +155,15 @@ namespace Public_Transport.Controllers.Admin
         }
 
         // === BLOG CATEGORIES API ===
-        [HttpGet("api/BlogCategories")]
-        public async Task<ActionResult<IEnumerable<BlogCategories>>> GetBlogCategories()
+
+        [HttpGet("admin/blog/api/categories")]
+        public async Task<ActionResult<IEnumerable<BlogCategories>>> GetCategoriesAdmin()
         {
             var categories = await _blogService.GetCategoriesAdminAsync();
             return Ok(categories);
         }
 
-        [HttpGet("api/BlogCategories/{id:int}")]
-        [Authorize(Policy = "NoCustomer")]
+        [HttpGet("admin/blog/api/categories/{id:int}")]
         public async Task<ActionResult<BlogCategories>> GetBlogCategory(int id)
         {
             var category = await _blogService.GetCategoryAdminAsync(id);
@@ -214,11 +174,9 @@ namespace Public_Transport.Controllers.Admin
             return Ok(category);
         }
 
-        [HttpPost("api/BlogCategories")]
-        [Authorize(Policy = "NoCustomer")]
+        [HttpPost("admin/blog/api/categories")]
         public async Task<ActionResult<BlogCategories>> CreateBlogCategory([FromBody] CreateBlogCategoryDTO createDTO)
         {
-            // Thêm validation
             if (createDTO == null || string.IsNullOrWhiteSpace(createDTO.Name))
             {
                 return BadRequest(new { message = "Category name is required" });
@@ -235,11 +193,9 @@ namespace Public_Transport.Controllers.Admin
             }
         }
 
-        [HttpPut("api/BlogCategories/{id:int}")]
-        [Authorize(Policy = "NoCustomer")]
+        [HttpPut("admin/blog/api/categories/{id:int}")]
         public async Task<IActionResult> UpdateBlogCategory(int id, [FromBody] CreateBlogCategoryDTO updateDTO)
         {
-            // Thêm validation
             if (updateDTO == null || string.IsNullOrWhiteSpace(updateDTO.Name))
             {
                 return BadRequest(new { message = "Category name is required" });
@@ -260,8 +216,7 @@ namespace Public_Transport.Controllers.Admin
             }
         }
 
-        [HttpDelete("api/BlogCategories/{id:int}")]
-        [Authorize(Policy = "NoCustomer")]
+        [HttpDelete("admin/blog/api/categories/{id:int}")]
         public async Task<IActionResult> DeleteBlogCategory(int id)
         {
             try
@@ -283,16 +238,7 @@ namespace Public_Transport.Controllers.Admin
             }
         }
 
-        [HttpGet("admin/blog/api/categories")]
-        [Authorize(Policy = "NoCustomer")]
-        public async Task<ActionResult<IEnumerable<BlogCategories>>> GetCategoriesAdmin()
-        {
-            var categories = await _blogService.GetCategoriesAdminAsync();
-            return Ok(categories);
-        }
-
         [HttpGet("admin/blog/api/authors")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetBlogAuthors()
         {
             var authors = await _blogService.GetBlogAuthorsAsync();
@@ -300,7 +246,6 @@ namespace Public_Transport.Controllers.Admin
         }
 
         [HttpGet("admin/blog/api/current-user")]
-        [Authorize(Policy = "NoCustomer")]
         public async Task<ActionResult<UserDTO>> GetCurrentUser()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -308,18 +253,13 @@ namespace Public_Transport.Controllers.Admin
             {
                 return Unauthorized(new { message = "User not authenticated" });
             }
+
             var user = await _blogService.GetCurrentUserAsync(userId);
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });
             }
             return Ok(user);
-        }
-        [HttpGet("admin/blog/categories")]
-        [Authorize(Policy = "NoCustomer")]
-        public IActionResult Categories()
-        {
-            return View("~/Views/Admin/Blog/Category.cshtml");
         }
     }
 }

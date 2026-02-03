@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Public_Transport.Models.Entities;
 using Public_Transport.Services.IServices;
 
-namespace Fastkart.Services
+namespace Public_Transport.Services
 {
     public class UploadService : IUploadService
     {

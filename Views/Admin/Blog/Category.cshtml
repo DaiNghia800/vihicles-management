@@ -401,7 +401,7 @@
         showLoading(true);
         try {
             console.log('Loading categories...');
-            const response = await fetch('/api/BlogCategories');
+            const response = await fetch('/admin/blog/api/categories'); // ✅ CẬP NHẬT
             console.log('Response status:', response.status);
 
             if (response.ok) {

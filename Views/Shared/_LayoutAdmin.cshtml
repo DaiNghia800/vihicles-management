@@ -194,16 +194,6 @@
                         </li>
                     }
                 </ul>
-                    @* <li class="profile-box position-relative me-0 pe-0">
-                        <div class="profile d-flex align-items-center">
-                            <img src="/images/users/default-avatar.png" alt="Guest" class="user-img img-fluid" />
-                            <div class="user-name">
-                                <span>Guest</span>
-                                <p>Not logged in</p>
-                            </div>
-                        </div>
-                    </li> *@
-                </ul>
             </div>
         </div>
     </header>
@@ -261,16 +251,24 @@
                                     </li>
                                     <li>
                                         <a href="/admin/blog/categories" class="text-capitalize">
-                                          Blog Categories
+                                            Blog Categories
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/blog" target="_blank" class="text-capitalize">
+                                        <a href="/blogs" target="_blank" class="text-capitalize">
                                             View Blog Page
                                         </a>
                                     </li>
                                 </ul>
                             </li>
+                            <!-- === THÊM MỚI: Payment Management Menu === -->
+                            <li class="sidebar-list">
+                                <a href="/admin/payment" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/payment") ? "active" : "")">
+                                    <i class="fa-solid fa-credit-card"></i>
+                                    <span class="text-capitalize">Payments</span>
+                                </a>
+                            </li>
+                            <!-- === KẾT THÚC THÊM MỚI === -->
                             <li class="sidebar-list">
                                 <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
                                     <i class="fa-regular fa-user"></i>

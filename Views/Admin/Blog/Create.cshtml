@@ -413,7 +413,7 @@
 
     async function loadDropdownData() {
         try {
-            const categoriesRes = await fetch('/api/BlogCategories');
+            const categoriesRes = await fetch('/admin/blog/api/categories'); 
             if (categoriesRes.ok) {
                 categories = await categoriesRes.json();
                 populateCategories();

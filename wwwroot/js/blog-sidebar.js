@@ -9,8 +9,8 @@ let categoriesForSidebar = [];
 async function loadSidebarData(currentBlogId = null) {
     try {
         const [blogsRes, categoriesRes] = await Promise.all([
-            fetch('/blog/api/list'),
-            fetch('/blog/api/categories')
+            fetch('/blogs/api/list'),
+            fetch('/blogs/api/categories')
         ]);
 
         if (blogsRes.ok) {
@@ -82,7 +82,7 @@ function renderCategories() {
         const count = allBlogsForSidebar.filter(b => b.categoryUid === cat.uid).length;
         return `
             <li>
-                <a href="/blog?category=${cat.uid}">
+                <a href="/blogs?category=${cat.uid}">
                     <i class="fa-solid fa-chevron-right" style="color: #ffab00;"></i>
                     ${cat.name} (${count})
                 </a>
