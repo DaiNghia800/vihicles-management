@@ -1,342 +1,199 @@
-﻿@model Public_Transport.Models.Entities.Trip
-@using System.Text.Json;
-
-@{
-    ViewData["Title"] = "Chi tiết lộ trình";
-    // 1. Chuyển dữ liệu các trạm sang JSON
-    var stationsJson = JsonSerializer.Serialize(Model.Route.RouteDetails.Select(x => new
-    {
-        name = x.Station.StationName,
-        address = x.Station.Address,
-        coords = x.Station.Coordinates,
-        order = x.OrderIndex
-    }));
+﻿@{
+    ViewData["Title"] = "Route detail Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-
-<style>
-    /* Ẩn bảng chỉ đường mặc định để đỡ rối, bật lên khi cần */
-    .routing-hidden .leaflet-routing-container {
-        display: none !important;
-    }
-    /* Style cho icon xe buýt trên bản đồ */
-    .bus-icon-marker {
-        background-color: #ffc107;
-        border: 2px solid #fff;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 30px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    }
-</style>
-
-<section class="routes-1 position-relative" style="height: 250px; background: #222;">
-    <div class="container mx-auto position-relative z-1 h-100">
-        <div class="d-flex justify-content-center align-items-center h-100">
+<section class="routes-1">
+    <div class="bg-overlay position-absolute bg-black opacity-75 start-0 top-0 w-100 h-100"></div>
+    <div class="container mx-auto position-relative z-1">
+        <div class="d-flex justify-content-center align-items-center">
             <div>
-                <h2 class="text-center text-white text-uppercase">@Model.Route.RouteName</h2>
-                <p class="text-center text-white-50">Chi tiết lộ trình & Điều hướng</p>
+                <h2 class="text-center">ROUTE DETAIL</h2>
+                <ul class="d-flex justify-content-center gap-1">
+                    <li>
+                        <span class="text-white fs-6 fw-light font-secondary">Home</span>
+                    </li>
+                    <li>
+                        <span class="color-primary">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </span>
+                        <span class="text-white fs-6 fw-light font-secondary">
+                            route detail
+                        </span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </section>
 
-<section class="route-detail py-5 bg-light">
+<section class="route-detail">
     <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-8">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="fw-bold mb-0">Bản đồ lộ trình</h3>
-                    <button id="btn-toggle-directions" class="btn btn-sm btn-outline-secondary d-none rounded-pill">
-                        <i class="fas fa-list-ul me-1"></i> Xem hướng dẫn đi bộ
-                    </button>
-                </div>
-
-                <div class="rounded-4 overflow-hidden shadow-sm position-relative" style="height: 500px; border: 1px solid #ddd;">
-                    <div id="map" style="width: 100%; height: 100%;"></div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 mt-4 mt-lg-0">
-                <div class="card p-4 border-0 shadow-sm rounded-4 h-100 bg-white">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="fw-bold text-warning mb-1">Route @Model.RouteId</h5>
-                            <small class="text-muted">@Model.Route.RouteName</small>
-                        </div>
-                        <span class="badge bg-success rounded-pill px-3 py-2">@Model.Vehicle?.VehicleType</span>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <div class="row text-center mb-4">
-                        <div class="col-6 mb-3">
-                            <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Thời gian</small>
-                            <span class="fw-bold fs-5" id="total-duration">-- phút</span>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Giá vé</small>
-                            <span class="fw-bold fs-5 text-warning">@Model.Route.BasePrice.ToString("N0")đ</span>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Đi bộ</small>
-                            <span class="fw-bold fs-5" distance>0 m</span>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted d-block text-uppercase" style="font-size: 0.8rem;">Chuyến sau</small>
-                            <span class="fw-bold fs-5 text-success">5 mins</span>
-                        </div>
-                    </div>
-
-                    <button type="button" button-start class="btn btn-warning w-100 fw-bold text-white py-3 rounded-pill shadow-sm mb-3 text-uppercase">
-                        <i class="fas fa-location-arrow me-2"></i> Start Navigation
-                    </button>
-
-                    <div class="alert alert-light border small text-muted">
-                        <i class="fas fa-info-circle me-1"></i> Hệ thống sẽ tìm đường đi bộ ngắn nhất từ vị trí của bạn đến trạm xe gần nhất.
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="row">
-            <div class="col-12">
-                <h4 class="fw-bold mb-4">Lộ trình chi tiết</h4>
-                <div class="timeline ps-3 border-start border-2 border-warning ms-2">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-3">
+                    Route 08: Ben Thanh - Cho Lon
+                </h2>
 
-                    <div class="timeline-item mb-5 position-relative ps-5">
-                        <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-white border border-2 border-warning d-flex align-items-center justify-content-center"
-                             style="width: 40px; height: 40px; left: -1px;">
-                            <i class="fas fa-walking text-warning"></i>
+                <p class="text-muted">
+                    The optimal route is based on your location.
+                    The system updates in real time from various modes of transportation.
+                </p>
+
+                <div class="rounded-4 overflow-hidden mb-4 bg-light shadow-sm"
+                     style="height: 400px; position: relative;">
+                    <div id="map" class="mb-4"></div>
+
+                    <div class="position-absolute top-50 start-50 translate-middle badge bg-warning p-3 rounded-circle shadow">
+                        <i class="fas fa-bus fs-4"></i>
+                    </div>
+                </div>
+
+                <h4 class="fw-bold mb-4">Steps to Destination</h4>
+
+                <div class="timeline">
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon">
+                            <i class="fas fa-walking"></i>
                         </div>
-                        <h6 class="fw-bold mb-1">Đi bộ đến trạm đón</h6>
-                        <small class="text-muted">Khoảng cách: <span distance>...</span> | Thời gian: <span class="time">...</span></small>
+
+                        <h6 class="fw-bold mb-0">
+                            Walk
+                            <span distance>150m</span>
+                            to Ben Thanh Station
+                        </h6>
+
+                        <small class="text-muted">
+                            walk for about
+                            <span class="time">2 minutes</span>
+                        </small>
                     </div>
 
-                    @foreach (var detail in Model.Route.RouteDetails)
-                    {
-                        <div class="timeline-item mb-4 position-relative ps-5">
-                            <div class="position-absolute top-0 start-0 translate-middle rounded-circle bg-warning text-white d-flex align-items-center justify-content-center shadow-sm"
-                                 style="width: 40px; height: 40px; left: -1px;">
-                                <i class="fas fa-bus"></i>
-                            </div>
-                            <h6 class="fw-bold mb-1">@detail.Station.StationName</h6>
-                            <small class="text-muted d-block">@detail.Station.Address</small>
-                            <small class="text-success"><i class="fas fa-clock me-1"></i> @Model.DepartureTime.AddMinutes(detail.DistanceFromStart * 2).ToString("HH:mm")</small>
+                    <div class="timeline-item">
+                        <div class="timeline-icon bg-warning text-white">
+                            <i class="fas fa-bus"></i>
                         </div>
-                    }
+
+                        <div class="card p-3 border-start border-warning border-4">
+                            <h6 class="fw-bold mb-1">
+                                On Board: Electric Bus 08
+                            </h6>
+                            <small class="text-muted">
+                                Vehicle license plate: 51B-123.45 | Driver: Nguyen Van A
+                            </small>
+
+                            <div class="mt-2 p-2 bg-light rounded small">
+                                <i class="fas fa-info-circle text-warning me-1"></i>
+                                Expected to arrive in 5 minutes
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+
+                        <h6 class="fw-bold mb-0">
+                            Exit at Cho Lon Station
+                        </h6>
+
+                        <small class="text-muted">
+                            Your destination is on the right.
+                        </small>
+                    </div>
+
                 </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold text-warning mb-0">
+                            Route 08
+                        </h4>
+                        <span class="badge bg-success rounded-pill">
+                            Electric Bus
+                        </span>
+                    </div>
+
+                    <p class="text-muted small">
+                        Ben Thanh - Cho Lon
+                    </p>
+
+                    <hr>
+
+                    <div class="row g-3 text-center mb-4">
+
+                        <div class="col-6">
+                            <small class="text-muted d-block">Duration</small>
+                            <span class="fw-bold">
+                                <i class="far fa-clock text-warning"></i>
+                                <span id="total-duration">25 mins</span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <small class="text-muted d-block">Fare</small>
+                            <span class="fw-bold">
+                                <i class="fas fa-ticket-alt text-warning"></i>
+                                7.000đ
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <small class="text-muted d-block">Walking</small>
+                            <span class="fw-bold">
+                                <i class="fas fa-walking text-warning"></i>
+                                <span distance>150m</span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <small class="text-muted d-block">Next Bus</small>
+                            <span class="fw-bold text-success">
+                                5 mins
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="button"
+                                button-start
+                                class="btn btn-warning fw-bold rounded-pill py-2 shadow-sm">
+                            START NAVIGATION
+                        </button>
+
+                        <button type="button"
+                                id="btn-toggle-directions"
+                                class="btn btn-outline-secondary btn-sm rounded-pill d-none py-2">
+                            <i class="fas fa-list-ul me-1"></i>
+                            See detailed instructions.
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card p-4">
+                    <h6 class="fw-bold mb-3">Next Departures</h6>
+
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span>08:00 AM</span>
+                        <span class="text-muted small">Trip 1</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span>08:15 AM</span>
+                        <span class="text-muted small text-success">Trip 2</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between py-2">
+                        <span>08:30 AM</span>
+                        <span class="text-muted small">Trip 3</span>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </section>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
-<script>
-    // 1. Lấy dữ liệu trạm từ C#
-    var stationsData = @Html.Raw(stationsJson);
-
-    // Chuyển đổi dữ liệu trạm thành mảng LatLng của Leaflet
-    var busWaypoints = [];
-    stationsData.forEach(function(s) {
-        var coords = s.coords.split(',').map(Number);
-        if(coords.length === 2) {
-            busWaypoints.push(L.latLng(coords[0], coords[1]));
-        }
-    });
-
-    // --- PHẦN JS CỦA BẠN (Đã chỉnh sửa để khớp dữ liệu) ---
-    let busRouteControl;
-
-    // Khởi tạo bản đồ (Lấy tâm là trạm đầu tiên)
-    var startPoint = busWaypoints.length > 0 ? busWaypoints[0] : [10.7712, 106.6980];
-    var map = L.map('map').setView(startPoint, 13);
-
-    // Thêm lớp nền
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Icon trạm xe buýt
-    var stationIcon = L.divIcon({
-        html: '<i class="fas fa-bus" style="line-height: 30px; color: white;"></i>',
-        iconSize: [30, 30],
-        className: 'bus-icon-marker'
-    });
-
-    // Vẽ đường đi của XE BUÝT (Màu vàng/cam) đi qua tất cả các trạm
-    if (busWaypoints.length > 0) {
-        busRouteControl = L.Routing.control({
-            waypoints: busWaypoints, // Dùng danh sách trạm thật
-            lineOptions: {
-                styles: [{
-                    color: '#ffb606', // Màu vàng xe buýt
-                    weight: 6,
-                    opacity: 0.8
-                }]
-            },
-            router: L.Routing.osrmv1({
-                serviceUrl: 'https://router.project-osrm.org/route/v1',
-                profile: 'car' // Xe buýt chạy đường ô tô
-            }),
-            createMarker: function (i, wp, nWps) {
-                // Tạo marker tại mỗi trạm
-                return L.marker(wp.latLng, {icon: stationIcon})
-                    .bindPopup('<b>Trạm:</b> ' + stationsData[i].name);
-            },
-            addWaypoints: false,
-            draggableWaypoints: false,
-            show: false, // Ẩn hướng dẫn text của tuyến xe buýt
-            fitSelectedRoutes: true
-        }).addTo(map);
-    }
-
-    // --- LOGIC NAVIGATION (Tìm đường đi bộ) ---
-    let isNavigating = false;
-    let routingToStation = null;
-    const buttonStart = document.querySelector("[button-start]");
-    const btnToggle = document.getElementById("btn-toggle-directions");
-
-    // Tạo marker User
-    var userIcon = L.divIcon({
-        html: '<i class="fas fa-circle" style="color: #3b82f6; font-size: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></i>',
-        iconSize: [20, 20],
-        className: 'user-location-icon'
-    });
-    var userMarker = L.marker([0, 0], { icon: userIcon }); // Chưa add vào map vội
-
-    // Hàm tính khoảng cách đơn giản (Haversine) để tìm trạm gần nhất
-    function getDistanceSimple(lat1, lon1, lat2, lon2) {
-        var R = 6371;
-        var dLat = (lat2 - lat1) * (Math.PI / 180);
-        var dLon = (lon2 - lon1) * (Math.PI / 180);
-        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
-
-    if (buttonStart) {
-        buttonStart.addEventListener("click", function () {
-            if (!isNavigating) {
-                // BẮT ĐẦU TÌM ĐƯỜNG
-                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang định vị...';
-
-                map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
-
-                map.once('locationfound', function (e) {
-                    userMarker.setLatLng(e.latlng).addTo(map);
-
-                    // 1. Tìm trạm gần nhất
-                    var minDist = 99999;
-                    var nearestStationLatLng = null;
-                    var nearestStationName = "";
-
-                    busWaypoints.forEach(function(wp, index) {
-                        var dist = getDistanceSimple(e.latlng.lat, e.latlng.lng, wp.lat, wp.lng);
-                        if(dist < minDist) {
-                            minDist = dist;
-                            nearestStationLatLng = wp;
-                            nearestStationName = stationsData[index].name;
-                        }
-                    });
-
-                    // 2. Vẽ đường đi bộ từ User -> Trạm gần nhất
-                    if (routingToStation) map.removeControl(routingToStation);
-
-                    routingToStation = L.Routing.control({
-                        waypoints: [e.latlng, nearestStationLatLng],
-                        lineOptions: {
-                            styles: [{
-                                color: '#3b82f6', // Màu xanh đi bộ
-                                weight: 5,
-                                opacity: 0.8,
-                                dashArray: '10, 10' // Nét đứt
-                            }]
-                        },
-                        router: L.Routing.osrmv1({
-                            profile: 'foot' // Chế độ đi bộ
-                        }),
-                        createMarker: function() { return null; }, // Không tạo marker mặc định
-                        addWaypoints: false,
-                        show: true, // Hiện bảng chỉ dẫn
-                        containerClassName: 'routing-container-custom' // Class để toggle
-                    }).addTo(map);
-
-                    // Ẩn bảng chỉ đường mặc định ban đầu (cho gọn)
-                    setTimeout(() => {
-                        const container = document.querySelector('.leaflet-right');
-                        if (container) container.classList.add('routing-hidden');
-                        if (btnToggle) btnToggle.classList.remove('d-none');
-                    }, 1000);
-
-                    // 3. Cập nhật thông tin lên giao diện
-                    routingToStation.on('routesfound', function (e) {
-                        const routes = e.routes;
-                        const summary = routes[0].summary;
-                        const distance = Math.round(summary.totalDistance); // mét
-                        const time = Math.round(summary.totalTime / 60); // phút
-
-                        // Cập nhật text trên màn hình
-                        const listDistanceSpan = document.querySelectorAll("span[distance]");
-                        listDistanceSpan.forEach(span => {
-                            span.innerText = distance >= 1000 ? (distance / 1000).toFixed(1) + " km" : distance + " m";
-                        });
-
-                        const timeSpan = document.querySelector(".time");
-                        if(timeSpan) timeSpan.innerText = time + " phút";
-
-                        alert(`Đã tìm thấy trạm gần nhất: ${nearestStationName} (${distance}m)`);
-                    });
-
-                    // Đổi trạng thái nút
-                    buttonStart.innerHTML = '<i class="fas fa-stop me-2"></i> Stop Navigation';
-                    buttonStart.classList.replace("btn-warning", "btn-danger");
-                    isNavigating = true;
-
-                });
-
-                map.on('locationerror', function(e) {
-                    alert("Không thể định vị: " + e.message);
-                    buttonStart.innerHTML = '<i class="fas fa-location-arrow me-2"></i> Start Navigation';
-                });
-
-            } else {
-                // DỪNG TÌM ĐƯỜNG
-                map.stopLocate();
-                if (routingToStation) {
-                    map.removeControl(routingToStation);
-                    routingToStation = null;
-                }
-                if (userMarker) userMarker.removeFrom(map);
-
-                if (btnToggle) btnToggle.classList.add('d-none');
-
-                // Zoom lại toàn cảnh tuyến xe
-                if(busRouteControl) map.fitBounds(L.latLngBounds(busWaypoints));
-
-                buttonStart.innerHTML = '<i class="fas fa-location-arrow me-2"></i> Start Navigation';
-                buttonStart.classList.replace("btn-danger", "btn-warning");
-                isNavigating = false;
-            }
-        });
-    }
-
-    // Logic nút Bật/Tắt hướng dẫn
-    if (btnToggle) {
-        btnToggle.addEventListener("click", function () {
-            const container = document.querySelector('.leaflet-right');
-            if (container) {
-                container.classList.toggle('routing-hidden');
-                this.innerHTML = container.classList.contains('routing-hidden') ?
-                    '<i class="fas fa-list-ul me-1"></i> Xem hướng dẫn đi bộ' :
-                    '<i class="fas fa-times me-1"></i> Đóng hướng dẫn';
-            }
-        });
-    }
-</script>
