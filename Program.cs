@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Public_Transport.Models.EF;
+using Public_Transport.Models.Entities;
+using Public_Transport.Services;
+using Public_Transport.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddScoped<IUploadService, UploadService>();
 
 var app = builder.Build();
 

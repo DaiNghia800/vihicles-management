@@ -1,0 +1,81 @@
+﻿@using Public_Transport.Models.Entities;
+@model Vehicle;
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "Edit Vehicle";
+    var vehicle = ViewBag.vehicle as Vehicle;
+}
+
+<section class="product-create">
+    <form action="/admin/vehicle/edit/@vehicle.VehicleId" method="post" class="theme-form theme-form-2" id="mainForm" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-8 mx-auto">
+                <div class="card">
+                    <div class="card-header2">
+                        <h5>Vehicle Information</h5>
+                    </div>
+                    <div class="row mb-4 align-items-center">
+                        <label for="name" class="col-3 form-label-title">License Plate</label>
+                        <div class="col-9 parent">
+                            <input class="form-control" asp-for="LicensePlate" type="text" id="name" placeholder="Enter license plate number" />
+                            <span asp-validation-for="LicensePlate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-4 align-items-center">
+                        <label for="type" class="col-3 form-label-title">Vehicle Type</label>
+                        <div class="col-9 parent">
+                            <input class="form-control" asp-for="VehicleType" type="text" id="type" placeholder="Enter vehicle type" />
+                            <span asp-validation-for="VehicleType" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-4 align-items-center">
+                        <label for="Seat" class="col-3 form-label-title">Seat Capacity</label>
+                        <div class="col-9 parent">
+                            <input class="form-control" asp-for="SeatCapacity" type="number" id="Seat" placeholder="0" />
+                            <span asp-validation-for="SeatCapacity" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-4 align-items-center">
+                        <label for="status" class="col-3 form-label-title">Status</label>
+                        <div class="col-9">
+                            <div class="radio-section">
+                                <label>
+                                    <input type="radio" name="Status" value="Active" @(vehicle.Status == "Active" ? "checked" : "")>
+                                    <i></i>
+                                    <span>Active</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="Status" value="Inactive" @(vehicle.Status == "Inactive" ? "checked" : "")>
+                                    <i></i>
+                                    <span>Inactive</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="Status" value="Maintenance" @(vehicle.Status == "Maintenance" ? "checked" : "")>
+                                    <i></i>
+                                    <span>Maintenance</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header2">
+                        <h5>Product Images</h5>
+                    </div>
+                    <div class="row mb-4 align-items-center">
+                        <label for="desc" class="col-3 form-label-title">Images</label>
+                        <div class="col-9">
+                            <div id="my-dropzone" class="dropzone"></div>
+                            <input type="hidden" name="Thumbnail" id="Thumbnail" data-thumbnail='@(string.IsNullOrEmpty(vehicle.Thumbnail) ? "[]" : vehicle.Thumbnail)'>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mb-3">
+                    <button type="submit" class="btn text-white theme-bg-color ms-auto" button-save>Add Vehicle</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</section>
+

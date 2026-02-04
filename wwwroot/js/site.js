@@ -187,42 +187,6 @@ if (dropzoneElement) {
     });
 }
 //end dropzone
-
-// get subcategory by category
-var subcategorySelect = $("#subcategory");
-var categorySelect = $("#category");
-function getSubCategory(categoryId) {
-    $.ajax({
-        url: "/admin/product/subCategory",
-        type: "GET",
-        dataType: 'json',
-        data: { categoryId: categoryId },
-        success: function (data) {
-            if (data.length > 0) {
-                var options;
-                const subcategoryId = subcategorySelect[0].getAttribute("subcategory-id");
-                data.forEach(function (sub) {
-                    options += `<option value="${sub.uid}" ${sub.uid == subcategoryId ? "selected" : ""}>${sub.subCategoryName}</option>`;
-                });
-                subcategorySelect.html(options).trigger('change');
-            } else {
-                subcategorySelect.html('<option disabled selected value="">Không có SubCategory</option>').trigger('change');
-            }
-        },
-        error: function (err) {
-            subcategorySelect.html('<option disabled selected value="">Không có SubCategory</option>').trigger('change');
-            console.error(err);
-        }
-    });
-}
-
-getSubCategory(categorySelect.val());
-categorySelect.on("change", function () {
-    getSubCategory($(this).val());
-})
-// end get subcategory by category
-
-
 //search
 const inputSearch = document.querySelector("[input-search]");
 if (inputSearch) {
@@ -256,7 +220,6 @@ if (inputSearch) {
     //end display default
 }
 //end search
-
 
 //product list
 const productList = document.getElementById("product-list")
@@ -480,7 +443,6 @@ if (formChangeMulti) {
             const ids = [];
 
             const listInputChange = document.querySelectorAll("[input-change]:checked");
-            console.log(listInputChange)
             listInputChange.forEach(input => {
                 const id = input.getAttribute("input-change");
                 ids.push(id);

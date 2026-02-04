@@ -1,0 +1,31 @@
+﻿@using Public_Transport.Models.Entities;
+@model Roles;
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "Edit Role";
+    var role = ViewBag.role as Roles;
+}
+
+<section class="product-category-create">
+    <form action="/admin/role/edit/@role.Uid" method="post" class="theme-form theme-form-2">
+        <div class="row">
+            <div class="col-8 mx-auto">
+                <div class="card">
+                    <div class="card-header2">
+                        <h5>Role Information</h5>
+                    </div>
+                    <div class="row mb-4 align-items-center">
+                        <label for="name" class="col-3 form-label-title">Role Name</label>
+                        <div class="col-9">
+                            <input class="form-control" type="text" asp-for="RoleName" id="name" placeholder="Role Name" />
+                            <span asp-validation-for="RoleName" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mb-3">
+                    <button type="submit" class="btn text-white theme-bg-color ms-auto" button-save>Update Role</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

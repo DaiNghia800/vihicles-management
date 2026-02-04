@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/lib/slick/slick.css" />
@@ -74,12 +75,12 @@
                     <li class="mode">
                         <i class="fa-regular fa-moon"></i>
                     </li>
-                    
+
                     <li class="profile-box position-relative me-0 pe-0">
                         <div class="profile d-flex align-items-center">
 
                             <img src="https://cdn2.fptshop.com.vn/small/avatar_trang_1_cd729c335b.jpg" alt="" class="img-fluid rounded-circle mb-0"
-                                            style="width: 40px; height: 40px; object-fit: cover;  " />
+                                 style="width: 40px; height: 40px; object-fit: cover;  " />
                             <div class="user-name">
                                 <span style="display:block; max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Nguyen Van A</span>
                                 <p>
@@ -90,7 +91,7 @@
                         </div>
                         <ul class="profile-dropdown">
                             <li>
-                                <a href="javascript:void(0)"  style="cursor:pointer;">
+                                <a href="javascript:void(0)" style="cursor:pointer;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
                                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="12" cy="7" r="4"></circle>
@@ -186,6 +187,142 @@
                                     <span class="text-capitalize">Dashboard</span>
                                 </a>
                             </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseVehicle" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/vehicle") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseVehicle">
+                                    <i class="fa-solid fa-bus"></i>
+                                    <span class="text-capitalize">Vehicle</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/vehicle") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/vehicle") ? "show" : "")" id="collapseVehicle">
+                                    <li>
+                                        <a href="/admin/vehicle" class="text-capitalize">
+                                            All Vehicle
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/vehicle/create" class="text-capitalize">
+                                            Add new Vehicle
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseDriver" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseDriver">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <span class="text-capitalize">Driver</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "show" : "")" id="collapseDriver">
+                                    <li>
+                                        <a href="/admin/driver" class="text-capitalize">
+                                            All Driver
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/driver/create" class="text-capitalize">
+                                            Add new Driver
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                    <span class="text-capitalize">Role</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/role") ? "show" : "")" id="collapseRole">
+                                    <li>
+                                        <a href="/admin/role" class="text-capitalize">
+                                            All roles
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/role/create" class="text-capitalize">
+                                            Add new role
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/role/permission" class="text-capitalize">
+                                            Permission
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseUser" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/user") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseUser">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span class="text-capitalize">User</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/user") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/user") ? "show" : "")" id="collapseUser">
+                                    <li>
+                                        <a href="/admin/user" class="text-capitalize">
+                                            All users
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/user/create" class="text-capitalize">
+                                            Add new user
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/role/permission" class="text-capitalize">
+                                            Permission
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseBlog" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/blog") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseBlog">
+                                    <i class="fa-solid fa-blog"></i>
+                                    <span class="text-capitalize">Blog</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/blog") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/blog") ? "show" : "")" id="collapseBlog">
+                                    <li>
+                                        <a href="/admin/blog" class="text-capitalize">
+                                            All blog
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/blog/create" class="text-capitalize">
+                                            Add new blog
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseSetting" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/setting") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseSetting">
+                                    <i class="fa-solid fa-gear"></i>
+                                    <span class="text-capitalize">Setting</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/setting") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/setting") ? "show" : "")" id="collapseSetting">
+                                    <li>
+                                        <a href="/admin/setting" class="text-capitalize">
+                                            All setting
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/setting/create" class="text-capitalize">
+                                            Add new setting
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                         }
                     </ul>
                 </nav>
@@ -223,11 +360,14 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/lib/tinymce/tinymce.min.js"></script>
     <script src="/lib/slick/slick.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.all.min.js"></script>
     <script src="~/js/sidebar-effect.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/leadflet.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -19,6 +19,7 @@ namespace Public_Transport.Models.EF
         public DbSet<PermissionType> PermissionTypes { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Users> Users { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -160,6 +161,48 @@ namespace Public_Transport.Models.EF
                     .IsRequired(false);
                 entity.Property(e => e.Deleted)
                     .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<Vehicle>(entity =>
+            {
+                entity.ToTable("Vehicles");
+
+                entity.HasKey(v => v.VehicleId);
+
+                entity.Property(v => v.LicensePlate)
+                      .IsRequired()
+                      .HasMaxLength(20);
+
+                entity.Property(v => v.Thumbnail)
+                      .HasColumnType("nvarchar(max)")
+                      .IsUnicode(false)
+                      .IsRequired(false);
+
+                entity.Property(v => v.VehicleType)
+                      .IsRequired()
+                      .HasMaxLength(50);
+
+                entity.Property(v => v.SeatCapacity)
+                      .IsRequired();
+
+                entity.Property(v => v.Status)
+                      .HasMaxLength(30)
+                      .HasDefaultValue("Active");
+
+                entity.Property(v => v.CreatedAt)
+                      .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(v => v.UpdatedAt)
+                      .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(v => v.CreatedBy)
+                      .HasMaxLength(100);
+
+                entity.Property(v => v.UpdatedBy)
+                      .HasMaxLength(100);
+
+                entity.Property(v => v.Deleted)
+                      .HasDefaultValue(false);
             });
         }
     }

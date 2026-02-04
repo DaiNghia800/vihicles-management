@@ -812,32 +812,32 @@ header.close {
 }
 
 .dashboard-area .box-total.box-product .box-contain::after {
-    background-color: #ef3f3e;
+    background-color: #ffa53b;
 }
 
 .dashboard-area .box-total.box-product .box-contain .media-body h4 span {
-    background-color: rgba(239, 63, 62, 0.1);
+    background-color: rgb(255, 165, 59, 0.1);
     color: #ef3f3e;
 }
 
 .dashboard-area .box-total.box-product .box-contain .box-icon {
-    background-color: rgba(239, 63, 62, 0.1);
-    color: #ef3f3e;
+    background-color: rgb(255, 165, 59, 0.1);
+    color: #ffa53b;
 }
 
 .dashboard-area .box-total.box-custom .box-contain::after {
-    background-color: #9e65c2;
+    background-color: #ef3f3e;
 }
 
 .dashboard-area .box-total.box-custom .box-contain .media-body h4 span {
-    background-color: rgba(158, 101, 194, 0.1);
+    background-color: rgba(239, 63, 62, 0.1);
     color: #9e65c2;
     text-transform: uppercase;
 }
 
 .dashboard-area .box-total.box-custom .box-contain .box-icon {
-    background-color: rgba(158, 101, 194, 0.1);
-    color: #9e65c2;
+    background-color: rgba(239, 63, 62, 0.1);
+    color: #ef3f3e;
 }
 
 .dashboard-area .box-title h4 {
@@ -1337,7 +1337,7 @@ header.close {
 }
 
 .table-search {
-    margin-bottom: 1.5625rem;
+/*    margin-bottom: 1.5625rem;*/
     color: #333;
     text-align: right;
 }
@@ -1435,6 +1435,11 @@ header.close {
 .theme-table tbody tr td.status-close button {
     background-color: rgba(47, 135, 51, 0.15);
     color: #2f8733;
+}
+
+.theme-table tbody tr td.status-warning button {
+    background-color: rgba(254, 164, 59, 0.15);
+    color: #FEA43B;
 }
 
 .theme-table tbody tr td:last-child ul {
@@ -2585,3 +2590,14 @@ h5.card-title {
 
 /* End otp */
 
+.custom-bus-icon {
+    background-color: #198754;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    padding: 10px;
+}
