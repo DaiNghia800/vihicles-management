@@ -4,7 +4,7 @@
     {
         // Roles
         public const string ROLE_ADMIN = "Admin";
-        public const string ROLE_PASSENGER = "Passenger"; // ✅ Đổi từ ROLE_CUSTOMER
+        public const string     ROLE_PASSENGER = "Passenger"; // ✅ Đổi từ ROLE_CUSTOMER
         public const string ROLE_DRIVER = "Driver";
         
         // Policies

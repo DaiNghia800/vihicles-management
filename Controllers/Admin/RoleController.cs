@@ -86,7 +86,7 @@ namespace Public_Transport.Controllers.Admin
             return Json(new
             {
                 code = role,
-                message = $"Không thể xóa vai trò vì đang chứa {role} người dùng. Vui lòng xóa hoặc chuyển người dùng trước."
+                message = $"Unable to delete the role of the game containing user {role}. Please delete or transfer the previous user."
             });
         }
 

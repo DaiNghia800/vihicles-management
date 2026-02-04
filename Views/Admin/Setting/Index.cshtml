@@ -88,10 +88,13 @@
                             <input type="hidden" asp-for="RoleUid" />
                         </div>
                     </div>
-
-                    <div class="d-flex justify-content-end mb-3">
-                        <button type="submit" class="btn text-white theme-bg-color" button-save>Update Profile</button>
-                    </div>
+                    @if (User.HasClaim("permission", "setting_edit"))
+                    {
+                        <div class="d-flex justify-content-end mb-3">
+                            <button type="submit" class="btn text-white theme-bg-color" button-save>Update Profile</button>
+                        </div>
+                    }
+                    
                 </div>
             </div>
         </div>

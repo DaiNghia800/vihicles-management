@@ -75,6 +75,7 @@ namespace Public_Transport.Controllers.Login
                         claims.Add(new Claim("permission", p));
                     }
 
+
                     var claimIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var authProperties = new AuthenticationProperties
                     {

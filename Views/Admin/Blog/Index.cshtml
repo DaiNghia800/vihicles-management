@@ -316,9 +316,13 @@
                 <input type="text" id="searchInput" placeholder="Search blogs..." />
                 @* <span class="search-icon">🔍</span> *@
             </div>
-            <a href="/admin/blog/create" class="btn btn-primary">
-                Add New Blog
-            </a>
+            @if (User.HasClaim("permission", "blog_create"))
+            {
+                <a href="/admin/blog/create" class="btn btn-primary">
+                    Add New Blog
+                </a>
+            }
+            
         </div>
     </div>
 

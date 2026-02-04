@@ -44,7 +44,261 @@
                                 </td>
                             }
                         </tr>
-                        // end role
+                        // end dashboard
+
+                        // blog
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Blog Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="blog_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="blog_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="blog_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="blog_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end blog
+
+                        // payment
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Payment Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="payment_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end payment
+
+                        // ticket
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Ticket Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="ticket_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end ticket
+
+                        // trip
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Trip Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="trip_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="trip_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="trip_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="trip_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end trip
+
+                        // vehicle
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Vehicle Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="vehicle_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="vehicle_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="vehicle_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="vehicle_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end vehicle
+
+                        // route
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Route Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="route_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="route_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="route_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="route_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end route
+
+                        // station
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Station Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="station_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="station_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="station_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="station_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end station
 
                         // role
                         <tr>
@@ -98,6 +352,120 @@
                             }
                         </tr>
                         // end role
+
+                        // user
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">User Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="user_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="user_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="user_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="user_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end user
+
+                        // driver
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Diver Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="driver_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="driver_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="driver_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="driver_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end driver
+
+                        // setting
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Setting Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="setting_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="setting_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end setting
                     }
                 </tbody>
             </table>
