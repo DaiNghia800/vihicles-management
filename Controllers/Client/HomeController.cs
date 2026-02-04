@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Public_Transport.Models;
 
-namespace Public_Transport.Controllers
+namespace Public_Transport.Controllers.Client
 {
     public class HomeController : Controller
     {

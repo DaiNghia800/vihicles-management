@@ -4,7 +4,7 @@ using Public_Transport.Models.EF;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Public_Transport.Controllers
+namespace Public_Transport.Controllers.Client
 {
     public class TripController : Controller
     {
