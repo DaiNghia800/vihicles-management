@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 
 namespace Public_Transport.Models.Entities
 {
@@ -31,7 +32,7 @@ namespace Public_Transport.Models.Entities
 
         [Required(ErrorMessage = "Status is required")]
         [StringLength(20)]
-        public string Status { get; set; } = "Active";
+        public string Status { get; set; } = string.Empty;
 
         public int? VehicleAssignedId { get; set; }
 
@@ -44,8 +45,43 @@ namespace Public_Transport.Models.Entities
         // Navigation property for trips
         public virtual ICollection<Trip>? Trips { get; set; }
 
-        // ✅ Computed property để lấy ảnh từ User
+        // ✅ FIX: Computed property để lấy ảnh từ User với logic xử lý JSON
         [NotMapped]
-        public string ProfileImage => User?.ImgUser ?? "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png";
+        public string ProfileImage
+        {
+            get
+            {
+                const string defaultAvatar = "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png";
+
+                if (User == null || string.IsNullOrWhiteSpace(User.ImgUser))
+                {
+                    return defaultAvatar;
+                }
+
+                try
+                {
+                    // Kiểm tra nếu là URL trực tiếp
+                    if (User.ImgUser.StartsWith("http"))
+                    {
+                        return User.ImgUser;
+                    }
+
+                    // Kiểm tra nếu là JSON array
+                    if (User.ImgUser.TrimStart().StartsWith("["))
+                    {
+                        var images = JsonSerializer.Deserialize<List<string>>(User.ImgUser);
+                        return images?.FirstOrDefault() ?? defaultAvatar;
+                    }
+
+                    // Xử lý trường hợp string bình thường có brackets
+                    return User.ImgUser.Trim('[', ']', '"', ' ');
+                }
+                catch
+                {
+                    // Fallback nếu parse lỗi
+                    return User.ImgUser.Trim('[', ']', '"', ' ');
+                }
+            }
+        }
     }
 }
