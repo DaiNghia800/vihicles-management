@@ -101,6 +101,19 @@
                     </div>
 
                     <div class="d-grid gap-2 mt-3">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <button type="button" id="btn-booking" class="btn btn-primary fw-bold rounded-pill py-2 shadow-sm" data-trip-id="@Model.TripId">
+                                <i class="fas fa-credit-card me-2"></i> BOOK & PAY NOW
+                            </button>
+                        }
+                        else
+                        {
+                            <a href="/login" class="btn btn-primary fw-bold rounded-pill py-2 shadow-sm text-white text-decoration-none">
+                                <i class="fas fa-sign-in-alt me-2"></i> LOGIN TO BOOK
+                            </a>
+                        }
+                        
                         <button type="button" button-start class="btn btn-warning fw-bold rounded-pill py-2 shadow-sm text-white">
                             <i class="fas fa-location-arrow me-2"></i> NAVIGATE TO STATION
                         </button>
@@ -298,6 +311,45 @@
                 const container = document.querySelector('.leaflet-right');
                 if (container) {
                     container.classList.toggle('routing-hidden');
+                }
+            });
+        }
+
+        // Booking with MoMo Payment Integration
+        const btnBooking = document.getElementById("btn-booking");
+        if (btnBooking) {
+            btnBooking.addEventListener("click", async function () {
+                const tripId = this.getAttribute("data-trip-id");
+                const originalText = this.innerHTML;
+                
+                // Disable button and show loading
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Processing...';
+
+                try {
+                    const response = await fetch('/payment/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ tripId: parseInt(tripId) })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        // Redirect to MoMo payment page
+                        window.location.href = result.paymentUrl;
+                    } else {
+                        alert(result.message || 'Payment creation failed. Please try again.');
+                        this.disabled = false;
+                        this.innerHTML = originalText;
+                    }
+                } catch (error) {
+                    console.error('Error creating payment:', error);
+                    alert('An error occurred. Please try again later.');
+                    this.disabled = false;
+                    this.innerHTML = originalText;
                 }
             });
         }

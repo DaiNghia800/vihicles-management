@@ -1,0 +1,841 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Tickets";
+}
+
+<style>
+    .tickets-container {
+        padding: 40px 0;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    .filter-section {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 10px 24px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+        color: #666;
+    }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+
+    .ticket-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+        .ticket-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+    .ticket-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ticket-id {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .ticket-status {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-paid {
+        background: #10b981;
+        color: white;
+    }
+
+    .status-booked {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .status-cancelled {
+        background: #ef4444;
+        color: white;
+    }
+
+    .status-used {
+        background: #8b5cf6;
+        color: white;
+    }
+
+    .ticket-body {
+        padding: 24px;
+    }
+
+    .route-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 2px dashed #e0e0e0;
+    }
+
+    .route-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        flex: 1;
+    }
+
+    .route-icon {
+        font-size: 1.5rem;
+        color: #667eea;
+    }
+
+    .ticket-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .detail-icon {
+        color: #667eea;
+        font-size: 1.2rem;
+    }
+
+    .detail-content {
+        flex: 1;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 2px;
+    }
+
+    .detail-value {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .ticket-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .btn-action {
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-detail {
+        background: #667eea;
+        color: white;
+    }
+
+        .btn-detail:hover {
+            background: #5568d3;
+        }
+
+    .btn-pay {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
+    }
+
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+    .btn-cancel {
+        background: #ef4444;
+        color: white;
+    }
+
+        .btn-cancel:hover {
+            background: #dc2626;
+        }
+
+        .btn-cancel:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 16px;
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        color: #e0e0e0;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 40px;
+    }
+
+    .pagination-btn {
+        padding: 10px 16px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .pagination-btn.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .price-badge {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+</style>
+
+<section class="routes-1 position-relative" style="height: 300px; background: url('/assets/images/bus.jpg') no-repeat center center/cover;">
+    <div class="bg-overlay position-absolute bg-black opacity-75 start-0 top-0 w-100 h-100"></div>
+    <div class="container mx-auto position-relative z-1 h-100">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div>
+                <h2 class="text-center text-white">My Tickets</h2>
+                <ul class="d-flex justify-content-center gap-1 list-unstyled">
+                    <li><span class="text-white fs-6 fw-light font-secondary">Home</span></li>
+                    <li><span class="color-primary text-white mx-2"><i class="fa-solid fa-angle-right"></i></span></li>
+                    <li><span class="text-white fs-6 fw-light font-secondary">Tickets</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="tickets-container">
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-tabs" id="filterTabs">
+                <button class="filter-btn active" data-status="All">
+                    <i class="fas fa-list me-2"></i>All Tickets
+                </button>
+                <button class="filter-btn" data-status="Paid">
+                    <i class="fas fa-check-circle me-2"></i>Paid
+                </button>
+                <button class="filter-btn" data-status="Booked">
+                    <i class="fas fa-clock me-2"></i>Booked
+                </button>
+                <button class="filter-btn" data-status="Cancelled">
+                    <i class="fas fa-times-circle me-2"></i>Cancelled
+                </button>
+                <button class="filter-btn" data-status="Used">
+                    <i class="fas fa-check-double me-2"></i>Used
+                </button>
+            </div>
+        </div>
+
+        <!-- Tickets List -->
+        <div id="ticketsList"></div>
+
+        <!-- Pagination -->
+        <div class="pagination-container" id="paginationContainer"></div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let currentPage = 1;
+        let currentStatus = 'All';
+        const pageSize = 10;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadTickets();
+            setupFilters();
+        });
+
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentStatus = this.dataset.status;
+                    currentPage = 1;
+                    loadTickets();
+                });
+            });
+        }
+
+        async function loadTickets() {
+            showLoading(true);
+            try {
+                const params = new URLSearchParams({
+                    page: currentPage,
+                    pageSize: pageSize,
+                    status: currentStatus
+                });
+
+                const response = await fetch(`/my-tickets/api/my-tickets?${params}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load tickets');
+                }
+
+                const data = await response.json();
+                renderTickets(data.tickets);
+                renderPagination(data.pagination);
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load tickets. Please try again.'
+                });
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function renderTickets(tickets) {
+            const container = document.getElementById('ticketsList');
+
+            if (!tickets || tickets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h3>No tickets found</h3>
+                        <p>You haven't purchased any tickets yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = tickets.map(ticket => {
+                // ✅ Kiểm tra điều kiện hiển thị nút Pay và Cancel
+                const canPay = ticket.status === 'Booked' && new Date(ticket.trip.departureTime) > new Date();
+                const canCancel = ticket.status === 'Booked'; // ✅ CHỈ Booked mới được cancel, Paid KHÔNG được cancel
+
+                return `
+                    <div class="ticket-card">
+                        <div class="ticket-header">
+                            <div class="ticket-id">
+                                <i class="fas fa-ticket-alt me-2"></i>
+                                Ticket #${ticket.ticketId}
+                            </div>
+                            <div class="ticket-status status-${ticket.status.toLowerCase()}">
+                                ${ticket.status}
+                            </div>
+                        </div>
+                        <div class="ticket-body">
+                            <div class="route-info">
+                                <div class="route-icon">
+                                    <i class="fas fa-route"></i>
+                                </div>
+                                <div class="route-name">${ticket.trip.routeName}</div>
+                                <div class="price-badge">${formatPrice(ticket.price)}</div>
+                            </div>
+
+                            <div class="ticket-details">
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <div class="detail-label">Departure</div>
+                                        <div class="detail-value">${formatDateTime(ticket.trip.departureTime)}</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <div class="detail-label">Arrival</div>
+                                        <div class="detail-value">${formatDateTime(ticket.trip.arrivalTime)}</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-bus"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <div class="detail-label">Vehicle</div>
+                                        <div class="detail-value">${ticket.trip.vehicleType}</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-hashtag"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <div class="detail-label">License Plate</div>
+                                        <div class="detail-value">${ticket.trip.licensePlate}</div>
+                                    </div>
+                                </div>
+
+                                ${ticket.payment ? `
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <div class="detail-label">Payment Method</div>
+                                        <div class="detail-value">${ticket.payment.paymentMethod}</div>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-receipt"></i>
+                                    </div>
+                                    <div class="detail-content">
+                                        <div class="detail-label">Transaction Ref</div>
+                                        <div class="detail-value">${ticket.payment.transactionRef || 'N/A'}</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+
+                            <div class="ticket-actions">
+                                <button class="btn-action btn-detail" onclick="viewDetail(${ticket.ticketId})">
+                                    <i class="fas fa-eye me-2"></i>View Detail
+                                </button>
+
+                                ${canPay ? `
+                                    <button class="btn-action btn-pay" onclick="payTicket(${ticket.ticketId})">
+                                        <i class="fas fa-credit-card me-2"></i>Pay Now
+                                    </button>
+                                ` : ''}
+
+                                ${canCancel ? `
+                                    <button class="btn-action btn-cancel" onclick="cancelTicket(${ticket.ticketId})">
+                                        <i class="fas fa-times me-2"></i>Cancel Ticket
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ✅ Hàm Pay Ticket
+        async function payTicket(ticketId) {
+            const result = await Swal.fire({
+                title: 'Pay for Ticket?',
+                text: 'You will be redirected to payment gateway',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#667eea',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, pay now',
+                cancelButtonText: 'Cancel'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Creating payment link',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const response = await fetch(`/payment/retry/${ticketId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Redirecting...',
+                        text: 'Taking you to payment gateway',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = data.paymentUrl;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Payment Failed',
+                        text: data.message || 'Could not create payment'
+                    });
+                }
+            } catch (error) {
+                console.error('Error paying ticket:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to process payment'
+                });
+            }
+        }
+
+        function renderPagination(pagination) {
+            const container = document.getElementById('paginationContainer');
+
+            if (pagination.totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button class="pagination-btn" ${pagination.currentPage === 1 ? 'disabled' : ''}
+                    onclick="changePage(${pagination.currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= pagination.totalPages; i++) {
+                if (i === 1 || i === pagination.totalPages ||
+                    (i >= pagination.currentPage - 2 && i <= pagination.currentPage + 2)) {
+                    html += `
+                        <button class="pagination-btn ${i === pagination.currentPage ? 'active' : ''}"
+                            onclick="changePage(${i})">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === pagination.currentPage - 3 || i === pagination.currentPage + 3) {
+                    html += '<span style="padding: 10px;">...</span>';
+                }
+            }
+
+            html += `
+                <button class="pagination-btn" ${pagination.currentPage === pagination.totalPages ? 'disabled' : ''}
+                    onclick="changePage(${pagination.currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            loadTickets();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function viewDetail(ticketId) {
+            showLoading(true);
+            try {
+                const response = await fetch(`/my-tickets/api/detail/${ticketId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load ticket detail');
+                }
+
+                const ticket = await response.json();
+                const canPay = ticket.status === 'Booked' && new Date(ticket.trip.departureTime) > new Date();
+
+                Swal.fire({
+                    title: `Ticket #${ticket.ticketId}`,
+                    html: `
+                        <div style="text-align: left;">
+                            <h4 style="color: #667eea; margin-bottom: 20px;">
+                                <i class="fas fa-route me-2"></i>${ticket.trip.routeName}
+                            </h4>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong>Status:</strong>
+                                <span class="ticket-status status-${ticket.status.toLowerCase()}">${ticket.status}</span>
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-user me-2"></i>Passenger:</strong> ${ticket.user.fullName}
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-envelope me-2"></i>Email:</strong> ${ticket.user.email}
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-phone me-2"></i>Phone:</strong> ${ticket.user.phoneNumber || 'N/A'}
+                            </div>
+
+                            <hr>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-calendar-alt me-2"></i>Departure:</strong> ${formatDateTime(ticket.trip.departureTime)}
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-clock me-2"></i>Arrival:</strong> ${formatDateTime(ticket.trip.arrivalTime)}
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-bus me-2"></i>Vehicle:</strong> ${ticket.trip.vehicle ? ticket.trip.vehicle.vehicleType : 'N/A'}
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-hashtag me-2"></i>License Plate:</strong> ${ticket.trip.vehicle ? ticket.trip.vehicle.licensePlate : 'N/A'}
+                            </div>
+
+                            <hr>
+
+                            <div style="margin-bottom: 15px;">
+                                <strong><i class="fas fa-money-bill-wave me-2"></i>Price:</strong>
+                                <span style="color: #667eea; font-size: 1.2rem; font-weight: bold;">${formatPrice(ticket.price)}</span>
+                            </div>
+
+                            ${ticket.payment ? `
+                                <div style="margin-bottom: 15px;">
+                                    <strong><i class="fas fa-credit-card me-2"></i>Payment Method:</strong> ${ticket.payment.paymentMethod}
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <strong><i class="fas fa-check-circle me-2"></i>Payment Status:</strong> ${ticket.payment.status}
+                                </div>
+
+                                <div style="margin-bottom: 15px;">
+                                    <strong><i class="fas fa-receipt me-2"></i>Transaction Ref:</strong> ${ticket.payment.transactionRef || 'N/A'}
+                                </div>
+                            ` : ''}
+
+                            ${canPay ? `
+                                <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                                    <i class="fas fa-info-circle" style="color: #0284c7;"></i>
+                                    <strong style="color: #0284c7;">This ticket is booked but not yet paid.</strong>
+                                    <p style="margin: 5px 0 0 0; color: #0369a1;">Click "Pay Now" below to complete payment.</p>
+                                </div>
+                            ` : ''}
+
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                                <small style="color: #666;">
+                                    <i class="fas fa-calendar me-2"></i>Booked on: ${formatDateTime(ticket.bookingDate)}
+                                </small>
+                            </div>
+                        </div>
+                    `,
+                    width: '600px',
+                    showCloseButton: true,
+                    showCancelButton: canPay,
+                    confirmButtonText: canPay ? '<i class="fas fa-credit-card me-2"></i>Pay Now' : 'Close',
+                    cancelButtonText: 'Close',
+                    confirmButtonColor: '#667eea',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed && canPay) {
+                        payTicket(ticketId);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading ticket detail:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load ticket detail'
+                });
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function cancelTicket(ticketId) {
+            const result = await Swal.fire({
+                title: 'Cancel Ticket?',
+                text: 'Are you sure you want to cancel this ticket?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, cancel it',
+                cancelButtonText: 'No, keep it'
+            });
+
+            if (!result.isConfirmed) return;
+
+            showLoading(true);
+            try {
+                const response = await fetch(`/my-tickets/api/cancel/${ticketId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to cancel ticket');
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Cancelled!',
+                    text: 'Your ticket has been cancelled.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                loadTickets();
+            } catch (error) {
+                console.error('Error cancelling ticket:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                });
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+
+        function formatDateTime(dateTimeStr) {
+            const date = new Date(dateTimeStr);
+            return new Intl.DateTimeFormat('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+            }
+        }
+    </script>
+}

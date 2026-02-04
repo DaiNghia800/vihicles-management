@@ -1,0 +1,116 @@
+@model Public_Transport.Models.Entities.Payment
+
+@{
+    ViewData["Title"] = "Payment Result";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var success = ViewBag.Success as bool? ?? false;
+}
+<section class="routes-1 position-relative" style="height: 300px; background: url('/assets/images/bus.jpg') no-repeat center center/cover;">
+    <div class="bg-overlay position-absolute bg-black opacity-75 start-0 top-0 w-100 h-100"></div>
+    <div class="container mx-auto position-relative z-1 h-100">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div>
+                <h2 class="text-center text-white">PAYMENT</h2>
+                <ul class="d-flex justify-content-center gap-1 list-unstyled">
+                    <li><span class="text-white fs-6 fw-light font-secondary">Home</span></li>
+                    <li><span class="color-primary text-white mx-2"><i class="fa-solid fa-angle-right"></i></span></li>
+                    <li><span class="text-white fs-6 fw-light font-secondary">Invoice</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="payment-result py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center p-5">
+                        @if (success)
+                        {
+                            <div class="mb-4">
+                                <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                            </div>
+                            <h2 class="text-success mb-3">Payment Successful!</h2>
+                            <p class="text-muted">Your ticket has been booked successfully</p>
+                        }
+                        else
+                        {
+                            <div class="mb-4">
+                                <i class="fas fa-times-circle text-danger" style="font-size: 5rem;"></i>
+                            </div>
+                            <h2 class="text-danger mb-3">Payment Failed</h2>
+                            <p class="text-muted">@ViewBag.Message</p>
+                        }
+
+                        <hr class="my-4">
+
+                        @if (Model != null)
+                        {
+                            <div class="text-start">
+                                <h5 class="mb-3">Booking Details</h5>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Ticket ID:</div>
+                                    <div class="col-6 fw-bold">#@Model.Ticket.TicketId</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Route:</div>
+                                    <div class="col-6 fw-bold">@Model.Ticket.Trip.Route.RouteName</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Departure:</div>
+                                    <div class="col-6 fw-bold">@Model.Ticket.Trip.DepartureTime.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Amount:</div>
+                                    <div class="col-6 fw-bold text-warning">@Model.Amount.ToString("#,##0")ð</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Payment Method:</div>
+                                    <div class="col-6">@Model.PaymentMethod</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Transaction ID:</div>
+                                    <div class="col-6 small">@ViewBag.OrderId</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Status:</div>
+                                    <div class="col-6">
+                                        <span class="badge @(success ? "bg-success" : "bg-danger")">@Model.Status</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <hr class="my-4">
+
+                        <div class="d-grid gap-2">
+                            @if (success)
+                            {
+                                <a href="/passenger/my-tickets" class="btn btn-warning btn-lg rounded-pill">
+                                    <i class="fas fa-ticket-alt me-2"></i>View My Tickets
+                                </a>
+                            }
+                            <a href="/trip" class="btn btn-outline-secondary btn-lg rounded-pill">
+                                <i class="fas fa-home me-2"></i>Back to Trips
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .payment-result {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        background: #f8f8f8;
+    }
+    
+    .payment-result .card {
+        border-radius: 1rem;
+    }
+</style>

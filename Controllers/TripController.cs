@@ -18,9 +18,9 @@ namespace Public_Transport.Controllers
         public async Task<IActionResult> Index()
         {
             var trips = await _context.Trips
-                .Include(t => t.Route)   
+                .Include(t => t.Route)
                 .Include(t => t.Vehicle)
-                .OrderBy(t => t.DepartureTime) 
+                .OrderBy(t => t.DepartureTime)
                 .ToListAsync();
 
             return View(trips);
@@ -35,9 +35,9 @@ namespace Public_Transport.Controllers
 
             var trip = await _context.Trips
                 .Include(t => t.Vehicle)
-                .Include(t => t.Driver)  
-                .Include(t => t.Route)   
-                                         
+                .Include(t => t.Driver)
+                .Include(t => t.Route)
+
                     .ThenInclude(r => r.RouteDetails.OrderBy(rd => rd.OrderIndex))
                         .ThenInclude(rd => rd.Station)
                 .FirstOrDefaultAsync(m => m.TripId == id);

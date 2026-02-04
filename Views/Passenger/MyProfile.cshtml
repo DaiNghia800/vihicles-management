@@ -1,0 +1,64 @@
+﻿@using Public_Transport.Models.Entities
+@using System.Text.Json
+@model Public_Transport.Models.Entities.Users
+
+<div class="row">
+    <div class="col-md-4 text-center border-end">
+        @{
+            Users users = Model;
+            var thumbnails = string.IsNullOrWhiteSpace(users.ImgUser)
+            ? new List<string>()
+            : JsonSerializer.Deserialize<List<string>>(users.ImgUser);
+
+            var firstImg = thumbnails.FirstOrDefault();
+        }
+
+        @if (!string.IsNullOrEmpty(firstImg))
+        {
+            <img src=@firstImg alt=@users.FullName class="img-fluid rounded-circle mb-3"
+                 style="width: 150px; height: 150px; object-fit: cover;  " />
+        }
+        <h5 class="mb-1">@Model.FullName</h5>
+        <p class="text-muted mb-0">@Model.Role.RoleName</p>
+    </div>
+
+    <div class="col-md-8">
+        <div class="user-detail-info px-3">
+            <h6 class="text-primary fw-bold mb-3 pt-2">Contact Information</h6>
+
+            <div class="mb-3">
+                <label class="fw-bold d-block">Email:</label>
+                <span class="text-muted">@Model.Email</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold d-block">Phone Number:</label>
+                <span class="text-muted">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold d-block">Address:</label>
+                <span class="text-muted">@(string.IsNullOrEmpty(Model.Address) ? "Not provided" : Model.Address)</span>
+            </div>
+
+            <hr>
+
+            <h6 class="text-primary fw-bold mb-3">Account Information</h6>
+
+            <div class="row">
+                <div class="col-sm-6 mb-3">
+                    <label class="fw-bold d-block">Role:</label>
+                    <span class="text-muted">@Model.Role.RoleName</span>
+                </div>
+
+                <div class="col-sm-6 mb-3">
+                    <label class="fw-bold d-block">Member Since:</label>
+                    <span class="text-muted">@Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/site.css" />
+}

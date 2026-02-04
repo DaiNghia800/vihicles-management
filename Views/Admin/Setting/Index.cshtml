@@ -1,0 +1,99 @@
+﻿@model Public_Transport.Models.ViewModels.UserCreateViewModel;
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "Profile Settings";
+}
+
+<section class="product-create">
+    <form asp-controller="Setting" asp-action="UpdateProfile" asp-route-id="@Model.Uid" method="post" enctype="multipart/form-data" id="mainForm" class="theme-form theme-form-2">
+        @Html.AntiForgeryToken()
+        <div class="row">
+            <div class="col-8 mx-auto">
+                <div class="card">
+                    <div class="card-header2">
+                        <h5>Profile Settings</h5>
+                    </div>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mx-3">@TempData["SuccessMessage"]</div>
+                    }
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mx-3"></div>
+
+                    <input type="hidden" asp-for="Uid" />
+
+                    <div class="row mb-4 align-items-center">
+                        <label asp-for="FullName" class="col-3 form-label-title">Full Name <span class="text-danger">*</span></label>
+                        <div class="col-9">
+                            <input class="form-control" type="text" asp-for="FullName" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <label asp-for="Email" class="col-3 form-label-title">Email <span class="text-danger">*</span></label>
+                        <div class="col-9">
+                            <input class="form-control" type="email" asp-for="Email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <label asp-for="Address" class="col-3 form-label-title">Address</label>
+                        <div class="col-9">
+                            <input class="form-control" type="text" asp-for="Address" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <label asp-for="PhoneNumber" class="col-3 form-label-title">Phone Number</label>
+                        <div class="col-9">
+                            <input class="form-control" type="tel" asp-for="PhoneNumber" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <label asp-for="Password" class="col-3 form-label-title">Password <small>(Leave blank if not changed)</small></label>
+                        <div class="col-9">
+                            <input class="form-control" type="password" asp-for="Password" placeholder="Enter new password if you want to change" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <label asp-for="ConfirmPassword" class="col-3 form-label-title">Confirm Password</label>
+                        <div class="col-9">
+                            <input class="form-control" type="password" asp-for="ConfirmPassword" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <label class="col-3 form-label-title">User Image</label>
+                        <div class="col-9">
+                            <div id="my-dropzone" class="dropzone" style="z-index:0;"></div>
+                            <input type="hidden" name="ImgUser" id="Thumbnail" data-thumbnail='@(string.IsNullOrEmpty(Model.ImgUser) ? "[\"https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png\"]" : Model.ImgUser)' />
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 align-items-center">
+                        <label asp-for="RoleUid" class="col-3 form-label-title">Role</label>
+                        <div class="col-9">
+                            <select asp-for="RoleUid" class="js-example-basic-single w-100"
+                                    asp-items="@(ViewData["RolesList"] as SelectList)" disabled>
+                                <option value="">-- Choose one Role --</option>
+                            </select>
+                            <input type="hidden" asp-for="RoleUid" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="submit" class="btn text-white theme-bg-color" button-save>Update Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>

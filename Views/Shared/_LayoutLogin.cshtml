@@ -1,0 +1,271 @@
+﻿@using System.Security.Claims
+@using Public_Transport.Models.Entities
+@using System.Text.Json
+@inject Public_Transport.Services.IServices.IUserService UserService
+
+
+@{
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    var currentUser = default(Public_Transport.Models.Entities.Users);
+
+    if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
+    {
+        currentUser = UserService.GetUserById(userId);
+    }
+    var pageTitle = ViewData["Title"]?.ToString();
+  
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css">
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/slick/slick.css" />
+    <link rel="stylesheet" href="/lib/slick/slick-theme.css" />
+    @RenderSection("Styles", required: false)
+    @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
+    @* <link rel="stylesheet" href="~/Fastkart.styles.css" asp-append-version="true" /> *@
+    @* <link rel="stylesheet" href="~/assets/css/style.css" /> *@
+    <link rel="stylesheet" href="~/assets/css/Style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Public_Transport.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-custom "style="background-color:black">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <!-- <span class="fa-stack fa-xs" style="font-size: 1rem;">
+                    <i class="fas fa-circle fa-stack-2x text-white"></i>
+                    <i class="fas fa-steering-wheel fa-stack-1x text-dark"></i>
+                </span>
+                Driveria -->
+                <img class="img-logo" src="https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/logo-6FBNTQ.png" alt="logo">
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="fas fa-bars text-white"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
+                    <li class="nav-item dropdown"><a class="nav-link" href="#">Courses <i class="fas fa-chevron-down"></i></a></li>
+                    <li class="nav-item dropdown"><a class="nav-link" href="#">Pages <i class="fas fa-chevron-down"></i></a></li>
+                    <li class="nav-item dropdown"><a class="nav-link" href="/blogs">Blog </a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="d-none d-lg-block">
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <li class="profile-box position-relative me-0 pe-0" style="list-style: none; flex:1">
+                        <div class="profile d-flex align-items-center" style="cursor: pointer;">
+                            @{
+                                Users users = currentUser;
+                                var thumbnails = string.IsNullOrWhiteSpace(users.ImgUser)
+                                ? new List<string>()
+                                : JsonSerializer.Deserialize<List<string>>(users.ImgUser);
+
+                                var firstImg = thumbnails.FirstOrDefault();
+                            }
+
+                            @if (!string.IsNullOrEmpty(firstImg))
+                            {
+                                <img src=@firstImg alt=@users.FullName class="img-fluid rounded-circle mb-0"
+                                     style="width: 40px; height: 40px; object-fit: cover;  " />
+                            }
+                            else
+                            {
+                                <img src="/images/users/default-avatar.png" alt="@currentUser.FullName" class="user-img img-fluid"
+                                     style="width: 40px; height: 40px; object-fit: cover;  " />
+                            }
+                            <div class="user-name ms-2">
+                                <span class="fw-semibold" style="display:block; max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:white">
+                                    @(currentUser?.FullName ?? "User")
+                                </span>
+                                <p class="mb-0 small text-muted" style="color:white !important">
+                                    @(currentUser.Role.RoleName)
+                                    <i class="fa-solid fa-angle-down"></i>
+                                </p>
+                            </div>
+                        </div>
+                        <ul class="profile-dropdown position-absolute bg-white shadow rounded" style="right: 0; top: 100%; min-width: 200px; z-index: 1000; display: none; list-style: none; padding: 0.5rem 0; margin-top: 0.5rem;">
+                            <li>
+                                <a href="javascript:void(0)" onclick="viewMyProfile(@currentUser.Uid)" style="cursor:pointer" class="d-flex align-items-center px-3 py-2 text-decoration-none text-dark hover-bg-light">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span>My Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/order/my-orders" style="cursor:pointer" class="d-flex align-items-center px-3 py-2 text-decoration-none text-dark hover-bg-light">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                                        <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                                        <rect x="1" y="3" width="22" height="5"></rect>
+                                        <line x1="10" y1="12" x2="14" y2="12"></line>
+                                    </svg>
+                                    <span>Orders</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/customer/profile/@users.Uid" style="cursor:pointer" class="d-flex align-items-center px-3 py-2 text-decoration-none text-dark hover-bg-light">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                    </svg>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                            <li class="border-top mt-1 pt-1">
+                                <a href="/Account/Logout" id="btnLogoutFrontend" class="d-flex align-items-center px-3 py-2 text-decoration-none text-danger hover-bg-light">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                        <polyline points="16 17 21 12 16 7"></polyline>
+                                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span>Logout</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <a href="/login" class="btn btn-contact">
+                        <i class="fa-solid fa-user"></i> Login
+                    </a>
+                }
+
+            </div>
+        </div>
+    </nav>
+    @if (!string.IsNullOrEmpty(pageTitle) && pageTitle.ToLower() != "home")
+    {
+        <section class="breadcrumb-section" style="padding-top:8rem !important">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb-contain">
+                            <h2>@pageTitle</h2>
+                            <nav>
+                                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                                    <li class="breadcrumb-item">
+                                        <a href="/">
+                                            <i class="fa-solid fa-house" style="color:  var(--brand-yellow)"></i>
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item active">@pageTitle</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    <div class="">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <img src="https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/logo-6FBNTQ.png" alt="Driveria Logo" style="max-width: 150px; margin-bottom: 20px;">
+                    <p class="mb-4">Lorem ipsum dolor sit amet, consectet adipiscing elit, sed do eiusmod.</p>
+
+                    <ul class="footer-links contact-list">
+                        <li><i class="fas fa-map-marker-alt"></i> <span>Jl. Raya Puputan No 142</span></li>
+                        <li><i class="fas fa-envelope"></i> <span>support@domain.com</span></li>
+                        <li><i class="fas fa-phone-alt"></i> <span>(+62)81 115 8596</span></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <h4 class="footer-title">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Services</a></li>
+                        <li><a href="#">Registration</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <h4 class="footer-title">Useful Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms and Conditions</a></li>
+                        <li><a href="#">Disclaimer</a></li>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-widget">
+                    <h4 class="footer-title">Newsletter</h4>
+                    <form class="newsletter-form">
+                        <input type="email" class="newsletter-input" placeholder="Your Email Address" required>
+                        <button type="submit" class="newsletter-btn">SEND</button>
+                    </form>
+                    <p class="mb-3">Lorem ipsum dolor sit amet, consectectur adipiscing elit.</p>
+
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="copyright-text">Driving Lessons & Traffic School Template Kit by Jegtheme</p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <p class="copyright-text">Copyright © 2021. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="/lib/tinymce/tinymce.min.js"></script>
+    <script src="/lib/slick/slick.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.all.min.js"></script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
+    <script src="~/js/customer.js" asp-append-version="true"></script>
+    <script src="~/assets/js/script.js"></script>
+    @RenderSection("Scripts", required: false)
+    
+</body>
+</html>

@@ -1,0 +1,47 @@
+﻿@{
+    Layout = "_LayoutLogin";
+    ViewData["title"] = "Verify OTP";
+}
+<section class="log-in-section otp-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xxl-6 col-xl-5 col-lg-6 d-lg-block d-none">
+                <div class="image-contain">
+                    <img src="~/images/otp.png" class="img-fluid" alt="">
+                </div>
+            </div>
+            <div class="col-lg-5 col-sm-8 mx-auto">
+                <div class="log-in-box">
+                    <div class="log-in-title">
+                        <h3>Please enter the one time password to verify your account</h3>
+                        <h5>
+                            <p>A code has been sent to</p>
+                            <span id="masked-email">*******9897</span>
+                        </h5>
+                    </div>
+                    <form id="verify_otp_form" novalidate>
+                        @Html.AntiForgeryToken()
+                        <div class="inputs">
+                            <input class="form-control otp-input" type="text" maxlength="1" placeholder="0" data-index="0">
+                            <input class="form-control otp-input" type="text" maxlength="1" placeholder="0" data-index="1">
+                            <input class="form-control otp-input" type="text" maxlength="1" placeholder="0" data-index="2">
+                            <input class="form-control otp-input" type="text" maxlength="1" placeholder="0" data-index="3">
+                            <input class="form-control otp-input" type="text" maxlength="1" placeholder="0" data-index="4">
+                            <input class="form-control otp-input" type="text" maxlength="1" placeholder="0" data-index="5">
+                        </div>
+                        <input type="hidden" id="otp-code" name="OtpCode" />
+                        <div class="send-box pt-4">
+                            <h5>
+                                <p>Didn't get the code? </p>
+                                <a href="javascript:void(0)" id="resend-otp-link" style="pointer-events: none; opacity: 0.5;">
+                                    Resend It (<span id="countdown">60</span>s)
+                                </a>
+                            </h5>
+                        </div>
+                        <button type="submit" class="btn-1 btn-animation" style="height:2.4rem; width:100%">Validate</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

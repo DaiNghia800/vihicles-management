@@ -24,6 +24,12 @@ namespace Public_Transport.Models.EF
         public DbSet<RouteDetail> RouteDetails { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<Trip> Trips { get; set; }
+        public DbSet<BlogPosts> BlogPosts { get; set; }
+        public DbSet<BlogCategories> BlogCategories { get; set; }
+        
+        // --- THÊM MỚI: Tickets và Payments ---
+        public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         public DbSet<Driver> Drivers { get; set; }
 
@@ -167,6 +173,77 @@ namespace Public_Transport.Models.EF
                 entity.Property(e => e.Deleted)
                     .HasDefaultValue(false);
             });
+            modelBuilder.Entity<BlogCategories>(entity =>
+            {
+                entity.HasKey(e => e.Uid);
+                entity.Property(e => e.Name)
+                    .HasMaxLength(200)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<BlogPosts>(entity =>
+            {
+                entity.HasKey(e => e.Uid);
+
+                entity.Property(e => e.Title)
+                    .HasMaxLength(500)
+                    .IsRequired();
+
+                entity.Property(e => e.Content)
+                    .HasColumnType("nvarchar(max)")
+                    .IsRequired();
+
+                entity.HasOne(e => e.Users)
+                    .WithMany()
+                    .HasForeignKey(e => e.AuthorUid)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Category)
+                    .WithMany()
+                    .HasForeignKey(e => e.CategoryUid)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // --- THÊM MỚI: Cấu hình Ticket và Payment ---
+            modelBuilder.Entity<Ticket>(entity =>
+            {
+                entity.HasKey(e => e.TicketId);
+
+                entity.HasOne(e => e.Trip)
+                    .WithMany()
+                    .HasForeignKey(e => e.TripId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(e => e.BookingDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(e => e.Status)
+                    .HasDefaultValue("Booked");
+            });
+
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.HasKey(e => e.PaymentId);
+
+                entity.HasOne(e => e.Ticket)
+                    .WithOne(t => t.Payment)
+                    .HasForeignKey<Payment>(e => e.TicketId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(e => e.PaymentDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(e => e.Status)
+                    .HasDefaultValue("Pending");
+            });
+            
         }
     }
 }
