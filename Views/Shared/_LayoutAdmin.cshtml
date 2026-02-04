@@ -372,8 +372,7 @@
                                                 Add new role
                                             </a>
                                         </li>
-                                        @if (User.HasClaim("permission", "role_permission"))
-                                        {
+                                        @if (User.HasClaim("permission", "role_permission")) {
                                             <li>
                                                 <a href="/admin/role/permission" class="text-capitalize">
                                                     Permission

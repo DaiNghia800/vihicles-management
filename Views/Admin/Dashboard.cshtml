@@ -4,14 +4,15 @@
     ViewData["title"] = "Dashboard";
 }
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
 <section class="dashboard-area">
     <div class="row">
         <div class="col-sm-6 col-xxl-3 col-lg-6">
             <div class="box-total card-hover">
                 <div class="box-contain">
                     <div class="media-body">
-                        <span>Active Vehicles.</span>
-
+                        <span>Active Vehicles</span>
                         <h4>@ViewData["totalVehicleActive"]</h4>
                     </div>
                     <div class="box-icon">
@@ -53,8 +54,8 @@
             <div class="box-total box-custom card-hover">
                 <div class="box-contain">
                     <div class="media-body">
-                        <span>Incidents / Alerts</span>
-                        <h4>4</h4>
+                        <span>Cancelled / Alerts</span>
+                        <h4 class="text-danger">@ViewData["totalIncidents"]</h4>
                     </div>
                     <div class="box-icon">
                         <i class="fa-solid fa-triangle-exclamation fs-4"></i>
@@ -66,15 +67,14 @@
         <div class="col-6">
             <div class="box-report card-hover">
                 <div class="box-title mb-3">
-                    <h4 class="text-capitalize">Online activity diagram</h4>
+                    <h4 class="text-capitalize">Live Route Map</h4>
                 </div>
-
-                <div id="map" style="height: 400px; width: 100%; border-radius: 0 0 12px 12px; z-index: 49"></div>
+                <div id="map" style="height: 400px; width: 100%; border-radius: 0 0 12px 12px; z-index: 1;"></div>
             </div>
         </div>
 
         <div class="col-6">
-            <div class="box-best-selling card-hover">
+            <div class="box-best-selling card-hover" style="height: 465px; overflow-y: auto;">
                 <div class="box-title-border">
                     <div class="title">
                         <h4>Recent Trip Status</h4>
@@ -90,13 +90,14 @@
                             </tr>
                         </thead>
                         <tbody id="tripStatusBody">
+                            <tr><td colspan="3" class="text-center text-muted py-3">Loading data...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <div class="col-12">
+        <div class="col-12 mt-4">
             <div class="box-earning card-hover">
                 <div class="box-title mb-3">
                     <h4 class="text-capitalize">Traffic Flow Analysis (Last 24h)</h4>
@@ -105,32 +106,129 @@
             </div>
         </div>
 
-        @* <div class="col-6">
-            <div class="box-to-do card-hover">
-                <div class="box-title mb-3">
-                    <h4 class="text-capitalize">To Do List</h4>
-                </div>
-                <ul class="to-do-list">
-                    <li>
-                        <div class="form-check ps-0">
-                            <input type="checkbox" class="check-animated" />
-                        </div>
-                        <div class="to-do-list-name">
-                            <strong>Check new orders</strong>
-                            <p>Daily</p>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="form-check ps-0">
-                            <input type="checkbox" class="check-animated" />
-                        </div>
-                        <div class="to-do-list-name">
-                            <strong>Update product stock</strong>
-                            <p>Weekly</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div> *@
     </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // --- PHẦN 1: BẢN ĐỒ (MAP) ---
+        // Khởi tạo map tại tọa độ TP.HCM (hoặc tọa độ mặc định của em)
+        var map = L.map('map').setView([10.762622, 106.660172], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Gọi API lấy dữ liệu Map
+        fetch('/admin/dashboard/map-data')
+            .then(response => response.json())
+            .then(routes => {
+                var colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFC300'];
+
+                routes.forEach((route, index) => {
+                    if(route.stations && route.stations.length > 0) {
+                        var latlngs = route.stations.map(s => [s.lat, s.lng]);
+                        var color = colors[index % colors.length];
+
+                        // Vẽ đường nối các trạm
+                        L.polyline(latlngs, {color: color, weight: 4, opacity: 0.7}).addTo(map)
+                         .bindPopup(`<b>Route:</b> ${route.routeName}`);
+
+                        // Vẽ marker trạm đầu và cuối
+                        L.circleMarker(latlngs[0], {color: color, radius: 6, fillOpacity: 1}).addTo(map);
+                        L.circleMarker(latlngs[latlngs.length-1], {color: color, radius: 6, fillOpacity: 1}).addTo(map);
+                    }
+                });
+            })
+            .catch(err => console.error("Map Error:", err));
+
+
+        // --- PHẦN 2: BẢNG RECENT TRIPS ---
+        fetch('/admin/dashboard/recent-trips')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('tripStatusBody');
+                tbody.innerHTML = ''; // Xóa loading text
+
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="text-center">No recent trips found.</td></tr>';
+                    return;
+                }
+
+                data.forEach(trip => {
+                    // Logic màu sắc Badge Status
+                    let badgeClass = 'bg-secondary';
+                    if(trip.status === 'Running') badgeClass = 'bg-primary';
+                    else if(trip.status === 'Completed') badgeClass = 'bg-success';
+                    else if(trip.status === 'Cancelled') badgeClass = 'bg-danger';
+                    else if(trip.status === 'Scheduled') badgeClass = 'bg-warning text-dark';
+
+                    // Logic hiển thị Delay
+                    let delayHtml = '<span class="text-success fw-bold">On Time</span>';
+                    if(trip.isDelayed) {
+                        delayHtml = `<span class="text-danger fw-bold">+${trip.delay} min</span>`;
+                    }
+
+                    const row = `
+                        <tr>
+                            <td class="ps-4 fw-bold text-dark">${trip.routeName}</td>
+                            <td><span class="badge ${badgeClass} rounded-pill px-3 py-2">${trip.status}</span></td>
+                            <td class="pe-4 text-end">${delayHtml}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(err => console.error("Trip Error:", err));
+
+
+        // --- PHẦN 3: BIỂU ĐỒ TRAFFIC ---
+        fetch('/admin/dashboard/traffic-flow')
+            .then(res => res.json())
+            .then(data => {
+                const ctx = document.getElementById('trafficChart').getContext('2d');
+
+                // Chuyển đổi dữ liệu từ API sang format của Chart.js
+                // Giả định API trả về mảng object: { hourLabel: "00:00", passengerCount: 10 }
+                const labels = data.map(d => d.hourLabel);
+                const values = data.map(d => d.passengerCount);
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Passengers',
+                            data: values,
+                            borderColor: '#0da487',
+                            backgroundColor: 'rgba(13, 164, 135, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4 // Làm mượt đường kẻ
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false } // Ẩn chú thích
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#f0f0f0' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(err => console.error("Chart Error:", err));
+    });
+</script>

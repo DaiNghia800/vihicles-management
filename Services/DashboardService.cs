@@ -1,4 +1,5 @@
-﻿using Public_Transport.Models.DTO;
+﻿using Microsoft.EntityFrameworkCore;
+using Public_Transport.Models.DTO;
 using Public_Transport.Models.EF;
 using Public_Transport.Models.Entities;
 using Public_Transport.Services.IServices;
@@ -13,6 +14,8 @@ namespace Public_Transport.Services
         {
             _context = context;
         }
+
+        // --- 1. EXISTING METHODS (CODE CŨ CỦA EM) ---
 
         public int getVehicleActive()
         {
@@ -32,7 +35,8 @@ namespace Public_Transport.Services
             {
                 return _context.Tickets.Count(p => p.Status == "Used" && p.BookingDate.Date == DateTime.Today && p.BookingDate.Hour <= DateTime.Now.Hour);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return -1;
             }
         }
@@ -101,5 +105,76 @@ namespace Public_Transport.Services
             }
         }
 
+        // --- 2. NEW METHODS (CODE MỚI ANH THÊM CHO DASHBOARD) ---
+
+        // Lấy 5 chuyến xe gần nhất & tính toán trạng thái Delay
+        public List<object> GetRecentTrips()
+        {
+            try
+            {
+                var trips = _context.Trips
+                    .Include(t => t.Route)
+                    .OrderByDescending(t => t.DepartureTime) // Lấy chuyến mới nhất
+                    .Take(5)
+                    .ToList() // Tải về bộ nhớ trước để xử lý logic ngày tháng
+                    .Select(t => new
+                    {
+                        RouteName = t.Route?.RouteName ?? "Unknown Route",
+                        Status = t.Status,
+                        // Logic Delay: Nếu đang chạy (Running) mà giờ hiện tại > giờ đến dự kiến => Trễ
+                        Delay = (t.Status == "Running" && DateTime.Now > t.ArrivalTime) ?
+                                (int)(DateTime.Now - t.ArrivalTime).TotalMinutes : 0,
+                        IsDelayed = (t.Status == "Running" && DateTime.Now > t.ArrivalTime)
+                    })
+                    .ToList<object>();
+
+                return trips;
+            }
+            catch
+            {
+                return new List<object>();
+            }
+        }
+
+        // Lấy dữ liệu vẽ bản đồ (Routes + Stations)
+        public object GetMapData()
+        {
+            try
+            {
+                var routes = _context.Routes
+                    .Include(r => r.RouteDetails)
+                    .ThenInclude(rd => rd.Station)
+                    .Where(r => r.RouteDetails.Any()) // Chỉ lấy tuyến có trạm
+                    .Select(r => new
+                    {
+                        RouteName = r.RouteName,
+                        Stations = r.RouteDetails.OrderBy(rd => rd.OrderIndex).Select(rd => new
+                        {
+                            Name = rd.Station.StationName,
+                            Lat = rd.Station.Latitude,
+                            Lng = rd.Station.Longitude
+                        }).ToList()
+                    })
+                    .ToList();
+                return routes;
+            }
+            catch
+            {
+                return new List<object>();
+            }
+        }
+
+        // Đếm số lượng chuyến bị hủy (Incident/Alerts)
+        public int GetIncidentCount()
+        {
+            try
+            {
+                return _context.Trips.Count(t => t.Status == "Cancelled");
+            }
+            catch
+            {
+                return 0;
+            }
+        }
     }
 }
