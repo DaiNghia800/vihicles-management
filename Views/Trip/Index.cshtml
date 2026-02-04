@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<Public_Transport.Models.Entities.Trip>
-
+@using System.Text.Json
 @{
     ViewData["Title"] = "Route List";
 }
@@ -36,7 +36,22 @@
                         <div class="inner-body bg-white p-4 rounded-4 shadow-sm h-100">
                             <div class="bg-gray rounded-4 overflow-hidden">
                                 <div class="box-img rounded-4 overflow-hidden position-relative">
-                                    <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=2071&auto=format&fit=crop" alt="Bus" class="mw-100 w-100 h-100 object-fit-cover" style="height: 200px;">
+                                    @{
+                                        var thumbnails = string.IsNullOrWhiteSpace(item.Thumbnail)
+                                        ? new List<string>()
+                                        : JsonSerializer.Deserialize<List<string>>(item.Thumbnail);
+
+                                        var firstImg = thumbnails.FirstOrDefault();
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(firstImg))
+                                    {
+                                        <img src=@firstImg alt="" class="img-fluid" />
+                                    }
+                                    else
+                                    {
+                                        <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=2071&auto=format&fit=crop" alt="Bus" class="mw-100 w-100 h-100 object-fit-cover" style="height: 200px;">
+                                    }
                                     <span class="position-absolute top-0 end-0 bg-success text-white fs-6 fw-normal py-2 px-3 rounded-top-4 rounded-start-3">
                                         @item.Vehicle?.VehicleType
                                     </span>

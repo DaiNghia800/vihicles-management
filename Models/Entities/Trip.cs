@@ -18,7 +18,10 @@ namespace Public_Transport.Models.Entities
         public DateTime ArrivalTime { get; set; }
 
         [StringLength(20)]
-        public string Status { get; set; } 
+        public string Status { get; set; }
+
+        [StringLength(500)]
+        public string? Thumbnail { get; set; }
 
 
         public virtual Route? Route { get; set; }
