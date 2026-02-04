@@ -1,0 +1,437 @@
+﻿
+@model Public_Transport.Models.Entities.Users
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "Edit User";
+    var roles = ViewBag.Roles as IEnumerable<Public_Transport.Models.Entities.Roles>;
+}
+
+<style>
+    /* Copy CSS từ Create.cshtml */
+    .user-form-container {
+        padding: 1.25rem;
+        max-width: 60rem;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.875rem;
+    }
+
+    .form-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .back-btn {
+        padding: 0.625rem 1.25rem;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+    }
+
+        .back-btn:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
+    .form-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.875rem;
+        box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.08);
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.625rem;
+        border-bottom: 0.125rem solid #14a38b;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+        font-size: 0.875rem;
+    }
+
+    .required {
+        color: #dc3545;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 0.75rem 0.9375rem;
+        border: 0.0625rem solid #ddd;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+    }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #14a38b;
+            box-shadow: 0 0 0 0.1875rem rgba(20, 163, 139, 0.1);
+        }
+
+    .form-textarea {
+        min-height: 6rem;
+        resize: vertical;
+    }
+
+    .info-note {
+        background-color: #e7f3ff;
+        border-left: 4px solid #2196f3;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .info-note p {
+            margin: 0;
+            color: #0c5689;
+            font-size: 0.875rem;
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 0.9375rem;
+        justify-content: flex-end;
+        padding-top: 1.25rem;
+        border-top: 0.0625rem solid #dee2e6;
+    }
+
+    .btn {
+        padding: 0.75rem 1.875rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #14a38b;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #0f8570;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.8125rem;
+        margin-top: 0.3125rem;
+    }
+
+    /* ✅ THÊM CSS cho Avatar Upload */
+    .avatar-upload-section {
+        text-align: center;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .avatar-preview-container {
+        margin-bottom: 1rem;
+    }
+
+    .avatar-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #14a38b;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .avatar-upload-btn {
+        display: inline-block;
+        padding: 0.625rem 1.25rem;
+        background-color: #14a38b;
+        color: white;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .avatar-upload-btn:hover {
+            background-color: #0f8570;
+        }
+
+    .avatar-help-text {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+</style>
+
+<div class="user-form-container">
+    <div class="form-header">
+        <h1 class="form-title">Edit User</h1>
+        <a href="/admin/user" class="back-btn">
+            ← Back to List
+        </a>
+    </div>
+
+    <div class="form-card">
+        <form asp-action="Edit" asp-route-id="@Model.Uid" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Uid" />
+            <input type="hidden" asp-for="ImgUser" id="currentAvatar" />
+
+            <!-- ✅ THÊM: Avatar Upload Section -->
+            <div class="form-section">
+                <h3 class="section-title">User Avatar</h3>
+                <div class="avatar-upload-section">
+                    <div class="avatar-preview-container">
+                        <img id="avatarPreview"
+                             src="@(string.IsNullOrEmpty(Model.ImgUser) ? "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png" : Model.ImgUser)"
+                             alt="Avatar Preview"
+                             class="avatar-preview" />
+                    </div>
+                    <div class="form-group">
+                        <label for="avatarUpload" class="avatar-upload-btn">
+                            <i class="fa fa-upload me-2"></i>Change Avatar
+                        </label>
+                        <input type="file"
+                               id="avatarUpload"
+                               name="AvatarFile"
+                               accept="image/*"
+                               class="d-none">
+                        <p class="avatar-help-text">
+                            Max file size: 5MB. Accepted formats: JPG, PNG, GIF
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h3 class="section-title">Personal Information</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="FullName" class="form-label">
+                            Full Name <span class="required">*</span>
+                        </label>
+                        <input asp-for="FullName" class="form-input" placeholder="Enter full name..." />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email" class="form-label">
+                            Email <span class="required">*</span>
+                        </label>
+                        <input asp-for="Email" type="email" class="form-input" placeholder="Enter email..." />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="PhoneNumber" class="form-label">
+                            Phone Number <span class="required">*</span>
+                        </label>
+                        <input asp-for="PhoneNumber" class="form-input" placeholder="0901234567" maxlength="10" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="RoleUid" class="form-label">
+                            Role <span class="required">*</span>
+                        </label>
+                        <select asp-for="RoleUid" class="form-select js-example-basic-single">
+                            <option value="">-- Select Role --</option>
+                            @if (roles != null)
+                            {
+                                @foreach (var role in roles)
+                                {
+                                    <option value="@role.Uid">@role.RoleName</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="RoleUid" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="DateOfBirth" class="form-label">
+                            Date of Birth <span class="required">*</span>
+                        </label>
+                        <input asp-for="DateOfBirth" type="date" class="form-input" id="dateOfBirth" max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        <small class="text-muted d-block mt-1" id="ageDisplay"></small>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label asp-for="Address" class="form-label">
+                        Address
+                    </label>
+                    <textarea asp-for="Address" class="form-textarea" placeholder="Enter address..."></textarea>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Change Password (Optional) -->
+            <div class="form-section">
+                <h3 class="section-title">Change Password (Optional)</h3>
+
+                <div class="info-note">
+                    <p><i class="fa-solid fa-info-circle"></i> Leave blank if you don't want to change the password.</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">
+                            New Password
+                        </label>
+                        <input type="password"
+                               id="newPassword"
+                               name="newPassword"
+                               class="form-input"
+                               placeholder="Enter new password..." />
+                        <span class="text-danger" id="newPasswordError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">
+                            Confirm New Password
+                        </label>
+                        <input type="password"
+                               id="confirmPassword"
+                               name="confirmPassword"
+                               class="form-input"
+                               placeholder="Confirm new password..." />
+                        <span class="text-danger" id="confirmPasswordError"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="/admin/user" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Update User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            // ✅ Avatar Upload Preview
+            $('#avatarUpload').on('change', function(e) {
+                const file = e.target.files[0];
+
+                if (file) {
+                    // Validate file size (5MB max)
+                    if (file.size > 5 * 1024 * 1024) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Too Large',
+                            text: 'Avatar file must be less than 5MB'
+                        });
+                        $(this).val('');
+                        return;
+                    }
+
+                    // Validate file type
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    if (!allowedTypes.includes(file.type)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid File Type',
+                            text: 'Only JPG, PNG, and GIF images are allowed'
+                        });
+                        $(this).val('');
+                        return;
+                    }
+
+                    // Preview image
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#avatarPreview').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Phone number validation
+            $('input[name="PhoneNumber"]').on('input', function() {
+                let value = $(this).val();
+                value = value.replace(/[^0-9]/g, '');
+                if (value.length > 10) {
+                    value = value.substring(0, 10);
+                }
+                $(this).val(value);
+            });
+
+            // Password validation
+            $('#confirmPassword').on('input', function() {
+                const password = $('#newPassword').val();
+                const confirmPassword = $(this).val();
+
+                if (password && confirmPassword && password !== confirmPassword) {
+                    $('#confirmPasswordError').text('Passwords do not match');
+                } else {
+                    $('#confirmPasswordError').text('');
+                }
+            });
+        });
+    </script>
+}

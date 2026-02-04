@@ -1,0 +1,349 @@
+﻿@model IEnumerable<Public_Transport.Models.Entities.Driver>
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "License Management";
+    var expiringDrivers = ViewBag.ExpiringDrivers as List<Public_Transport.Models.Entities.Driver>;
+}
+
+<style>
+    .license-management {
+        padding: 1.25rem;
+    }
+
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.875rem;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .back-btn {
+        padding: 0.625rem 1.25rem;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+    }
+
+        .back-btn:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
+    .alert-warning-custom {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .alert-warning-custom h5 {
+            color: #856404;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-warning-custom p {
+            color: #856404;
+            margin: 0;
+        }
+
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.08);
+    }
+
+        .stat-card .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card.warning .stat-icon {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .stat-card.danger .stat-icon {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .stat-card.success .stat-icon {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-label {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+    .table-card {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+        .section-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+    .license-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .license-table thead {
+            background-color: #f8f9fa;
+        }
+
+        .license-table th {
+            padding: 0.9375rem;
+            text-align: left;
+            font-weight: 600;
+            color: #000;
+            border-bottom: 0.125rem solid #dee2e6;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .license-table td {
+            padding: 0.9375rem;
+            border-bottom: 0.0625rem solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .license-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+    .expiry-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .expiry-critical {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .expiry-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .expiry-valid {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .expiry-expired {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
+
+<div class="license-management">
+    <div class="header-section">
+        <h1 class="page-title">License Management</h1>
+        <a href="/admin/driver" class="back-btn">
+            ← Back to Drivers
+        </a>
+    </div>
+
+    <!-- Warning Alert for Expiring Licenses -->
+    @if (expiringDrivers != null && expiringDrivers.Any())
+    {
+        <div class="alert-warning-custom">
+            <h5><i class="fa-solid fa-triangle-exclamation"></i> License Expiration Alert</h5>
+            <p>There are <strong>@expiringDrivers.Count</strong> driver license(s) expiring within the next 30 days!</p>
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="stats-cards">
+        <div class="stat-card danger">
+            <div class="stat-icon">
+                <i class="fa-solid fa-calendar-xmark fa-lg"></i>
+            </div>
+            <div class="stat-value">@Model.Count(d => d.LicenseExpiry.HasValue && d.LicenseExpiry.Value < DateTime.Now)</div>
+            <div class="stat-label">Expired Licenses</div>
+        </div>
+
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fa-solid fa-clock fa-lg"></i>
+            </div>
+            <div class="stat-value">@(expiringDrivers?.Count ?? 0)</div>
+            <div class="stat-label">Expiring Soon (30 days)</div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fa-solid fa-check-circle fa-lg"></i>
+            </div>
+            <div class="stat-value">@Model.Count(d => d.LicenseExpiry.HasValue && d.LicenseExpiry.Value > DateTime.Now.AddDays(30))</div>
+            <div class="stat-label">Valid Licenses</div>
+        </div>
+    </div>
+
+    <!-- Expiring Soon Table -->
+    @if (expiringDrivers != null && expiringDrivers.Any())
+    {
+        <div class="table-card">
+            <div class="section-header">
+                <h3><i class="fa-solid fa-exclamation-triangle"></i> Licenses Expiring Soon</h3>
+            </div>
+            <table class="license-table">
+                <thead>
+                    <tr>
+                        <th>Driver Name</th>
+                        <th>License Number</th>
+                        <th>License Type</th>
+                        <th>Expiry Date</th>
+                        <th>Days Remaining</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var driver in expiringDrivers.OrderBy(d => d.LicenseExpiry))
+                    {
+                        var daysRemaining = (driver.LicenseExpiry.Value - DateTime.Now).Days;
+                        <tr>
+                            <td><strong>@driver.User?.FullName</strong></td>
+                            <td>@driver.LicenseNumber</td>
+                            <td>@driver.LicenseType</td>
+                            <td>@driver.LicenseExpiry.Value.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <span class="@(daysRemaining <= 7 ? "text-danger fw-bold" : "text-warning fw-bold")">
+                                    @daysRemaining days
+                                </span>
+                            </td>
+                            <td>
+                                <span class="expiry-status @(daysRemaining <= 7 ? "expiry-critical" : "expiry-warning")">
+                                    @(daysRemaining <= 7 ? "URGENT" : "Warning")
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- All Licenses Table -->
+    <div class="table-card">
+        <div class="section-header">
+            <h3><i class="fa-solid fa-list"></i> All Driver Licenses</h3>
+        </div>
+        <table class="license-table">
+            <thead>
+                <tr>
+                    <th>Driver Name</th>
+                    <th>License Number</th>
+                    <th>License Type</th>
+                    <th>Issue Date</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var driver in Model)
+                {
+                    var isExpired = driver.LicenseExpiry.HasValue && driver.LicenseExpiry.Value < DateTime.Now;
+                    var daysUntilExpiry = driver.LicenseExpiry.HasValue ? (driver.LicenseExpiry.Value - DateTime.Now).Days : 0;
+                    
+                    string expiryClass = "expiry-valid";
+                    string expiryText = "Valid";
+                    
+                    if (isExpired)
+                    {
+                        expiryClass = "expiry-expired";
+                        expiryText = "EXPIRED";
+                    }
+                    else if (daysUntilExpiry <= 7)
+                    {
+                        expiryClass = "expiry-critical";
+                        expiryText = "Critical";
+                    }
+                    else if (daysUntilExpiry <= 30)
+                    {
+                        expiryClass = "expiry-warning";
+                        expiryText = "Warning";
+                    }
+
+                    <tr>
+                        <td><strong>@driver.User?.FullName</strong></td>
+                        <td>@driver.LicenseNumber</td>
+                        <td>@driver.LicenseType</td>
+                        <td>@(driver.CreatedAt.HasValue ? driver.CreatedAt.Value.ToString("dd/MM/yyyy") : "N/A")</td>
+                        <td>
+                            @if (driver.LicenseExpiry.HasValue)
+                            {
+                                <span class="@(isExpired ? "text-danger fw-bold" : "")">
+                                    @driver.LicenseExpiry.Value.ToString("dd/MM/yyyy")
+                                    @if (!isExpired && daysUntilExpiry <= 30)
+                                    {
+                                        <br /><small>(@daysUntilExpiry days left)</small>
+                                    }
+                                </span>
+                            }
+                            else
+                            {
+                                <span>N/A</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="expiry-status @expiryClass">
+                                @expiryText
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

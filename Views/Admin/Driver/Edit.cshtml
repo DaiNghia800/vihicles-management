@@ -1,0 +1,311 @@
+﻿@model Public_Transport.Models.Entities.Driver
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "Edit Driver";
+}
+
+<style>
+    .driver-form-container {
+        padding: 1.25rem;
+        max-width: 60rem;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.875rem;
+    }
+
+    .form-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .back-btn {
+        padding: 0.625rem 1.25rem;
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+    }
+
+        .back-btn:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
+    .form-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.875rem;
+        box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.08);
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.625rem;
+        border-bottom: 0.125rem solid #14a38b;
+    }
+
+    .info-display {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .info-display .info-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-display .info-value {
+            font-size: 1.125rem;
+            color: #333;
+        }
+
+    /* ✅ CSS cho Profile Display */
+    .profile-display-section {
+        text-align: center;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-image-display {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #14a38b;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+        font-size: 0.875rem;
+    }
+
+    .required {
+        color: #dc3545;
+    }
+
+    .form-input,
+    .form-select {
+        width: 100%;
+        padding: 0.75rem 0.9375rem;
+        border: 0.0625rem solid #ddd;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+    }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #14a38b;
+            box-shadow: 0 0 0 0.1875rem rgba(20, 163, 139, 0.1);
+        }
+
+    .form-actions {
+        display: flex;
+        gap: 0.9375rem;
+        justify-content: flex-end;
+        padding-top: 1.25rem;
+        border-top: 0.0625rem solid #dee2e6;
+    }
+
+    .btn {
+        padding: 0.75rem 1.875rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #14a38b;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #0f8570;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.8125rem;
+        margin-top: 0.3125rem;
+    }
+</style>
+
+<div class="driver-form-container">
+    <div class="form-header">
+        <h1 class="form-title">Edit Driver</h1>
+        <a href="/admin/driver" class="back-btn">
+            ← Back to List
+        </a>
+    </div>
+
+    <div class="form-card">
+        <!-- ✅ Driver Profile Image (From User) -->
+        <div class="profile-display-section">
+            <img src="@Model.ProfileImage" 
+                 alt="@Model.User?.FullName" 
+                 class="profile-image-display" />
+            <p class="text-muted small mb-0">
+                <i class="fa fa-info-circle me-1"></i>
+                Profile image is linked to user account: <strong>@Model.User?.FullName</strong>
+            </p>
+            <p class="text-muted small">
+                To update this image, please edit the user's profile in User Management
+            </p>
+        </div>
+
+        <!-- Driver User Information (Read-only) -->
+        <div class="info-display">
+            <div class="info-label">Driver Name</div>
+            <div class="info-value">@Model.User?.FullName</div>
+            <div class="info-label mt-2">Email</div>
+            <div class="info-value">@Model.User?.Email</div>
+        </div>
+
+        <form asp-action="Edit" asp-route-id="@Model.DriverId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="DriverId" />
+            <input type="hidden" asp-for="UserId" />
+
+            <!-- License Information -->
+            <div class="form-section">
+                <h3 class="section-title">License Information</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="LicenseNumber" class="form-label">
+                            License Number <span class="required">*</span>
+                        </label>
+                        <input asp-for="LicenseNumber" class="form-input" placeholder="Enter license number..." />
+                        <span asp-validation-for="LicenseNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LicenseType" class="form-label">
+                            License Type <span class="required">*</span>
+                        </label>
+                        <select asp-for="LicenseType" class="form-select">
+                            <option value="">-- Select Type --</option>
+                            <option value="B1">B1 - Motorcycle</option>
+                            <option value="B2">B2 - Car under 9 seats</option>
+                            <option value="C">C - Truck</option>
+                            <option value="D">D - Bus</option>
+                            <option value="E">E - Container</option>
+                        </select>
+                        <span asp-validation-for="LicenseType" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="LicenseExpiry" class="form-label">
+                            License Expiry Date <span class="required">*</span>
+                        </label>
+                        <input asp-for="LicenseExpiry" type="date" class="form-input" />
+                        <span asp-validation-for="LicenseExpiry" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ExperienceYears" class="form-label">
+                            Experience (Years) <span class="required">*</span>
+                        </label>
+                        <input asp-for="ExperienceYears" type="number" min="0" class="form-input" placeholder="Enter years of experience..." />
+                        <span asp-validation-for="ExperienceYears" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Status" class="form-label">
+                        Status <span class="required">*</span>
+                    </label>
+                    <select asp-for="Status" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="/admin/driver" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Update Driver</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // Validate license expiry date
+            $('input[name="LicenseExpiry"]').on('change', function() {
+                const expiryDate = new Date($(this).val());
+                const today = new Date();
+                
+                if (expiryDate <= today) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid License Expiry',
+                        text: 'License expiry date must be in the future'
+                    });
+                }
+            });
+        });
+    </script>
+}

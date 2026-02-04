@@ -1,0 +1,342 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Transport Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/site.css">
+</head>
+
+<body>
+
+    <section class="page-header position-relative d-flex align-items-center justify-content-center">
+        <div class="bg-overlay"></div>
+
+        <div class="container position-relative z-index-1 text-center">
+            <h2 class="text-white fw-bold display-4 mb-3">Public Transport</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="#" class="text-white text-decoration-none hover-yellow">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active text-custom" aria-current="page">Transport Network</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <section class="py-5 pb-5 bg-light overflow-hidden">
+        <div class="container">
+            <div class="row align-items-center justify-content-between">
+
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <div class="image-wrapper position-relative text-center" style="margin-left: 50px;">
+                        <img src="./image/bus.jpg"
+                             class="img-fluid rounded shadow animate-left z-index-1 main-img"
+                             alt="Modern City Bus">
+
+                        <img src="./image/bus-and-train.jpg"
+                             class="img-fluid rounded shadow animate-left overlay-img delay-image"
+                             alt="Metro Train System">
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="animate-right">
+                        <h5 class="text-uppercase fw-bold mb-2">About Our System</h5>
+                        <h2 class="fw-bold mb-3 display-6">Smart & Sustainable City Transportation</h2>
+                        <p class="text-muted mb-4">
+                            We provide an integrated public transport network connecting buses, trains, and metro lines. Our mission is to offer safe, reliable, and eco-friendly travel solutions for everyone.
+                        </p>
+                    </div>
+
+                    <div class="row mb-4 animate-right delay-1">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-primary me-2"></i> Real-time Tracking
+                                </li>
+                                <li class="mb-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-primary me-2"></i> Integrated Ticketing
+                                </li>
+                                <li class="mb-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-primary me-2"></i> Eco-friendly Fleet
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-primary me-2"></i> 24/7 Support Center
+                                </li>
+                                <li class="mb-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-primary me-2"></i> Accessible Stations
+                                </li>
+                                <li class="mb-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-primary me-2"></i> Mobile App Booking
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="animate-right delay-2">
+                        <div class="d-flex align-items-center p-3 rounded shadow-sm border"
+                             style="max-width: 320px; background-color: #3cda61;">
+                            <div class="me-3">
+                                <i class="fas fa-users fa-2x text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="fw-bold m-0 text-dark counter" data-target="5000000">0</h3>
+                                <span class="text-dark small text-uppercase fw-bold">Daily Passengers</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h5 class="text-custom text-uppercase fw-bold mb-2">Our Services</h5>
+                <h2 class="fw-bold display-6 mb-3">Efficient Mobility Solutions</h2>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm service-card p-4">
+                        <div class="card-body position-relative z-index-1 text-center">
+                            <div class="icon-wrapper mb-4 mx-auto">
+                                <i class="fas fa-bus fa-2x text-custom"></i>
+                            </div>
+                            <h3 class="h4 fw-bold mb-3">City Bus Network</h3>
+                            <p class="text-muted mb-4">
+                                Comprehensive bus routes covering all major districts with high frequency schedules.
+                            </p>
+                            <a href="bus-schedule.html" class="read-more fw-bold text-decoration-none text-custom">
+                                View Schedules <i class="fas fa-arrow-right ms-2 small"></i>
+                            </a>
+                        </div>
+                        <div class="watermark-icon"><i class="fas fa-bus"></i></div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm service-card p-4">
+                        <div class="card-body position-relative z-index-1 text-center">
+                            <div class="icon-wrapper mb-4 mx-auto">
+                                <i class="fas fa-subway fa-2x text-custom"></i>
+                            </div>
+                            <h3 class="h4 fw-bold mb-3">Rapid Metro Transit</h3>
+                            <p class="text-muted mb-4">
+                                Fast and reliable metro lines connecting the city center to suburban areas.
+                            </p>
+                            <a href="metro-lines.html" class="read-more fw-bold text-decoration-none text-custom">
+                                Check Lines <i class="fas fa-arrow-right ms-2 small"></i>
+                            </a>
+                        </div>
+                        <div class="watermark-icon"><i class="fas fa-subway"></i></div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm service-card p-4">
+                        <div class="card-body position-relative z-index-1 text-center">
+                            <div class="icon-wrapper mb-4 mx-auto">
+                                <i class="fas fa-id-card fa-2x text-custom"></i>
+                            </div>
+                            <h3 class="h4 fw-bold mb-3">Smart Travel Card</h3>
+                            <p class="text-muted mb-4">
+                                One card for all modes of transport. Easy top-up and contactless payments.
+                            </p>
+                            <a href="smart-card.html" class="read-more fw-bold text-decoration-none text-custom">
+                                Get Your Card <i class="fas fa-arrow-right ms-2 small"></i>
+                            </a>
+                        </div>
+                        <div class="watermark-icon"><i class="fas fa-id-card"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section py-5 position-relative cta-overlap-target">
+        <div class="bg-overlay"></div>
+        <div class="container position-relative z-index-1">
+            <div class="row align-items-center gy-4">
+                <div class="col-lg-6 text-white">
+                    <h2 class="display-5 fw-bold mb-3">Plan Your Journey Today</h2>
+                    <p class="lead mb-0 opacity-75">
+                        Download our mobile app to check real-time schedules, buy tickets, and plan your route across the city.
+                    </p>
+                </div>
+                <div class="col-lg-6 text-start text-lg-end">
+                    <div class="d-flex flex-column align-items-start align-items-lg-end gap-3">
+                        <a href="#" class="btn btn-custom-primary btn-lg">Plan Route</a>
+                        <a href="#" class="btn btn-custom-text btn-lg d-inline-flex align-items-center justify-content-center">
+                            Download App <i class="fas fa-download ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section position-relative" id="stats-trigger">
+        <div class="container">
+            <div class="move-up-box rounded shadow p-4 p-lg-5 text-white" style="background-color: #28a745;">
+                <div class="row g-4 text-center">
+
+                    <div class="col-6 col-md-3 border-black-10">
+                        <div class="stat-item">
+                            <div class="icon-box-white mb-3 mx-auto">
+                                <i class="fas fa-route fa-2x text-green"></i>
+                            </div>
+                            <h2 class="fw-bold display-6 mb-0 counter" data-target="150">0</h2>
+                            <p class="text-white-50 text-uppercase small fw-bold mt-2">Active Routes</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-3 border-black-10">
+                        <div class="stat-item">
+                            <div class="icon-box-white mb-3 mx-auto">
+                                <i class="fas fa-clock fa-2x text-green"></i>
+                            </div>
+                            <h2 class="fw-bold display-6 mb-0">
+                                <span class="counter" data-target="99">0</span>%
+                            </h2>
+                            <p class="text-white-50 text-uppercase small fw-bold mt-2">On-Time Performance</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-3 border-black-10">
+                        <div class="stat-item">
+                            <div class="icon-box-white mb-3 mx-auto">
+                                <i class="fas fa-map-marked-alt fa-2x text-green"></i>
+                            </div>
+                            <h2 class="fw-bold display-6 mb-0 counter" data-target="450">0</h2>
+                            <p class="text-white-50 text-uppercase small fw-bold mt-2">Stations & Stops</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <div class="stat-item">
+                            <div class="icon-box-white mb-3 mx-auto">
+                                <i class="fas fa-bus-alt fa-2x text-green"></i>
+                            </div>
+                            <h2 class="fw-bold display-6 mb-0 counter" data-target="1200">0</h2>
+                            <p class="text-white-50 text-uppercase small fw-bold mt-2">Modern Vehicles</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="blog-section py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h5 class="text-custom text-uppercase fw-bold mb-2">News & Updates</h5>
+                <h2 class="fw-bold display-6 mb-3">Latest Transport News</h2>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm blog-card">
+                        <div class="blog-image-wrapper position-relative overflow-hidden">
+                            <a href="#">
+                                <img src="https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/learning-truck-driving-cdl-e1627375280451.jpg"
+                                     class="card-img-top" alt="New Electric Buses">
+                            </a>
+                            <a href="#" class="category-badge position-absolute top-0 start-0 m-3 text-decoration-none">
+                                Sustainability
+                            </a>
+                        </div>
+                        <div class="card-body p-4">
+                            <h4 class="card-title h5 fw-bold mb-3">
+                                <a href="#" class="text-dark text-decoration-none hover-title">
+                                    City Launches 50 New Electric Buses to Reduce Emissions
+                                </a>
+                            </h4>
+                            <p class="card-text text-muted small mb-4">
+                                Our commitment to a greener city continues with the addition of zero-emission electric buses to the fleet...
+                            </p>
+                            <a href="#" class="read-more-link fw-bold text-decoration-none text-custom">
+                                Read More <i class="fas fa-arrow-right ms-2 small"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm blog-card">
+                        <div class="blog-image-wrapper position-relative overflow-hidden">
+                            <a href="#">
+                                <img src="https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/driver-instructor-showing-traffiic-signs-e1627375674338.jpg"
+                                     class="card-img-top" alt="Metro Schedule Change">
+                            </a>
+                            <a href="#" class="category-badge position-absolute top-0 start-0 m-3 text-decoration-none">
+                                Alert
+                            </a>
+                        </div>
+                        <div class="card-body p-4">
+                            <h4 class="card-title h5 fw-bold mb-3">
+                                <a href="#" class="text-dark text-decoration-none hover-title">
+                                    Schedule Updates for Metro Line 1 During Holidays
+                                </a>
+                            </h4>
+                            <p class="card-text text-muted small mb-4">
+                                Please be aware of the modified operating hours for the upcoming national holiday period...
+                            </p>
+                            <a href="#" class="read-more-link fw-bold text-decoration-none text-custom">
+                                Read More <i class="fas fa-arrow-right ms-2 small"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm blog-card">
+                        <div class="blog-image-wrapper position-relative overflow-hidden">
+                            <a href="#">
+                                <img src="https://templatekit.jegtheme.com/driveria/wp-content/uploads/sites/127/2021/07/male-instructor-happy-with-driving-of-his-student-e1627375376155.jpg"
+                                     class="card-img-top" alt="Mobile App Features">
+                            </a>
+                            <a href="#" class="category-badge position-absolute top-0 start-0 m-3 text-decoration-none">
+                                Technology
+                            </a>
+                        </div>
+                        <div class="card-body p-4">
+                            <h4 class="card-title h5 fw-bold mb-3">
+                                <a href="#" class="text-dark text-decoration-none hover-title">
+                                    New Mobile App Features: Live Tracking & QR Tickets
+                                </a>
+                            </h4>
+                            <p class="card-text text-muted small mb-4">
+                                Experience seamless travel with our latest app update, featuring real-time vehicle location...
+                            </p>
+                            <a href="#" class="read-more-link fw-bold text-decoration-none text-custom">
+                                Read More <i class="fas fa-arrow-right ms-2 small"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+</body>
+</html>

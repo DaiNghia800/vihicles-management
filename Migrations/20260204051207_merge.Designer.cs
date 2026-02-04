@@ -12,7 +12,7 @@ using Public_Transport.Models.EF;
 namespace Public_Transport.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260204030252_merge")]
+    [Migration("20260204051207_merge")]
     partial class merge
     {
         /// <inheritdoc />
@@ -90,13 +90,16 @@ namespace Public_Transport.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DriverId"));
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("ExperienceYears")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("LicenseExpiry")
-                        .HasColumnType("datetime2");
+                        .IsRequired()
+                        .HasColumnType("datetime");
 
                     b.Property<string>("LicenseNumber")
                         .IsRequired()
@@ -110,11 +113,15 @@ namespace Public_Transport.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Active");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -123,6 +130,9 @@ namespace Public_Transport.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("DriverId");
+
+                    b.HasIndex("LicenseNumber")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -439,20 +449,25 @@ namespace Public_Transport.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TripId"));
 
                     b.Property<DateTime>("ArrivalTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<DateTime>("DepartureTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime");
 
                     b.Property<int?>("DriverId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DriverId1")
                         .HasColumnType("int");
 
                     b.Property<int>("RouteId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Scheduled");
 
                     b.Property<int?>("VehicleId")
                         .HasColumnType("int");
@@ -460,6 +475,8 @@ namespace Public_Transport.Migrations
                     b.HasKey("TripId");
 
                     b.HasIndex("DriverId");
+
+                    b.HasIndex("DriverId1");
 
                     b.HasIndex("RouteId");
 
@@ -488,6 +505,9 @@ namespace Public_Transport.Migrations
                         .HasMaxLength(100)
                         .IsUnicode(true)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("date");
 
                     b.Property<bool>("Deleted")
                         .ValueGeneratedOnAdd()
@@ -632,12 +652,13 @@ namespace Public_Transport.Migrations
                     b.HasOne("Public_Transport.Models.Entities.Users", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Public_Transport.Models.Entities.Vehicle", "VehicleAssigned")
                         .WithMany()
-                        .HasForeignKey("VehicleAssignedId");
+                        .HasForeignKey("VehicleAssignedId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
 
@@ -693,7 +714,7 @@ namespace Public_Transport.Migrations
                     b.HasOne("Public_Transport.Models.Entities.Station", "Station")
                         .WithMany("RouteDetails")
                         .HasForeignKey("StationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Route");
@@ -722,19 +743,25 @@ namespace Public_Transport.Migrations
 
             modelBuilder.Entity("Public_Transport.Models.Entities.Trip", b =>
                 {
-                    b.HasOne("Public_Transport.Models.Entities.Driver", "Driver")
+                    b.HasOne("Public_Transport.Models.Entities.Driver", null)
                         .WithMany("Trips")
-                        .HasForeignKey("DriverId");
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Public_Transport.Models.Entities.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId1");
 
                     b.HasOne("Public_Transport.Models.Entities.Route", "Route")
                         .WithMany("Trips")
                         .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Public_Transport.Models.Entities.Vehicle", "Vehicle")
                         .WithMany("Trips")
-                        .HasForeignKey("VehicleId");
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Driver");
 

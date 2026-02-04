@@ -23,11 +23,20 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    
+    @* ✅ CHỈ DÙNG GOOGLE FONTS - KHÔNG DÙNG LOCAL FONT *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
     <link rel="stylesheet" href="/lib/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/lib/slick/slick.css" />
@@ -319,28 +328,6 @@
                                 </a>
                             </li>
                             <li class="sidebar-list">
-                                
-                                <a href="#collapseDriver" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseDriver">
-                                    <i class="fa-solid fa-user-tie"></i>
-                                    <span class="text-capitalize">Driver</span>
-                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "active" : "")">
-                                        <i class="fa-solid fa-chevron-right"></i>
-                                    </div>
-                                </a>
-                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "show" : "")" id="collapseDriver">
-                                    <li>
-                                        <a href="/admin/driver" class="text-capitalize">
-                                            All Driver
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="/admin/driver/create" class="text-capitalize">
-                                            Add new Driver
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="sidebar-list">
                                 <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
                                     <i class="fa-solid fa-user-shield"></i>
                                     <span class="text-capitalize">Role</span>
@@ -367,6 +354,63 @@
                                 </ul>
                             </li>
                             <li class="sidebar-list">
+                                <a href="#collapseUser"
+                                   class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/user") ? "active" : "")"
+                                   data-bs-toggle="collapse"
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="collapseUser">
+                                    <i class="fa-solid fa-users"></i>
+                                    <span class="text-capitalize">Users</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/user") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/user") ? "show" : "")" id="collapseUser">
+                                    <li>
+                                        <a href="/admin/user" class="text-capitalize">
+                                            All Users
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/user/create" class="text-capitalize">
+                                            Add New User
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseDriver"
+                                   class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/driver") ? "active" : "")"
+                                   data-bs-toggle="collapse"
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="collapseDriver">
+                                    <i class="fa-solid fa-id-card"></i>
+                                    <span class="text-capitalize">Drivers</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/driver") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/driver") ? "show" : "")" id="collapseDriver">
+                                    <li>
+                                        <a href="/admin/driver" class="text-capitalize">
+                                            All Drivers
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/driver/create" class="text-capitalize">
+                                            Add New Driver
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/driver/license-management" class="text-capitalize">
+                                            License Management
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                             <li class="sidebar-list">
                                 <a href="#collapseSettings" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/settings") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseSettings">
                                     <i class="fa-solid fa-cog"></i>
                                     <span class="text-capitalize">Settings</span>
@@ -378,10 +422,10 @@
                                     <li>
                                         <a href="/admin/settings/profile/@currentUser.Uid" class="text-capitalize">
                                             Profile Setting
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                                            </a>
+									</li>
+                                    </ul>
+							</li>
                         }
                     </ul>
                 </nav>
@@ -413,7 +457,11 @@
 
     <script src="/lib/jquery/jquery.min.js"></script>
     <script src="/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <partial name="_ValidationScriptsPartial" />
+    
+    @* jQuery Validation từ CDN thay vì local *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validation.unobtrusive.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -423,7 +471,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/lib/tinymce/tinymce.min.js"></script>
     <script src="/lib/slick/slick.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.3/dist/sweetalert2.all.min.js"></script>
     <script src="~/js/sidebar-effect.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/leadflet.js" asp-append-version="true"></script>

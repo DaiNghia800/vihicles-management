@@ -32,5 +32,10 @@ namespace Public_Transport.Services
             var result = await _cloudinary.UploadAsync(uploadParams);
             return result.SecureUrl.ToString();
         }
+
+        public Task<string> UploadSingleImageAsync(IFormFile profileImageFile)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -11,24 +11,43 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add services to the container
+builder.Services.AddControllersWithViews(options =>
+{
+    // Tắt implicit required validation cho non-nullable value types
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
+
+// ✅ FIX: Configure Cookie Policy
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => true;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always; // ← Bắt buộc HTTPS
+});
+
+// Configure session
 builder.Services.AddSession(options =>
 {
-    options.Cookie.IsEssential = true;
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.IdleTimeout = TimeSpan.FromHours(3);
-    options.Cookie.Name = "public-transport.session";
+    options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← Bắt buộc HTTPS
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
+
+// Configure authentication cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.ExpireTimeSpan = TimeSpan.FromHours(3);
-        options.LoginPath = "/login";
-        options.AccessDeniedPath = "/access-denied";
+        options.LoginPath = "/login";  // ← ĐÃ ĐỔI: từ "/Account/Login" thành "/login"
+        options.AccessDeniedPath = "/access-denied";  // ← ĐÃ ĐỔI: từ "/Account/AccessDenied" thành "/access-denied"
+        options.ExpireTimeSpan = TimeSpan.FromHours(24);
+        options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.IsEssential = true;
-        options.SlidingExpiration = false;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ← Bắt buộc HTTPS
+        options.Cookie.SameSite = SameSiteMode.Lax;
     })
     .AddCookie("External", options =>
     {
@@ -69,12 +88,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         facebookOptions.Fields.Add("last_name");
     });
 
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.CheckConsentNeeded = context => true;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-});
-
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("NoPassenger", policy => 
@@ -100,6 +113,7 @@ builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<MoMoService>();
 
 // ✅ === Cloudinary Settings ===
+builder.Services.AddScoped<IDriverService, DriverService>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
 builder.Services.AddScoped<IDashboardService, DashboardService>();
@@ -109,21 +123,24 @@ builder.Services.AddScoped<IUploadService, UploadService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // ← Redirect HTTP sang HTTPS
 app.UseStaticFiles();
 
-app.UseRouting();
-app.UseStatusCodePagesWithReExecute("/Home/NotFoundPage");
+app.UseCookiePolicy(); // ← Áp dụng Cookie Policy
 
+app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseMiddleware<AdminAccessMiddleware>();
 app.UseSession();
 

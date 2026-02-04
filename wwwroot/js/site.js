@@ -957,3 +957,137 @@ if (inputStockQuantity) {
 //end Safety Stock
 
 
+// AboutUs
+
+// Hàm chạy hiệu ứng đếm số
+const runCounter = (el) => {
+    const target = +el.getAttribute('data-target');
+    const duration = 2000; // Thời gian chạy (2 giây)
+    const increment = target / (duration / 16);
+
+    const updateCount = () => {
+        const count = +el.innerText;
+        if (count < target) {
+            el.innerText = Math.ceil(count + increment);
+            setTimeout(updateCount, 16);
+        } else {
+            el.innerText = target;
+        }
+    };
+
+    updateCount();
+};
+
+// Cấu hình quan sát khi lướt tới mới chạy
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            const counter = entry.target;
+            
+            // Chờ 0.8 giây (800ms) cho khớp với hiệu ứng trượt của CSS rồi mới chạy số
+            setTimeout(() => {
+                runCounter(counter);
+            }, 800);
+            
+            observer.unobserve(counter);
+        }
+    });
+}, { threshold: 0.5 });
+
+// Kích hoạt cho các thẻ có class .counter
+document.addEventListener("DOMContentLoaded", () => {
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach((counter) => {
+        observer.observe(counter);
+    });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // 1. Hàm đếm số (Counter)
+    const runCounter = (el) => {
+        const target = +el.getAttribute('data-target');
+        const duration = 2000; // Chạy trong 2 giây
+        // Tính toán bước nhảy để khớp với 60fps
+        const increment = target / (duration / 16); 
+
+        const updateCount = () => {
+            const count = +el.innerText;
+            if (count < target) {
+                el.innerText = Math.ceil(count + increment);
+                setTimeout(updateCount, 16);
+            } else {
+                el.innerText = target;
+            }
+        };
+        updateCount();
+    };
+
+    // 2. Intersection Observer (Theo dõi khi cuộn tới)
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Lấy phần tử box đang theo dõi
+                const box = entry.target.querySelector('.move-up-box');
+                
+                // A. Kích hoạt hiệu ứng trượt lên
+                box.classList.add('active');
+
+                // B. Kích hoạt số chạy (Chỉ chạy 1 lần)
+                const counters = box.querySelectorAll('.counter');
+                counters.forEach(counter => {
+                    // Kiểm tra nếu số vẫn là 0 thì mới chạy
+                    if (counter.innerText == "0") {
+                        runCounter(counter);
+                    }
+                });
+
+                // Ngừng theo dõi sau khi đã chạy xong
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 }); // Khi thấy 20% section thì bắt đầu chạy
+
+    // Bắt đầu theo dõi section chứa thống kê
+    const statsSection = document.querySelector('#stats-trigger');
+    if (statsSection) {
+        observer.observe(statsSection);
+    }
+});
+
+// Driver Create - Validate user selection
+$(document).ready(function() {
+    const driverCreateForm = $('form[action*="/admin/driver/create"]');
+    
+    if (driverCreateForm.length > 0) {
+        driverCreateForm.on('submit', function(e) {
+            const userId = $('#UserId').val();
+            
+            if (!userId) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'User Required',
+                    text: 'Please select a user for this driver'
+                });
+                return false;
+            }
+            
+            const licenseExpiry = $('input[name="LicenseExpiry"]').val();
+            if (licenseExpiry) {
+                const expiryDate = new Date(licenseExpiry);
+                const today = new Date();
+                
+                if (expiryDate <= today) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid License Expiry',
+                        text: 'License expiry date must be in the future'
+                    });
+                    return false;
+                }
+            }
+        });
+    }
+});

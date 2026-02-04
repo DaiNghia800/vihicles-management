@@ -1,0 +1,140 @@
+﻿@model Public_Transport.Models.Entities.Driver
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "Create New Driver";
+}
+
+<section class="user-area">
+    <div class="card">
+        <div class="card-header2">
+            <h5>Create New Driver</h5>
+        </div>
+        
+        <form asp-action="Create" method="post" class="theme-form">
+            @Html.AntiForgeryToken()
+            
+            <div class="row">
+                <!-- ✅ Hiển thị ảnh từ User được chọn (Read-only) -->
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6 class="mb-3">Driver Profile Image</h6>
+                            <p class="text-muted small mb-3">
+                                <i class="fa fa-info-circle me-1"></i>
+                                Profile image will be automatically taken from the selected user's account
+                            </p>
+                            <div class="avatar-display-container mb-3">
+                                <img id="userProfilePreview" 
+                                     src="https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png" 
+                                     alt="User Profile" 
+                                     class="rounded-circle"
+                                     style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #14a38b;">
+                            </div>
+                            <small class="form-text text-muted">
+                                To change this image, please update the user's profile picture in User Management
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Select User -->
+                <div class="col-12 mb-3">
+                    <label class="form-label-title">Select User <span class="text-danger">*</span></label>
+                    <select asp-for="UserId" class="form-control js-example-basic-single" id="UserId">
+                        <option value="">-- Select User --</option>
+                        @if (ViewBag.Users != null)
+                        {
+                            foreach (var user in ViewBag.Users)
+                            {
+                                <option value="@user.Uid" data-img="@user.ImgUser">
+                                    @user.FullName (@user.Email) - Age: @(DateTime.Today.Year - (user.DateOfBirth?.Year ?? 0))
+                                </option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+                
+                <!-- License Number -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="LicenseNumber" class="form-control" placeholder="License Number" />
+                        <label asp-for="LicenseNumber" class="form-label-title">License Number <span class="text-danger">*</span></label>
+                    </div>
+                    <span asp-validation-for="LicenseNumber" class="text-danger"></span>
+                </div>
+                
+                <!-- License Type -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label-title">License Type <span class="text-danger">*</span></label>
+                    <select asp-for="LicenseType" class="form-control">
+                        <option value="">-- Select License Type --</option>
+                        <option value="B1">B1 - Motorcycle</option>
+                        <option value="B2">B2 - Car under 9 seats</option>
+                        <option value="C">C - Truck</option>
+                        <option value="D">D - Bus 9-30 seats</option>
+                        <option value="E">E - Bus over 30 seats</option>
+                    </select>
+                    <span asp-validation-for="LicenseType" class="text-danger"></span>
+                </div>
+                
+                <!-- License Expiry -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="LicenseExpiry" class="form-control" type="date" />
+                        <label asp-for="LicenseExpiry" class="form-label-title">License Expiry Date</label>
+                    </div>
+                    <span asp-validation-for="LicenseExpiry" class="text-danger"></span>
+                </div>
+                
+                <!-- Experience Years -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input asp-for="ExperienceYears" class="form-control" type="number" min="0" max="50" />
+                        <label asp-for="ExperienceYears" class="form-label-title">Experience Years</label>
+                    </div>
+                    <span asp-validation-for="ExperienceYears" class="text-danger"></span>
+                </div>
+                
+                <!-- Status -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label-title">Status</label>
+                    <select asp-for="Status" class="form-control">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="text-end mt-4">
+                <a asp-action="Index" class="btn btn-secondary me-2">
+                    <i class="fa fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-save me-2"></i>Create Driver
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        $(document).ready(function() {
+            // ✅ Cập nhật preview ảnh khi chọn user
+            $('#UserId').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const userImage = selectedOption.data('img');
+                
+                if (userImage) {
+                    $('#userProfilePreview').attr('src', userImage);
+                } else {
+                    $('#userProfilePreview').attr('src', 'https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png');
+                }
+            });
+        });
+    </script>
+}

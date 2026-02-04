@@ -171,6 +171,7 @@ namespace Public_Transport.Migrations
                     Email = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
                     PhoneNumber = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: true),
                     Address = table.Column<string>(type: "nvarchar(255)", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "date", nullable: true),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoleUid = table.Column<int>(type: "int", nullable: false),
                     OtpCode = table.Column<string>(type: "varchar(6)", unicode: false, maxLength: 6, nullable: true),
@@ -218,7 +219,7 @@ namespace Public_Transport.Migrations
                         column: x => x.StationId,
                         principalTable: "Stations",
                         principalColumn: "StationId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,12 +261,12 @@ namespace Public_Transport.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     LicenseNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LicenseType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    LicenseExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LicenseExpiry = table.Column<DateTime>(type: "datetime", nullable: false),
                     ExperienceYears = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "Active"),
                     VehicleAssignedId = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "GETDATE()")
                 },
                 constraints: table =>
                 {
@@ -275,12 +276,13 @@ namespace Public_Transport.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Uid",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Drivers_Vehicles_VehicleAssignedId",
                         column: x => x.VehicleAssignedId,
                         principalTable: "Vehicles",
-                        principalColumn: "VehicleId");
+                        principalColumn: "VehicleId",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -291,10 +293,11 @@ namespace Public_Transport.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RouteId = table.Column<int>(type: "int", nullable: false),
                     VehicleId = table.Column<int>(type: "int", nullable: true),
-                    DepartureTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ArrivalTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    DriverId = table.Column<int>(type: "int", nullable: true)
+                    DepartureTime = table.Column<DateTime>(type: "datetime", nullable: false),
+                    ArrivalTime = table.Column<DateTime>(type: "datetime", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true, defaultValue: "Scheduled"),
+                    DriverId = table.Column<int>(type: "int", nullable: true),
+                    DriverId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -303,18 +306,25 @@ namespace Public_Transport.Migrations
                         name: "FK_Trips_Drivers_DriverId",
                         column: x => x.DriverId,
                         principalTable: "Drivers",
+                        principalColumn: "DriverId",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Trips_Drivers_DriverId1",
+                        column: x => x.DriverId1,
+                        principalTable: "Drivers",
                         principalColumn: "DriverId");
                     table.ForeignKey(
                         name: "FK_Trips_Routes_RouteId",
                         column: x => x.RouteId,
                         principalTable: "Routes",
                         principalColumn: "RouteId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Trips_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
-                        principalColumn: "VehicleId");
+                        principalColumn: "VehicleId",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -381,6 +391,12 @@ namespace Public_Transport.Migrations
                 column: "CategoryUid");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Drivers_LicenseNumber",
+                table: "Drivers",
+                column: "LicenseNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Drivers_UserId",
                 table: "Drivers",
                 column: "UserId");
@@ -435,6 +451,11 @@ namespace Public_Transport.Migrations
                 name: "IX_Trips_DriverId",
                 table: "Trips",
                 column: "DriverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Trips_DriverId1",
+                table: "Trips",
+                column: "DriverId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trips_RouteId",
