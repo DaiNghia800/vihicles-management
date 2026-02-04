@@ -57,7 +57,7 @@ function renderRecentPosts(currentBlogId = null) {
         <div class="recent-post-item">
             <div class="recent-post-content">
                 <h6>
-                    <a href="/blog/${b.uid}">${truncateText(b.title, 60)}</a>
+                    <a href="/blogs/${b.uid}">${truncateText(b.title, 60)}</a>
                 </h6>
                 <div class="date">
                    <i class="fa-solid fa-clock" style="color: #a8a8a8;"></i> ${formatDate(b.createdAt)}

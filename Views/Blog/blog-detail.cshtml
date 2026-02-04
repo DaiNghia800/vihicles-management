@@ -3,7 +3,113 @@
     ViewData["title"] = "Blog Detail";
     var blogId = ViewData["BlogId"]?.ToString();
 }
+<style>
+    .blog-detail-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+    }
 
+    .blog-header-image {
+        width: 100%;
+        height: 400px;
+        overflow: hidden;
+    }
+
+        .blog-header-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .blog-meta {
+        padding: 20px 30px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .category-badge {
+        background: #ffba00;
+        color: black;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .separator {
+        color: #ddd;
+    }
+
+    .author-name, .blog-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .blog-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #333;
+        padding: 30px 30px 20px;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .blog-content {
+        padding: 0 30px 30px;
+        font-size: 16px;
+        line-height: 1.8;
+        color: #555;
+    }
+
+        .blog-content p {
+            margin-bottom: 20px;
+        }
+
+        .blog-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .blog-content h2, .blog-content h3 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3rem;
+    }
+
+    .btn-primary {
+        background-color: #ffba00;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+        .btn-primary:hover {
+            background-color: #e5a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 186, 0, 0.3);
+        }
+</style>
 <section class="routes-1 position-relative" style="height: 300px; background: url('/assets/images/bus.jpg') no-repeat center center/cover;">
     <div class="bg-overlay position-absolute bg-black opacity-75 start-0 top-0 w-100 h-100"></div>
     <div class="container mx-auto position-relative z-1 h-100">
@@ -148,110 +254,3 @@
     }
 </script>
 
-<style>
-    .blog-detail-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        margin-bottom: 30px;
-    }
-
-    .blog-header-image {
-        width: 100%;
-        height: 400px;
-        overflow: hidden;
-    }
-
-    .blog-header-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .blog-meta {
-        padding: 20px 30px;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        font-size: 14px;
-        color: #666;
-    }
-
-    .category-badge {
-        background: #ffba00;
-        color: black;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .separator {
-        color: #ddd;
-    }
-
-    .author-name, .blog-date {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .blog-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: #333;
-        padding: 30px 30px 20px;
-        margin: 0;
-        line-height: 1.4;
-    }
-
-    .blog-content {
-        padding: 0 30px 30px;
-        font-size: 16px;
-        line-height: 1.8;
-        color: #555;
-    }
-
-    .blog-content p {
-        margin-bottom: 20px;
-    }
-
-    .blog-content img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin: 20px 0;
-    }
-
-    .blog-content h2, .blog-content h3 {
-        margin-top: 30px;
-        margin-bottom: 15px;
-        color: #333;
-    }
-
-    .spinner-border {
-        width: 3rem;
-        height: 3rem;
-        border-width: 0.3rem;
-    }
-
-    .btn-primary {
-        background-color: #ffba00;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 30px;
-        font-weight: 600;
-        transition: all 0.3s;
-    }
-
-    .btn-primary:hover {
-        background-color: #e5a800;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 186, 0, 0.3);
-    }
-</style>

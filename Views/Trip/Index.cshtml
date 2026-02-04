@@ -1,6 +1,4 @@
-﻿@model IEnumerable<Public_Transport.Models.Entities.Trip>
-@using System.Text.Json
-@{
+﻿@{
     ViewData["Title"] = "Route List";
 }
 
@@ -22,69 +20,477 @@
 
 <section class="routes-2 py-5 bg-light">
     <div class="container mx-auto">
-        <div class="header mb-5">
+        <div class="header mb-4">
             <h5 class="color-primary fs-6 fw-medium mb-3 text-center text-warning">SELECT A ROUTE</h5>
             <h2 class="text-black fs-2 fw-medium text-center mb-3">LIST OF PROPOSED ROUTES</h2>
             <p class="text-center text-muted">Based on existing schedules available in our system.</p>
         </div>
 
-        <div class="body">
-            <div class="row">
-                @foreach (var item in Model)
-                {
-                    <div class="col-md-4 mt-4">
-                        <div class="inner-body bg-white p-4 rounded-4 shadow-sm h-100">
-                            <div class="bg-gray rounded-4 overflow-hidden">
-                                <div class="box-img rounded-4 overflow-hidden position-relative">
-                                    @{
-                                        var thumbnails = string.IsNullOrWhiteSpace(item.Thumbnail)
-                                        ? new List<string>()
-                                        : JsonSerializer.Deserialize<List<string>>(item.Thumbnail);
-
-                                        var firstImg = thumbnails.FirstOrDefault();
-                                    }
-
-                                    @if (!string.IsNullOrEmpty(firstImg))
-                                    {
-                                        <img src=@firstImg alt="" class="img-fluid" />
-                                    }
-                                    else
-                                    {
-                                        <img src="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=2071&auto=format&fit=crop" alt="Bus" class="mw-100 w-100 h-100 object-fit-cover" style="height: 200px;">
-                                    }
-                                    <span class="position-absolute top-0 end-0 bg-success text-white fs-6 fw-normal py-2 px-3 rounded-top-4 rounded-start-3">
-                                        @item.Vehicle?.VehicleType
-                                    </span>
-                                </div>
-
-                                <div class="box-content position-relative mt-3">
-                                    <div class="inner-content">
-                                        <div class="border-bottom pb-3 mb-3">
-                                            <h3 class="text-black fs-5 fw-medium mt-2 mb-3">@item.Route.RouteName</h3>
-                                            <p class="p-0 text-truncate mb-0 text-muted">@item.Route.Description</p>
-                                        </div>
-
-                                        <div class="d-flex justify-content-between">
-                                            <span class="text-black fs-6 fw-light">
-                                                <i class="fa-solid fa-clock text-warning me-1"></i>
-                                                @item.DepartureTime.ToString("HH:mm") - @item.ArrivalTime.ToString("HH:mm")
-                                            </span>
-                                            <span class="text-black fs-6 fw-light">
-                                                <i class="fa-solid fa-sack-dollar text-warning me-1"></i>
-                                                @item.Route.BasePrice.ToString("N0") VND
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <a asp-action="Details" asp-route-id="@item.TripId" class="btn btn-warning text-white text-uppercase fw-medium fs-6 text-center d-block pt-3 pb-3 rounded-4 mt-4 w-100">
-                                    See details <i class="fa-solid fa-arrow-right ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                }
+        <!-- ✅ Search & Filter Section -->
+        <div class="filter-section bg-white rounded-4 shadow-sm p-4 mb-4">
+            <div class="row g-3">
+                <!-- Search Input -->
+                <div class="col-md-4">
+                    <label class="form-label fw-medium">Search Route</label>
+                    <input type="text"
+                           id="searchInput"
+                           class="form-control"
+                           placeholder="Search by route name, description...">
                 </div>
+
+                <!-- Status Filter -->
+                <div class="col-md-2">
+                    <label class="form-label fw-medium">Status</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="All">All Status</option>
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Running">Running</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <!-- From Date -->
+                <div class="col-md-2">
+                    <label class="form-label fw-medium">From Date</label>
+                    <input type="date" id="fromDate" class="form-control">
+                </div>
+
+                <!-- To Date -->
+                <div class="col-md-2">
+                    <label class="form-label fw-medium">To Date</label>
+                    <input type="date" id="toDate" class="form-control">
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button class="btn btn-warning text-white w-100" onclick="applyFilters()">
+                        <i class="fa-solid fa-filter me-1"></i> Filter
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetFilters()" title="Reset Filters">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Advanced Filters (Collapsible) -->
+            <div class="collapse mt-3" id="advancedFilters">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">Min Price (VND)</label>
+                        <input type="number" id="minPrice" class="form-control" placeholder="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-medium">Max Price (VND)</label>
+                        <input type="number" id="maxPrice" class="form-control" placeholder="1,000,000">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toggle Advanced Filters -->
+            <div class="text-center mt-3">
+                <a class="text-muted small" data-bs-toggle="collapse" href="#advancedFilters">
+                    <i class="fa-solid fa-chevron-down me-1"></i> Advanced Filters
+                </a>
+            </div>
+        </div>
+
+        <!-- ✅ Results Info -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <p class="text-muted mb-0" id="resultsInfo">Loading trips...</p>
+            <select id="pageSizeSelect" class="form-select w-auto" onchange="changePageSize()">
+                <option value="9">9 per page</option>
+                <option value="12">12 per page</option>
+                <option value="18">18 per page</option>
+                <option value="24">24 per page</option>
+            </select>
+        </div>
+
+        <!-- ✅ Loading Indicator -->
+        <div class="text-center py-5" id="loadingTrips" style="display: none;">
+            <div class="spinner-border text-warning" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading trips...</p>
+        </div>
+
+        <!-- ✅ Trips Container -->
+        <div class="row" id="tripsContainer">
+            <!-- Trips will be loaded here -->
+        </div>
+
+        <!-- ✅ No Data Message -->
+        <div class="text-center py-5" id="noDataMessage" style="display: none;">
+            <i class="fa-solid fa-bus fa-3x text-muted mb-3 opacity-50"></i>
+            <h4 class="text-muted">No trips found</h4>
+            <p class="text-muted">Try adjusting your search criteria</p>
+        </div>
+
+        <!-- ✅ Pagination Container -->
+        <div class="pagination-wrapper mt-4" id="paginationContainer" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="pagination-info text-muted" id="paginationInfo"></div>
+                <ul class="pagination mb-0" id="pagination"></ul>
+            </div>
         </div>
     </div>
 </section>
+
+<style>
+    .filter-section {
+        border: 1px solid #e0e0e0;
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+        color: #555;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #ddd;
+        font-size: 0.875rem;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+
+    /* Pagination Styles */
+    .pagination-wrapper {
+        border-top: 1px solid #e0e0e0;
+        padding-top: 1.5rem;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .page-item {
+        display: inline-block;
+    }
+
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 0.375rem;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+        cursor: pointer;
+        background: white;
+        font-size: 0.875rem;
+    }
+
+        .page-link:hover {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #000;
+        }
+
+    .page-item.active .page-link {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: white;
+    }
+
+    .page-item.disabled .page-link {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    /* Trip Card Styles */
+    .inner-body {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .inner-body:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+        }
+
+    .box-img img {
+        object-fit: cover;
+    }
+
+    /* .badge-seats {
+        background-color: #28a745;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+    }
+
+        .badge-seats.low {
+            background-color: #ffc107;
+        }
+
+        .badge-seats.full {
+            background-color: #dc3545;
+        } */
+</style>
+
+<script>
+    // ✅ Pagination variables
+    let currentPage = 1;
+    let pageSize = 9;
+
+    // ✅ Debounce function for search
+    let searchTimeout;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadTrips();
+
+        // Setup search with debounce
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                loadTrips();
+            }, 500); // Wait 500ms after user stops typing
+        });
+    });
+
+    // ✅ Load trips with filters
+    async function loadTrips() {
+        showLoading(true);
+
+        try {
+            const params = new URLSearchParams();
+
+            // Get filter values
+            const search = document.getElementById('searchInput').value.trim();
+            const status = document.getElementById('statusFilter').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            // Add params
+            if (search) params.append('search', search);
+            if (status && status !== 'All') params.append('status', status);
+            if (fromDate) params.append('fromDate', fromDate);
+            if (toDate) params.append('toDate', toDate);
+            if (minPrice) params.append('minPrice', minPrice);
+            if (maxPrice) params.append('maxPrice', maxPrice);
+
+            params.append('page', currentPage);
+            params.append('pageSize', pageSize);
+
+            const response = await fetch(`/trip/api/search?${params}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                renderTrips(data.trips);
+                renderPagination(data.pagination);
+                updateResultsInfo(data.pagination);
+            } else {
+                showNoData();
+            }
+        } catch (error) {
+            console.error('Error loading trips:', error);
+            showNoData();
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // ✅ Render trips
+    function renderTrips(trips) {
+        const container = document.getElementById('tripsContainer');
+
+        if (!trips || trips.length === 0) {
+            showNoData();
+            return;
+        }
+
+        document.getElementById('noDataMessage').style.display = 'none';
+        container.style.display = 'flex';
+
+        container.innerHTML = trips.map(trip => {
+            const thumbnail = trip.thumbnail ?
+                JSON.parse(trip.thumbnail)[0] :
+                'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=2071&auto=format&fit=crop';
+
+            const departureTime = new Date(trip.departureTime).toLocaleString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+
+            const arrivalTime = new Date(trip.arrivalTime).toLocaleString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+         
+
+            return `
+                <div class="col-md-4 mt-4">
+                    <div class="inner-body bg-white p-4 rounded-4 shadow-sm h-100">
+                        <div class="bg-gray rounded-4 overflow-hidden">
+                            <div class="box-img rounded-4 overflow-hidden position-relative">
+                                <img src="${thumbnail}" alt="${trip.routeName}" class="img-fluid">
+                                <span class="position-absolute top-0 end-0 bg-success text-white fs-6 fw-normal py-2 px-3 rounded-top-4 rounded-start-3">
+                                    ${trip.vehicleType}
+                                </span>
+                              
+                            </div>
+
+                            <div class="box-content position-relative mt-3">
+                                <div class="inner-content">
+                                    <div class="border-bottom pb-3 mb-3">
+                                        <h3 class="text-black fs-5 fw-medium mt-2 mb-3">${trip.routeName}</h3>
+                                        <p class="p-0 text-truncate mb-0 text-muted">${trip.routeDescription || 'No description'}</p>
+                                    </div>
+
+                             
+
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-black fs-6 fw-light">
+                                            <i class="fa-solid fa-clock text-warning me-1"></i>
+                                            ${new Date(trip.departureTime).toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})} - ${arrivalTime}
+                                        </span>
+                                        <span class="text-black fs-6 fw-light">
+                                            <i class="fa-solid fa-sack-dollar text-warning me-1"></i>
+                                            ${Number(trip.basePrice).toLocaleString('vi-VN')} VND
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="/trip/details/${trip.tripId}"
+                               class="btn btn-warning text-white text-uppercase fw-medium fs-6 text-center d-block pt-3 pb-3 rounded-4 mt-4 w-100">
+                                See details <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ✅ Render pagination
+    function renderPagination(pagination) {
+        const paginationElement = document.getElementById('pagination');
+        const paginationContainer = document.getElementById('paginationContainer');
+
+        if (!pagination || pagination.totalPages <= 1) {
+            paginationContainer.style.display = 'none';
+            return;
+        }
+
+        paginationContainer.style.display = 'block';
+
+        let paginationHTML = '';
+
+        // Previous button
+        paginationHTML += `
+            <li class="page-item ${pagination.currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" onclick="changePage(${pagination.currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+
+        // Page numbers
+        const totalPages = pagination.totalPages;
+        for (let i = 1; i <= totalPages; i++) {
+            if (
+                i === 1 ||
+                i === totalPages ||
+                (i >= pagination.currentPage - 2 && i <= pagination.currentPage + 2)
+            ) {
+                paginationHTML += `
+                    <li class="page-item ${i === pagination.currentPage ? 'active' : ''}">
+                        <a class="page-link" onclick="changePage(${i})">${i}</a>
+                    </li>
+                `;
+            } else if (i === pagination.currentPage - 3 || i === pagination.currentPage + 3) {
+                paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+
+        // Next button
+        paginationHTML += `
+            <li class="page-item ${pagination.currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" onclick="changePage(${pagination.currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+
+        paginationElement.innerHTML = paginationHTML;
+    }
+
+    // ✅ Update results info
+    function updateResultsInfo(pagination) {
+        const startItem = (pagination.currentPage - 1) * pagination.pageSize + 1;
+        const endItem = Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems);
+
+        document.getElementById('resultsInfo').textContent =
+            `Showing ${startItem} to ${endItem} of ${pagination.totalItems} trips`;
+
+        document.getElementById('paginationInfo').textContent =
+            `Page ${pagination.currentPage} of ${pagination.totalPages}`;
+    }
+
+    // ✅ Change page
+    function changePage(page) {
+        currentPage = page;
+        loadTrips();
+
+        // Scroll to top
+        document.querySelector('.routes-2').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+
+    // ✅ Change page size
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+        currentPage = 1;
+        loadTrips();
+    }
+
+    // ✅ Apply filters
+    function applyFilters() {
+        currentPage = 1;
+        loadTrips();
+    }
+
+    // ✅ Reset filters
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = 'All';
+        document.getElementById('fromDate').value = '';
+        document.getElementById('toDate').value = '';
+        document.getElementById('minPrice').value = '';
+        document.getElementById('maxPrice').value = '';
+        currentPage = 1;
+        loadTrips();
+    }
+
+    // ✅ Show/hide loading
+    function showLoading(show) {
+        document.getElementById('loadingTrips').style.display = show ? 'block' : 'none';
+        document.getElementById('tripsContainer').style.display = show ? 'none' : 'flex';
+        document.getElementById('paginationContainer').style.display = show ? 'none' : 'block';
+    }
+
+    // ✅ Show no data message
+    function showNoData() {
+        document.getElementById('tripsContainer').innerHTML = '';
+        document.getElementById('noDataMessage').style.display = 'block';
+        document.getElementById('paginationContainer').style.display = 'none';
+    }
+</script>

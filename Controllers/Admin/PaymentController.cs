@@ -24,13 +24,15 @@ namespace Public_Transport.Controllers.Admin
             return View("~/Views/Admin/Payment/Index.cshtml");
         }
 
-        // API: Lấy danh sách thanh toán
+        // API: Lấy danh sách thanh toán với PAGINATION
         [HttpGet("api/list")]
         public async Task<IActionResult> GetPayments(
             [FromQuery] string status = null,
             [FromQuery] string paymentMethod = null,
             [FromQuery] DateTime? fromDate = null,
-            [FromQuery] DateTime? toDate = null)
+            [FromQuery] DateTime? toDate = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             try
             {
@@ -65,8 +67,14 @@ namespace Public_Transport.Controllers.Admin
                     query = query.Where(p => p.PaymentDate <= toDate.Value);
                 }
 
+                // ✅ Đếm tổng số payments
+                var totalItems = await query.CountAsync();
+
+                // ✅ Lấy payments theo trang
                 var payments = await query
                     .OrderByDescending(p => p.PaymentDate)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .Select(p => new PaymentDTO
                     {
                         PaymentId = p.PaymentId,
@@ -83,7 +91,18 @@ namespace Public_Transport.Controllers.Admin
                     })
                     .ToListAsync();
 
-                return Ok(payments);
+                // ✅ Trả về kèm pagination info
+                return Ok(new
+                {
+                    payments,
+                    pagination = new
+                    {
+                        currentPage = page,
+                        pageSize,
+                        totalItems,
+                        totalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+                    }
+                });
             }
             catch (Exception ex)
             {
