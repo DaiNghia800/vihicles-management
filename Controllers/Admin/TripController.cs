@@ -17,8 +17,14 @@ namespace Public_Transport.Controllers.Admin
         }
 
         // GET: admin/trip
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? error = null)
         {
+            // Show error message if redirected from Delete action
+            if (!string.IsNullOrEmpty(error))
+            {
+                ViewData["Error"] = error;
+            }
+
             var trips = await _context.Trips
                 .Include(t => t.Route)
                 .Include(t => t.Vehicle)
@@ -26,23 +32,23 @@ namespace Public_Transport.Controllers.Admin
                 .OrderByDescending(t => t.DepartureTime)
                 .ToListAsync();
 
-            // --- LOGIC TỰ ĐỘNG CẬP NHẬT STATUS ---
+            // --- AUTO-UPDATE STATUS LOGIC ---
             bool hasChanges = false;
             var now = DateTime.Now;
 
             foreach (var trip in trips)
             {
-                // Chỉ xử lý các chuyến chưa Hủy (Cancelled) và chưa Hoàn thành (Completed)
+                // Only process trips that are not Cancelled or Completed
                 if (trip.Status != "Cancelled" && trip.Status != "Completed")
                 {
-                    // Case 1: Đã đến giờ chạy nhưng chưa tới giờ đến -> Đổi thành Running
+                    // Case 1: Time to depart -> Set to Running
                     if (trip.DepartureTime <= now && trip.ArrivalTime > now && trip.Status != "Running")
                     {
                         trip.Status = "Running";
-                        _context.Entry(trip).State = EntityState.Modified; // Đánh dấu để update DB
+                        _context.Entry(trip).State = EntityState.Modified;
                         hasChanges = true;
                     }
-                    // Case 2: Đã quá giờ đến -> Đổi thành Completed
+                    // Case 2: Arrival time passed -> Set to Completed
                     else if (trip.ArrivalTime <= now && trip.Status != "Completed")
                     {
                         trip.Status = "Completed";
@@ -52,7 +58,6 @@ namespace Public_Transport.Controllers.Admin
                 }
             }
 
-            // Nếu có thay đổi thì lưu xuống Database luôn
             if (hasChanges)
             {
                 await _context.SaveChangesAsync();
@@ -73,25 +78,23 @@ namespace Public_Transport.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Trip trip)
         {
+            // 1. Default Status
             trip.Status = "Scheduled";
             ModelState.Remove("Status");
-            // 1. LOGIC: Chặn tạo chuyến trong quá khứ
+
+            // 2. Validate: Departure time must be in the future
             if (trip.DepartureTime <= DateTime.Now)
             {
                 ModelState.AddModelError("DepartureTime", "The departure time must be later than the current time!");
             }
 
-            // 2. LOGIC: Giờ đến phải sau giờ đi
+            // 3. Validate: Arrival time must be after Departure time
             if (trip.ArrivalTime <= trip.DepartureTime)
             {
                 ModelState.AddModelError("ArrivalTime", "The estimated arrival time must be after the departure time!");
             }
 
-            // 3. LOGIC: Tự động set Status khi tạo mới
-            // Người dùng không cần chọn, hệ thống tự set là "Scheduled"
-            trip.Status = "Scheduled";
-
-            // Bỏ qua validate các object quan hệ (như bài trước)
+            // 4. Remove Validation for Navigation Properties
             ModelState.Remove("Route");
             ModelState.Remove("Vehicle");
             ModelState.Remove("Driver");
@@ -114,6 +117,10 @@ namespace Public_Transport.Controllers.Admin
 
             var trip = await _context.Trips.FindAsync(id);
             if (trip == null) return NotFound();
+            if (trip.Status == "Running" || trip.Status == "Completed")
+            {
+                return RedirectToAction(nameof(Index), new { error = "Cannot edit a trip that is currently Running or Completed!" });
+            }
 
             LoadViewData(trip);
             return View("~/Views/Admin/Trip/Edit.cshtml", trip);
@@ -126,10 +133,26 @@ namespace Public_Transport.Controllers.Admin
         {
             if (id != trip.TripId) return NotFound();
 
+            // 1. Validate Time Logic (Same as Create)
+            if (trip.ArrivalTime <= trip.DepartureTime)
+            {
+                ModelState.AddModelError("ArrivalTime", "The estimated arrival time must be after the departure time!");
+            }
+
+            // 2. [IMPORTANT] Remove Validation for Navigation Properties
+            ModelState.Remove("Route");
+            ModelState.Remove("Vehicle");
+            ModelState.Remove("Driver");
+
+            // Note: We don't remove "Status" here because Edit form might allow changing Status
+            // If the Edit form DOES NOT have a Status field, you must uncomment the line below:
+            // ModelState.Remove("Status"); 
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Update the trip
                     _context.Update(trip);
                     await _context.SaveChangesAsync();
                 }
@@ -140,6 +163,7 @@ namespace Public_Transport.Controllers.Admin
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             LoadViewData(trip);
             return View("~/Views/Admin/Trip/Edit.cshtml", trip);
         }
@@ -154,7 +178,15 @@ namespace Public_Transport.Controllers.Admin
                 .Include(t => t.Vehicle)
                 .Include(t => t.Driver).ThenInclude(d => d.User)
                 .FirstOrDefaultAsync(m => m.TripId == id);
+
             if (trip == null) return NotFound();
+
+            // Logic: Prevent deleting active trips
+            if (trip.Status == "Running" || trip.Status == "Completed")
+            {
+                // Pass error via Query String (to be displayed in Index)
+                return RedirectToAction(nameof(Index), new { error = "Cannot delete a trip that is currently Running or Completed!" });
+            }
 
             return View("~/Views/Admin/Trip/Delete.cshtml", trip);
         }
@@ -167,13 +199,19 @@ namespace Public_Transport.Controllers.Admin
             var trip = await _context.Trips.FindAsync(id);
             if (trip != null)
             {
+                // Double check logic before deleting
+                if (trip.Status == "Running" || trip.Status == "Completed")
+                {
+                    return RedirectToAction(nameof(Index), new { error = "Cannot delete a trip that is currently Running or Completed!" });
+                }
+
                 _context.Trips.Remove(trip);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
 
-        // Helper để load dropdown cho gọn code
+        // Helper to load dropdowns
         private void LoadViewData(Trip? trip = null)
         {
             // Load Route
@@ -182,7 +220,7 @@ namespace Public_Transport.Controllers.Admin
             // Load Vehicle
             ViewData["VehicleId"] = new SelectList(_context.Vehicles, "VehicleId", "LicensePlate", trip?.VehicleId);
 
-            // Load Driver (Kỹ thuật: Chọn ra User.FullName để hiển thị)
+            // Load Driver (Custom display: Name + License)
             var drivers = _context.Drivers.Include(d => d.User)
                 .Select(d => new {
                     d.DriverId,

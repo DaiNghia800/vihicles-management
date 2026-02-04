@@ -16,8 +16,14 @@ namespace Public_Transport.Controllers.Admin
         }
 
         // 1. List Stations
-        public async Task<IActionResult> Index()
+        // Updated to accept error message via Query String
+        public async Task<IActionResult> Index(string? error = null)
         {
+            if (!string.IsNullOrEmpty(error))
+            {
+                ViewData["Error"] = error;
+            }
+
             var stations = await _context.Stations
                 .OrderBy(s => s.StationName)
                 .ToListAsync();
@@ -35,7 +41,7 @@ namespace Public_Transport.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Station station)
         {
-            // Remove navigation property validation
+            // Remove navigation property validation to prevent IsValid = false errors
             ModelState.Remove("RouteDetails");
 
             if (ModelState.IsValid)
@@ -92,12 +98,12 @@ namespace Public_Transport.Controllers.Admin
             var station = await _context.Stations.FindAsync(id);
             if (station == null) return NotFound();
 
-            // Check if station is used in any route
+            // Logic: Check if station is assigned to any route
             var isUsed = await _context.RouteDetails.AnyAsync(rd => rd.StationId == id);
             if (isUsed)
             {
-                TempData["Error"] = "Cannot delete this station because it is part of a route!";
-                return RedirectToAction(nameof(Index));
+                // Redirect to Index with Error Message (passed via URL)
+                return RedirectToAction(nameof(Index), new { error = "Cannot delete this station because it is currently assigned to a Route!" });
             }
 
             return View("~/Views/Admin/Station/Delete.cshtml", station);
@@ -111,12 +117,11 @@ namespace Public_Transport.Controllers.Admin
             var station = await _context.Stations.FindAsync(id);
             if (station != null)
             {
-                // Double check
+                // Double Check Logic before deleting
                 var isUsed = await _context.RouteDetails.AnyAsync(rd => rd.StationId == id);
                 if (isUsed)
                 {
-                    TempData["Error"] = "Cannot delete this station because it is part of a route!";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), new { error = "Cannot delete this station because it is currently assigned to a Route!" });
                 }
 
                 _context.Stations.Remove(station);

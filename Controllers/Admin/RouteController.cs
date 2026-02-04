@@ -17,8 +17,12 @@ namespace Public_Transport.Controllers.Admin
         }
 
         // 1. Route List
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? error = null)
         {
+            if (!string.IsNullOrEmpty(error))
+            {
+                ViewData["Error"] = error;
+            }
             var routes = await _context.Routes
                 .OrderBy(r => r.RouteName) // Sort by name
                 .ToListAsync();
@@ -223,8 +227,7 @@ namespace Public_Transport.Controllers.Admin
 
             if (hasTrips)
             {
-                TempData["Error"] = "Cannot delete this route because there are active trips associated with it!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { error = "Cannot delete this route because there are active trips associated with it!" });
             }
 
             // Return the Delete View for confirmation
@@ -243,8 +246,7 @@ namespace Public_Transport.Controllers.Admin
                 var hasTrips = await _context.Trips.AnyAsync(t => t.RouteId == id);
                 if (hasTrips)
                 {
-                    TempData["Error"] = "Cannot delete this route because there are active trips associated with it!";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), new { error = "Cannot delete this route because there are active trips associated with it!" });
                 }
 
                 _context.Routes.Remove(route);

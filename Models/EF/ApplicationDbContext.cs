@@ -397,19 +397,14 @@ namespace Public_Transport.Models.EF
                     .HasMaxLength(20)
                     .HasDefaultValue("Scheduled");
 
-                // Relationship with Route
                 entity.HasOne(t => t.Route)
                     .WithMany(r => r.Trips)
                     .HasForeignKey(t => t.RouteId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-                // Relationship with Driver
-                entity.HasOne<Driver>()
-                    .WithMany(d => d.Trips)
+                entity.HasOne(t => t.Driver)
+                    .WithMany(d => d.Trips)  
                     .HasForeignKey(t => t.DriverId)
                     .OnDelete(DeleteBehavior.SetNull);
-
-                // Relationship with Vehicle
                 entity.HasOne(t => t.Vehicle)
                     .WithMany(v => v.Trips)
                     .HasForeignKey(t => t.VehicleId)
