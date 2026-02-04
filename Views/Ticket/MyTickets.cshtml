@@ -306,6 +306,51 @@
         font-weight: 700;
         color: #667eea;
     }
+
+    /* QR Code Styles */
+    .qr-code-section {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 20px;
+        text-align: center;
+        border: 2px solid #0284c7;
+    }
+
+    .qr-code-title {
+        color: #0284c7;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .qr-code-container {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+    }
+
+    .qr-code-image {
+        width: 280px;
+        height: 280px;
+        display: block;
+    }
+
+    .qr-code-instruction {
+        margin-top: 15px;
+        color: #0369a1;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
 </style>
 
 <section class="routes-1 position-relative" style="height: 300px; background: url('/assets/images/bus.jpg') no-repeat center center/cover;">
@@ -431,9 +476,8 @@
             }
 
             container.innerHTML = tickets.map(ticket => {
-                // ✅ Kiểm tra điều kiện hiển thị nút Pay và Cancel
                 const canPay = ticket.status === 'Booked' && new Date(ticket.trip.departureTime) > new Date();
-                const canCancel = ticket.status === 'Booked'; // ✅ CHỈ Booked mới được cancel, Paid KHÔNG được cancel
+                const canCancel = ticket.status === 'Booked';
 
                 return `
                     <div class="ticket-card">
@@ -542,16 +586,15 @@
             }).join('');
         }
 
-        // ✅ Hàm Pay Ticket
         async function payTicket(ticketId) {
             const result = await Swal.fire({
-                title: 'Pay for Ticket?',
-                text: 'You will be redirected to payment gateway',
+                title: '💳 Pay for Ticket?',
+                text: 'You will be redirected to MoMo payment gateway',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#667eea',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, pay now',
+                confirmButtonText: '<i class="fas fa-credit-card me-2"></i>Yes, Pay Now',
                 cancelButtonText: 'Cancel'
             });
 
@@ -560,11 +603,9 @@
             try {
                 Swal.fire({
                     title: 'Processing...',
-                    text: 'Creating payment link',
+                    html: '<i class="fas fa-spinner fa-spin fa-3x text-primary mb-3"></i><br>Creating secure payment link...',
                     allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
+                    showConfirmButton: false
                 });
 
                 const response = await fetch(`/payment/retry/${ticketId}`, {
@@ -574,31 +615,113 @@
                     }
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch (parseError) {
+                    throw new Error('Invalid response from server. Please try again.');
+                }
 
                 if (response.ok && data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Redirecting...',
-                        text: 'Taking you to payment gateway',
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        window.location.href = data.paymentUrl;
-                    });
+                    if (data.timeInfo && data.timeInfo.isUrgent) {
+                        await Swal.fire({
+                            icon: 'warning',
+                            title: '⏰ Time Warning',
+                            html: `
+                                <div style="text-align: left; padding: 10px;">
+                                    <p style="color: #d97706; font-weight: bold; margin-bottom: 15px;">
+                                        ${data.timeInfo.warningMessage}
+                                    </p>
+                                    <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                        <p style="margin: 5px 0;"><strong>🎫 Booked at:</strong> ${data.timeInfo.bookingTime}</p>
+                                        <p style="margin: 5px 0;"><strong>⏳ Payment Deadline:</strong> ${data.timeInfo.paymentDeadline}</p>
+                                        <p style="margin: 5px 0; color: #dc2626;"><strong>⚠️ Time Remaining:</strong> ${data.timeInfo.remainingMinutes} minutes</p>
+                                    </div>
+                                    <p style="color: #666; font-size: 14px;">
+                                        ⚡ Please complete payment quickly to avoid losing your ticket!
+                                    </p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Proceed to Payment',
+                            confirmButtonColor: '#dc2626'
+                        });
+                    } else {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Redirecting...',
+                            html: `
+                                <p>Taking you to MoMo payment gateway</p>
+                                ${data.timeInfo ? `<small style="color: #666;">Payment deadline: ${data.timeInfo.paymentDeadline}</small>` : ''}
+                            `,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+
+                    window.location.href = data.paymentUrl;
                 } else {
+                    let errorIcon = 'error';
+                    let errorTitle = 'Payment Failed';
+                    let errorHtml = `<p>${data.message}</p>`;
+
+                    if (data.message.includes('expired') || data.message.includes('deadline')) {
+                        errorIcon = 'warning';
+                        errorTitle = '⏰ Payment Time Expired';
+                        errorHtml = `
+                            <div style="text-align: left; padding: 10px;">
+                                <p style="margin-bottom: 15px;">${data.message}</p>
+                                ${data.bookingTime ? `
+                                    <div style="background: #fee2e2; padding: 15px; border-radius: 8px;">
+                                        <p style="margin: 5px 0;"><strong>🎫 Booked at:</strong> ${data.bookingTime}</p>
+                                        <p style="margin: 5px 0;"><strong>⏳ Deadline:</strong> ${data.deadline}</p>
+                                    </div>
+                                ` : ''}
+                                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                                    💡 <strong>Tip:</strong> Please complete payment within 10 minutes after booking to secure your ticket.
+                                </p>
+                            </div>
+                        `;
+                    } else if (data.message.includes('already paid')) {
+                        errorIcon = 'info';
+                        errorTitle = '✅ Already Paid';
+                        errorHtml = `
+                            <p>${data.message}</p>
+                            <p style="margin-top: 10px;">Your ticket is ready to use!</p>
+                        `;
+                    } else if (data.message.includes('cancelled')) {
+                        errorIcon = 'error';
+                        errorTitle = '❌ Ticket Cancelled';
+                    }
+
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Payment Failed',
-                        text: data.message || 'Could not create payment'
+                        icon: errorIcon,
+                        title: errorTitle,
+                        html: errorHtml,
+                        confirmButtonColor: '#667eea',
+                        confirmButtonText: 'OK, I Understand'
                     });
                 }
             } catch (error) {
-                console.error('Error paying ticket:', error);
+                console.error('💥 Unexpected error:', error);
+
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to process payment'
+                    title: '⚠️ Connection Error',
+                    html: `
+                        <p>Unable to process your payment request.</p>
+                        <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                            ${error.message}
+                        </p>
+                        <p style="color: #999; font-size: 12px; margin-top: 15px;">
+                            💡 Please check your internet connection and try again.
+                        </p>
+                    `,
+                    confirmButtonColor: '#667eea',
+                    confirmButtonText: 'Try Again'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        loadTickets();
+                    }
                 });
             }
         }
@@ -658,6 +781,26 @@
 
                 const ticket = await response.json();
                 const canPay = ticket.status === 'Booked' && new Date(ticket.trip.departureTime) > new Date();
+
+                // ✅ Build QR Code section if ticket is paid
+                let qrCodeSection = '';
+                if (ticket.status === 'Paid' && ticket.qrCode) {
+                    qrCodeSection = `
+                        <div class="qr-code-section">
+                            <div class="qr-code-title">
+                                <i class="fas fa-qrcode"></i>
+                                <span>Ticket QR Code</span>
+                            </div>
+                            <div class="qr-code-container">
+                                <img src="${ticket.qrCode}" alt="QR Code for Ticket #${ticket.ticketId}" class="qr-code-image"/>
+                            </div>
+                            <div class="qr-code-instruction">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Show this QR code to the driver when boarding</span>
+                            </div>
+                        </div>
+                    `;
+                }
 
                 Swal.fire({
                     title: `Ticket #${ticket.ticketId}`,
@@ -723,11 +866,13 @@
                                 </div>
                             ` : ''}
 
+                            ${qrCodeSection}
+
                             ${canPay ? `
                                 <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; margin-top: 15px;">
                                     <i class="fas fa-info-circle" style="color: #0284c7;"></i>
                                     <strong style="color: #0284c7;">This ticket is booked but not yet paid.</strong>
-                                    <p style="margin: 5px 0 0 0; color: #0369a1;">Click "Pay Now" below to complete payment.</p>
+                                    <p style="margin: 5px 0 0 0; color: #0369a1;">You have 10 minutes from booking time to complete payment.</p>
                                 </div>
                             ` : ''}
 
@@ -738,7 +883,7 @@
                             </div>
                         </div>
                     `,
-                    width: '600px',
+                    width: '750px',
                     showCloseButton: true,
                     showCancelButton: canPay,
                     confirmButtonText: canPay ? '<i class="fas fa-credit-card me-2"></i>Pay Now' : 'Close',

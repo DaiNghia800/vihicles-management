@@ -13,52 +13,72 @@ namespace Public_Transport.Controllers.Client
             _blogService = blogService;
         }
 
-        // View: Danh sách blog
-        [HttpGet("")]
+        // GET: /blogs
+        [HttpGet("/blogs")]
         public IActionResult Index()
         {
             return View("~/Views/Blog/blog-list.cshtml");
         }
 
-        // View: Chi tiết blog
-        [HttpGet("{id:int}")]
+        // GET: /blogs/{id}
+        [HttpGet("/blogs/{id:int}")]
         public IActionResult Detail(int id)
         {
-            if (id <= 0)
-            {
-                return RedirectToAction("Index");
-            }
-
             ViewData["BlogId"] = id;
             return View("~/Views/Blog/blog-detail.cshtml");
         }
 
-       
-        [HttpGet("api/list")]
-        public async Task<IActionResult> GetBlogsList()
+        // === API ENDPOINTS ===
+
+        // GET: /blogs/api/list
+        [HttpGet("/blogs/api/list")]
+        public async Task<IActionResult> GetBlogs()
         {
-            var blogs = await _blogService.GetBlogsPublicAsync();
-            return Ok(blogs);
+            try
+            {
+                var blogs = await _blogService.GetBlogsPublicAsync();
+                return Ok(blogs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error loading blogs", error = ex.Message });
+            }
         }
 
-       
-        [HttpGet("api/detail/{id:int}")]
+        // GET: /blogs/api/detail/{id}
+        [HttpGet("/blogs/api/detail/{id:int}")]
         public async Task<IActionResult> GetBlogDetail(int id)
         {
-            var blog = await _blogService.GetBlogDetailPublicAsync(id);
-            if (blog == null)
+            try
             {
-                return NotFound(new { message = "Blog not found" });
+                var blog = await _blogService.GetBlogDetailPublicAsync(id);
+                
+                if (blog == null)
+                {
+                    return NotFound(new { message = "Blog not found" });
+                }
+                
+                return Ok(blog);
             }
-            return Ok(blog);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error loading blog detail", error = ex.Message });
+            }
         }
 
-     
-        [HttpGet("api/categories")]
+        // GET: /blogs/api/categories
+        [HttpGet("/blogs/api/categories")]
         public async Task<IActionResult> GetCategories()
         {
-            var categories = await _blogService.GetCategoriesPublicAsync();
-            return Ok(categories);
+            try
+            {
+                var categories = await _blogService.GetCategoriesPublicAsync();
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error loading categories", error = ex.Message });
+            }
         }
     }
 }

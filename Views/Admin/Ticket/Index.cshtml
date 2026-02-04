@@ -8,39 +8,164 @@
         padding: 20px;
     }
 
+    /* ===== VERIFY TICKET SECTION ===== */
+    .verify-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .verify-title {
+        font-size: 2rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .verify-subtitle {
+        text-align: center;
+        font-size: 1rem;
+        margin-bottom: 30px;
+        opacity: 0.9;
+    }
+
+    .verify-controls {
+        display: flex;
+        gap: 15px;
+        max-width: 800px;
+        margin: 0 auto;
+        align-items: stretch;
+    }
+
+    .input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    .ticket-input {
+        width: 100%;
+        padding: 18px 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        font-size: 1.1rem;
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        transition: all 0.3s;
+        backdrop-filter: blur(10px);
+    }
+
+        .ticket-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .ticket-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+    .btn-verify {
+        background: white;
+        color: #667eea;
+        padding: 18px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+        .btn-verify:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+    .btn-scan {
+        background: #10b981;
+        color: white;
+        padding: 18px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    }
+
+        .btn-scan:hover {
+            background: #059669;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+    /* ===== FILTER SECTION ===== */
     .filter-card {
         background: white;
-        padding: 20px;
-        border-radius: 8px;
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .filter-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
         margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ===== TABLE SECTION ===== */
+    .table-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
 
     .status-badge {
-        padding: 4px 12px;
-        border-radius: 12px;
+        padding: 6px 14px;
+        border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 600;
+        display: inline-block;
     }
 
     .status-paid {
-        background: #10b981;
-        color: white;
+        background: #d1fae5;
+        color: #065f46;
     }
 
     .status-used {
-        background: #8b5cf6;
-        color: white;
+        background: #ddd6fe;
+        color: #5b21b6;
     }
 
     .status-cancelled {
-        background: #ef4444;
-        color: white;
+        background: #fee2e2;
+        color: #991b1b;
     }
 
     .status-booked {
-        background: #3b82f6;
-        color: white;
+        background: #dbeafe;
+        color: #1e40af;
     }
 
     .action-btn {
@@ -79,34 +204,226 @@
             transform: scale(1.1);
         }
 
-    .scan-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-        text-align: center;
+    /* ===== QR SCANNER MODAL ===== */
+    .qr-scanner-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        overflow-y: auto;
     }
 
-    .scan-input {
-        max-width: 400px;
-        margin: 20px auto;
-    }
-
-        .scan-input input {
-            padding: 12px;
-            border: 2px solid white;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            text-align: center;
+        .qr-scanner-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
         }
 
-    /* Pagination Styles - Tương tự Client Ticket */
+    .qr-scanner-content {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 750px;
+        width: 95%;
+        position: relative;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        animation: slideUp 0.3s ease;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .qr-scanner-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+        .qr-scanner-header h3 {
+            color: #333;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+    .btn-close-scanner {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-close-scanner:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+    /* ✅ IMPROVED QR READER CONTAINER */
+    #qr-reader {
+        width: 100%;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        background: #000;
+        min-height: 400px;
+        position: relative;
+    }
+
+        #qr-reader video {
+            width: 100% !important;
+            height: auto !important;
+            border-radius: 15px;
+        }
+
+    /* ✅ Hide default controls */
+    #qr-reader__dashboard_section {
+        display: none !important;
+    }
+
+    .qr-status {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.95rem;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.8;
+        }
+    }
+
+    .qr-status.scanning {
+        background: #dbeafe;
+        color: #1e40af;
+        border: 2px solid #3b82f6;
+    }
+
+    .qr-status.success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 2px solid #10b981;
+        animation: successPulse 0.5s ease;
+    }
+
+    @@keyframes successPulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .qr-status.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 2px solid #ef4444;
+    }
+
+    /* ✅ SCANNING TIPS */
+    .scan-tips {
+        margin-top: 20px;
+        padding: 20px;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-radius: 10px;
+        border-left: 4px solid #10b981;
+    }
+
+        .scan-tips h4 {
+            color: #065f46;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .scan-tips h4 i {
+                font-size: 1.3rem;
+            }
+
+        .scan-tips ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .scan-tips li {
+            color: #047857;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            padding-left: 28px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+            .scan-tips li::before {
+                content: '✓';
+                position: absolute;
+                left: 0;
+                color: #10b981;
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+
+    /* ===== PAGINATION ===== */
     .pagination-container {
         display: flex;
         justify-content: center;
         gap: 10px;
         margin-top: 40px;
+        padding: 20px;
     }
 
     .pagination-btn {
@@ -123,6 +440,7 @@
         .pagination-btn:hover:not(:disabled) {
             border-color: #667eea;
             color: #667eea;
+            transform: translateY(-2px);
         }
 
         .pagination-btn.active {
@@ -135,6 +453,43 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 768px) {
+        .verify-controls {
+            flex-direction: column;
+        }
+
+        .verify-section {
+            padding: 25px;
+        }
+
+        .verify-title {
+            font-size: 1.5rem;
+        }
+
+        .btn-verify, .btn-scan {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .qr-scanner-content {
+            padding: 20px;
+            width: 98%;
+        }
+
+        #qr-reader {
+            min-height: 300px;
+        }
+
+        .scan-tips {
+            padding: 15px;
+        }
+
+            .scan-tips li {
+                font-size: 0.85rem;
+            }
+    }
 </style>
 
 <div class="ticket-management">
@@ -142,23 +497,36 @@
         <h2><i class="fas fa-ticket-alt me-2"></i>Ticket Management</h2>
     </div>
 
-    <!-- Scan Ticket Section -->
-    <div class="scan-section">
-        <h2>Enter ticket ID to mark as used</h2>
-        <div class="scan-input">
-            <input type="number"
-                   id="scanTicketInput"
-                   class="form-control"
-                   placeholder="Enter Ticket ID..."
-                   onkeypress="handleScanEnter(event)">
+    <!-- Verify Ticket Section -->
+    <div class="verify-section">
+        <h2 class="verify-title">Verify Ticket</h2>
+        <p class="verify-subtitle">Enter ticket ID manually or scan QR code</p>
+
+        <div class="verify-controls">
+            <div class="input-wrapper">
+                <input type="number"
+                       id="scanTicketInput"
+                       class="ticket-input"
+                       placeholder="Enter Ticket ID..."
+                       onkeypress="handleScanEnter(event)">
+            </div>
+            <button class="btn-verify" onclick="scanTicket()">
+                <i class="fas fa-check-circle"></i>
+                Verify & Mark as Used
+            </button>
+            <button class="btn-scan" onclick="openQRScanner()">
+                <i class="fas fa-qrcode"></i>
+                Scan QR Code
+            </button>
         </div>
-        <button class="btn btn-light btn-lg" onclick="scanTicket()">
-            <i class="fas fa-check-circle me-2"></i>Verify & Mark as Used
-        </button>
     </div>
 
     <!-- Filter Section -->
     <div class="filter-card">
+        <div class="filter-title">
+            <i class="fas fa-filter"></i>
+            Filter Tickets
+        </div>
         <div class="row g-3">
             <div class="col-md-3">
                 <label class="form-label">Status</label>
@@ -190,33 +558,31 @@
     </div>
 
     <!-- Tickets Table -->
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover" id="ticketsTable">
-                    <thead>
-                        <tr>
-                            <th>Ticket ID</th>
-                            <th>Customer</th>
-                            <th>Route</th>
-                            <th>Departure</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th>Booking Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ticketsTableBody">
-                        <tr>
-                            <td colspan="8" class="text-center">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="ticketsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="padding: 15px;">Ticket ID</th>
+                        <th>Customer</th>
+                        <th>Route</th>
+                        <th>Departure</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Booking Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketsTableBody">
+                    <tr>
+                        <td colspan="8" class="text-center" style="padding: 40px;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <!-- Pagination Container -->
@@ -224,16 +590,75 @@
     </div>
 </div>
 
+<!-- QR Scanner Modal -->
+<div class="qr-scanner-modal" id="qrScannerModal">
+    <div class="qr-scanner-content">
+        <div class="qr-scanner-header">
+            <h3>
+                <i class="fas fa-qrcode"></i>
+                Scan QR Code
+            </h3>
+            <button class="btn-close-scanner" onclick="closeQRScanner()" type="button">
+                <i class="fas fa-times"></i>
+                Close
+            </button>
+        </div>
+
+        <!-- QR Reader Container -->
+        <div id="qr-reader"></div>
+
+        <div class="qr-status scanning" id="qrStatus">
+            <i class="fas fa-camera me-2"></i>
+            Initializing camera... Please allow camera access
+        </div>
+
+        <!-- Scanning Tips -->
+        <div class="scan-tips">
+            <h4>
+                <i class="fas fa-lightbulb"></i>
+                How to Scan Successfully
+            </h4>
+            <ul>
+                <li><strong>Distance:</strong> Hold QR code 15-30cm (6-12 inches) from camera</li>
+                <li><strong>Lighting:</strong> Ensure good lighting - avoid shadows or glare</li>
+                <li><strong>Stability:</strong> Keep both phone and QR code steady</li>
+                <li><strong>Focus:</strong> Center the QR code in frame and wait for auto-focus</li>
+                <li><strong>Angle:</strong> Keep QR code flat (not tilted) facing camera directly</li>
+                <li><strong>Patience:</strong> Wait 1-2 seconds for camera to focus and scan</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
     <script>
         let searchTimeout;
         let currentPage = 1;
         const pageSize = 10;
+        let html5QrCode = null;
+        let isScanning = false;
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadTickets();
             document.getElementById('scanTicketInput').focus();
+
+            // Close modal when clicking backdrop
+            const modal = document.getElementById('qrScannerModal');
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) {
+                    closeQRScanner();
+                }
+            });
+
+            // Close modal on ESC key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeQRScanner();
+                }
+            });
         });
 
         function debounceSearch() {
@@ -254,6 +679,269 @@
             }
         }
 
+        function openQRScanner() {
+            if (isScanning) {
+                console.log('Scanner already running');
+                return;
+            }
+
+            const modal = document.getElementById('qrScannerModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                startQRScanner();
+            }, 300);
+        }
+
+        function closeQRScanner() {
+            const modal = document.getElementById('qrScannerModal');
+
+            stopQRScanner();
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+
+            console.log('✅ Scanner closed');
+        }
+
+        function playSuccessSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 880;
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (error) {
+                console.log('Could not play sound:', error);
+            }
+        }
+
+        // ✅ IMPROVED startQRScanner function with better camera handling
+        function startQRScanner() {
+            if (isScanning) {
+                console.log('Scanner already running');
+                return;
+            }
+
+            const qrStatus = document.getElementById('qrStatus');
+            qrStatus.className = 'qr-status scanning';
+            qrStatus.innerHTML = '<i class="fas fa-camera me-2"></i>Requesting camera access...';
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+
+            // ✅ SIMPLIFIED CONFIG - remove unsupported formats reference
+            const config = {
+                fps: 10, // Lower FPS for better compatibility
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    let minEdgePercentage = 0.7;
+                    let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                    let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+                    return {
+                        width: qrboxSize,
+                        height: qrboxSize
+                    };
+                },
+                aspectRatio: 1.0
+            };
+
+            // ✅ SIMPLIFIED camera constraints - remove advanced options that might fail
+            const cameraConfig = {
+                facingMode: "environment" // Back camera preferred
+            };
+
+            // Try starting with back camera first
+            html5QrCode.start(
+                cameraConfig,
+                config,
+                onScanSuccess,
+                onScanError
+            ).then(() => {
+                isScanning = true;
+                qrStatus.className = 'qr-status scanning';
+                qrStatus.innerHTML = '<i class="fas fa-qrcode me-2"></i>✅ Camera ready! Point QR code at camera';
+                console.log('✅ QR Scanner started successfully');
+            }).catch(err => {
+                console.error("❌ Error starting QR scanner with back camera:", err);
+
+                // ✅ FALLBACK: Try with front camera if back camera fails
+                console.log("Trying front camera...");
+                qrStatus.innerHTML = '<i class="fas fa-camera me-2"></i>Trying front camera...';
+
+                html5QrCode.start(
+                    { facingMode: "user" }, // Front camera
+                    config,
+                    onScanSuccess,
+                    onScanError
+                ).then(() => {
+                    isScanning = true;
+                    qrStatus.className = 'qr-status scanning';
+                    qrStatus.innerHTML = '<i class="fas fa-qrcode me-2"></i>✅ Camera ready! (Using front camera)';
+                    console.log('✅ QR Scanner started with front camera');
+                }).catch(err2 => {
+                    console.error("❌ Error starting QR scanner with front camera:", err2);
+                    isScanning = false;
+
+                    qrStatus.className = 'qr-status error';
+
+                    // ✅ Better error message based on error type
+                    let errorMsg = 'Camera access denied or unavailable';
+                    let errorDetails = [];
+
+                    if (err2.name === 'NotAllowedError' || err2.name === 'PermissionDeniedError') {
+                        errorMsg = 'Camera permission denied';
+                        errorDetails = [
+                            'Click the camera icon in address bar',
+                            'Select "Always allow" for camera',
+                            'Refresh the page'
+                        ];
+                    } else if (err2.name === 'NotFoundError' || err2.name === 'DevicesNotFoundError') {
+                        errorMsg = 'No camera found';
+                        errorDetails = [
+                            'Check if your device has a camera',
+                            'Make sure camera is not being used by another app',
+                            'Try restarting your browser'
+                        ];
+                    } else if (err2.name === 'NotReadableError' || err2.name === 'TrackStartError') {
+                        errorMsg = 'Camera is busy';
+                        errorDetails = [
+                            'Close other apps using the camera',
+                            'Restart your browser',
+                            'Check if camera works in other applications'
+                        ];
+                    } else if (err2.name === 'OverconstrainedError' || err2.name === 'ConstraintNotSatisfiedError') {
+                        errorMsg = 'Camera does not support required settings';
+                        errorDetails = [
+                            'Try using a different browser',
+                            'Update your browser to latest version'
+                        ];
+                    } else if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+                        errorMsg = 'HTTPS connection required';
+                        errorDetails = [
+                            'Camera access requires HTTPS',
+                            'Contact administrator to enable HTTPS',
+                            'Or use manual ticket ID entry instead'
+                        ];
+                    } else {
+                        errorDetails = [
+                            'Allow camera permissions in browser',
+                            'Make sure no other app is using camera',
+                            'Try using HTTPS connection',
+                            'Check browser compatibility',
+                            'Try a different browser (Chrome/Edge recommended)'
+                        ];
+                    }
+
+                    qrStatus.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${errorMsg}`;
+
+                    setTimeout(() => {
+                        closeQRScanner();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: errorMsg,
+                            html: `
+                                <p class="mb-3">${err2.message || 'Unable to access camera'}</p>
+                                <div style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                    <strong>Troubleshooting steps:</strong>
+                                    <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                                        ${errorDetails.map(step => `<li style="margin: 8px 0;">${step}</li>`).join('')}
+                                    </ul>
+                                </div>
+                                <p class="mt-3 text-muted" style="font-size: 0.9rem;">
+                                    <strong>Alternative:</strong> You can manually enter the Ticket ID instead
+                                </p>
+                            `,
+                            confirmButtonColor: '#667eea',
+                            width: '600px'
+                        });
+                    }, 1500);
+                });
+            });
+        }
+
+        function stopQRScanner() {
+            if (html5QrCode && isScanning) {
+                html5QrCode.stop()
+                    .then(() => {
+                        console.log('✅ Scanner stopped');
+                        html5QrCode.clear();
+                        html5QrCode = null;
+                        isScanning = false;
+                    })
+                    .catch(err => {
+                        console.error("Error stopping scanner:", err);
+                        html5QrCode = null;
+                        isScanning = false;
+                    });
+            } else {
+                isScanning = false;
+            }
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`✅ QR Code detected: ${decodedText}`);
+
+            const qrStatus = document.getElementById('qrStatus');
+            qrStatus.className = 'qr-status success';
+            qrStatus.innerHTML = '<i class="fas fa-check-circle me-2"></i>✅ QR Code scanned successfully!';
+
+            playSuccessSound();
+            stopQRScanner();
+
+            setTimeout(() => {
+                closeQRScanner();
+            }, 500);
+
+            let ticketId = null;
+
+            // Try parsing ticket ID from QR code
+            if (/^\d+$/.test(decodedText)) {
+                ticketId = parseInt(decodedText);
+            } else {
+                const match = decodedText.match(/ticket[_\s#:-]*(\d+)/i) ||
+                             decodedText.match(/id[_\s#:-]*(\d+)/i) ||
+                             decodedText.match(/(\d+)/);
+                if (match) {
+                    ticketId = parseInt(match[1]);
+                }
+            }
+
+            if (ticketId && !isNaN(ticketId)) {
+                document.getElementById('scanTicketInput').value = ticketId;
+                scanTicket();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid QR Code',
+                    html: `
+                        <p>The scanned QR code does not contain a valid ticket ID.</p>
+                        <p class="text-muted" style="font-size: 0.9rem;">Scanned data: ${decodedText}</p>
+                    `,
+                    confirmButtonColor: '#667eea'
+                });
+            }
+        }
+
+        function onScanError(errorMessage) {
+            // Only log non-routine scan errors
+            if (errorMessage &&
+                !errorMessage.includes("NotFoundException") &&
+                !errorMessage.includes("No MultiFormat Readers")) {
+                console.debug("Scan error:", errorMessage);
+            }
+        }
+
+        // Rest of your functions remain the same...
         async function scanTicket() {
             const ticketId = document.getElementById('scanTicketInput').value;
 
@@ -261,7 +949,8 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Missing Information',
-                    text: 'Please enter Ticket ID'
+                    text: 'Please enter Ticket ID or scan QR code',
+                    confirmButtonColor: '#667eea'
                 });
                 return;
             }
@@ -279,17 +968,20 @@
                 if (result.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Success!',
+                        title: 'Ticket Verified Successfully!',
                         html: `
-                            <div style="text-align: left;">
-                                <p><strong>Ticket ID:</strong> ${result.ticket.ticketId}</p>
+                            <div style="text-align: left; padding: 10px;">
+                                <p><strong>Ticket ID:</strong> #${result.ticket.ticketId}</p>
                                 <p><strong>Customer:</strong> ${result.ticket.customerName}</p>
+                                <p><strong>Email:</strong> ${result.ticket.customerEmail}</p>
                                 <p><strong>Route:</strong> ${result.ticket.routeName}</p>
                                 <p><strong>Vehicle:</strong> ${result.ticket.vehicleType} - ${result.ticket.licensePlate}</p>
                                 <p><strong>Price:</strong> ${formatPrice(result.ticket.price)}</p>
+                                <p><strong>Status:</strong> <span style="color: #059669; font-weight: 600;">USED</span></p>
                             </div>
                         `,
-                        timer: 3000
+                        confirmButtonColor: '#667eea',
+                        timer: 5000
                     });
 
                     document.getElementById('scanTicketInput').value = '';
@@ -299,15 +991,17 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Verification Failed',
-                        text: result.message
+                        text: result.message,
+                        confirmButtonColor: '#667eea'
                     });
                 }
             } catch (error) {
                 console.error('Error scanning ticket:', error);
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to verify ticket'
+                    title: 'Connection Error',
+                    text: 'Failed to verify ticket. Please check your connection.',
+                    confirmButtonColor: '#667eea'
                 });
             }
         }
@@ -335,9 +1029,6 @@
 
                 const data = await response.json();
 
-                console.log('API Response:', data);
-                console.log('Pagination data:', data.pagination);
-
                 if (!data.tickets || !data.pagination) {
                     throw new Error('Invalid response structure');
                 }
@@ -349,7 +1040,8 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to load tickets: ' + error.message
+                    text: 'Failed to load tickets: ' + error.message,
+                    confirmButtonColor: '#667eea'
                 });
             }
         }
@@ -360,9 +1052,10 @@
             if (!tickets || tickets.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center text-muted">
+                        <td colspan="8" class="text-center text-muted" style="padding: 60px;">
                             <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                            No tickets found
+                            <h5>No tickets found</h5>
+                            <p class="mb-0">Try adjusting your filters</p>
                         </td>
                     </tr>
                 `;
@@ -372,7 +1065,7 @@
 
             tbody.innerHTML = tickets.map(ticket => `
                 <tr>
-                    <td><strong>#${ticket.ticketId}</strong></td>
+                    <td style="padding: 15px;"><strong>#${ticket.ticketId}</strong></td>
                     <td>
                         <div>${ticket.customer.fullName}</div>
                         <small class="text-muted">${ticket.customer.email}</small>
@@ -407,8 +1100,6 @@
         function renderPagination(pagination) {
             const container = document.getElementById('paginationContainer');
 
-            console.log('Rendering pagination:', pagination);
-
             if (!pagination || pagination.totalPages <= 1) {
                 container.innerHTML = '';
                 container.style.display = 'none';
@@ -422,7 +1113,6 @@
                 </button>
             `;
 
-            // Hiển thị trang đầu tiên
             html += `
                 <button class="pagination-btn ${pagination.currentPage === 1 ? 'active' : ''}"
                     onclick="changePage(1)">
@@ -430,12 +1120,10 @@
                 </button>
             `;
 
-            // Ellipsis nếu cần
             if (pagination.currentPage > 3) {
                 html += '<span style="padding: 10px;">...</span>';
             }
 
-            // Các trang ở giữa
             for (let i = Math.max(2, pagination.currentPage - 1); i <= Math.min(pagination.totalPages - 1, pagination.currentPage + 1); i++) {
                 html += `
                     <button class="pagination-btn ${i === pagination.currentPage ? 'active' : ''}"
@@ -445,12 +1133,10 @@
                 `;
             }
 
-            // Ellipsis nếu cần
             if (pagination.currentPage < pagination.totalPages - 2) {
                 html += '<span style="padding: 10px;">...</span>';
             }
 
-            // Hiển thị trang cuối
             if (pagination.totalPages > 1) {
                 html += `
                     <button class="pagination-btn ${pagination.currentPage === pagination.totalPages ? 'active' : ''}"
@@ -514,7 +1200,8 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: data.message
+                        text: data.message,
+                        confirmButtonColor: '#667eea'
                     });
                 }
             } catch (error) {
@@ -522,7 +1209,8 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Failed to update ticket status'
+                    text: 'Failed to update ticket status',
+                    confirmButtonColor: '#667eea'
                 });
             }
         }

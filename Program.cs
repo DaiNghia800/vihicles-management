@@ -8,6 +8,7 @@ using Public_Transport.Services;
 using Public_Transport.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -120,7 +121,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
-
+builder.Services.AddHostedService<TicketExpirationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline

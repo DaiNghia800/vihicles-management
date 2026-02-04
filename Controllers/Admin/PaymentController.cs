@@ -9,10 +9,12 @@ namespace Public_Transport.Controllers.Admin
     public class PaymentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<PaymentController> _logger;
 
-        public PaymentController(ApplicationDbContext context)
+        public PaymentController(ApplicationDbContext context, ILogger<PaymentController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // View chính: Danh sách thanh toán
@@ -207,20 +209,29 @@ namespace Public_Transport.Controllers.Admin
                     return BadRequest(new { message = "Only paid tickets can be marked as used" });
                 }
 
-                // Kiểm tra xem chuyến đi đã diễn ra chưa
+                // ✅ Loại bỏ kiểm tra thời gian
                 if (ticket.Trip.DepartureTime > DateTime.Now)
                 {
-                    return BadRequest(new { message = "Trip has not departed yet, cannot mark ticket as used" });
+                    var departureTimeStr = ticket.Trip.DepartureTime.ToString("dd/MM/yyyy HH:mm");
+                    return BadRequest(new { 
+                        message = $"Cannot mark as used. Trip departs at {departureTimeStr}. Please wait until departure time.",
+                        departureTime = departureTimeStr
+                    });
                 }
 
-                // Cập nhật trạng thái
+                // ✅ Paid -> Used (vẫn giữ slot +1, chỉ đổi trạng thái)
+                var oldStatus = ticket.Status;
                 ticket.Status = "Used";
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("✅ Ticket #{TicketId} marked as used. Status: {OldStatus} -> Used (slot maintained)", 
+                    ticketId, oldStatus);
 
                 return Ok(new { message = "Ticket marked as used successfully" });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating ticket status for TicketId: {TicketId}", ticketId);
                 return StatusCode(500, new { message = "Error updating ticket status", error = ex.Message });
             }
         }

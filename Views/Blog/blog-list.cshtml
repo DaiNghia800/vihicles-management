@@ -62,12 +62,12 @@
         loadData();
     });
 
-    async function loadData() {
+        async function loadData() {
         console.log('=== LOADING DATA ===');
         showLoading(true);
 
         try {
-            // ✅ CẬP NHẬT: Đổi endpoint sang BlogClientController
+            // ✅ Gọi API để lấy blogs mới nhất
             const blogsRes = await fetch('/blogs/api/list');
 
             if (blogsRes.ok) {
@@ -75,10 +75,9 @@
                 console.log('Total blogs from API:', allBlogs.length);
                 console.log('Blogs data:', allBlogs);
 
-                renderBlogList();
+                renderBlogList(); // Render ra màn hình
 
-                // Load sidebar data (sử dụng hàm từ blog-sidebar.js)
-                await loadSidebarData();
+                await loadSidebarData(); // Load sidebar
             } else {
                 console.error('Error loading blogs - Status:', blogsRes.status);
                 showNoData();
