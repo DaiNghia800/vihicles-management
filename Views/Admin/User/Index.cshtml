@@ -1,3 +1,5 @@
+﻿@using System.Text.Json
+
 @model IEnumerable<Public_Transport.Models.Entities.Users>
 @{
     Layout = "_LayoutAdmin";
@@ -365,14 +367,46 @@
             <tbody>
                 @if (Model != null && Model.Any())
                 {
-                    @foreach (var user in Model)
+                    foreach (var user in Model)
                     {
+                        // ✅ FIX: Parse image URL correctly
+                        var imageUrl = "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png";
+                        
+                        if (!string.IsNullOrWhiteSpace(user.ImgUser))
+                        {
+                            try
+                            {
+                                // Kiểm tra nếu là URL trực tiếp
+                                if (user.ImgUser.StartsWith("http"))
+                                {
+                                    imageUrl = user.ImgUser;
+                                }
+                                // Kiểm tra nếu là JSON array
+                                else if (user.ImgUser.TrimStart().StartsWith("["))
+                                {
+                                    var images = JsonSerializer.Deserialize<List<string>>(user.ImgUser);
+                                    imageUrl = images?.FirstOrDefault() ?? imageUrl;
+                                }
+                                else
+                                {
+                                    // Remove brackets and quotes nếu có
+                                    imageUrl = user.ImgUser.Trim('[', ']', '"', ' ');
+                                }
+                            }
+                            catch
+                            {
+                                // Use default if parsing fails
+                                imageUrl = user.ImgUser.Trim('[', ']', '"', ' ');
+                            }
+                        }
+                    
                         <tr>
                             <td>
                                 <div class="user-info">
-                                    <img src="@(string.IsNullOrEmpty(user.ImgUser) ? "/images/default-avatar.png" : user.ImgUser)" 
+                                    <img src="@imageUrl" 
                                          alt="@user.FullName" 
-                                         class="user-avatar" />
+                                         class="user-avatar"
+                                         onerror="this.src='https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png'" />
                                     <div class="user-details">
                                         <span class="user-name">@user.FullName</span>
                                         <span class="user-email">@user.Email</span>
@@ -382,8 +416,8 @@
                             <td>@user.PhoneNumber</td>
                             <td>@(string.IsNullOrEmpty(user.Address) ? "N/A" : user.Address)</td>
                             <td>
-                                <span class="role-badge role-@user.Role?.RoleName.ToLower()">
-                                    @user.Role?.RoleName
+                                <span class="role-badge role-@(user.Role?.RoleName?.ToLower() ?? "unknown")">
+                                    @(user.Role?.RoleName ?? "No Role")
                                 </span>
                             </td>
                             <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>

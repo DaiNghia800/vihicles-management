@@ -49,9 +49,9 @@ namespace Public_Transport.Services
             try
             {
                 return _context.Users
-                               .Include(u => u.Role)
-                               .AsNoTracking()
-                               .FirstOrDefault(u => u.Uid == id);
+                       .Include(u => u.Role)
+                       .AsNoTracking()
+                       .FirstOrDefault(u => u.Uid == id && !u.Deleted);
             }
             catch (Exception ex)
             {
@@ -804,6 +804,9 @@ namespace Public_Transport.Services
                     throw new KeyNotFoundException($"User with ID {id} not found");
                 }
 
+                _logger.LogInformation("Updating user {UserId}. Current ImgUser: {CurrentImg}, New ImgUser: {NewImg}", 
+                    id, existingUser.ImgUser, model.ImgUser);
+
                 if (await IsEmailExistsAsync(model.Email, id))
                 {
                     throw new InvalidOperationException("Email already exists in the system");
@@ -816,6 +819,7 @@ namespace Public_Transport.Services
                         throw new InvalidOperationException("Password must be at least 6 characters, including uppercase, lowercase, number and special character");
                     }
                     existingUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                    _logger.LogInformation("Password updated for user {UserId}", id);
                 }
 
                 // ✅ Update DateOfBirth nếu có
@@ -828,6 +832,19 @@ namespace Public_Transport.Services
                     existingUser.DateOfBirth = model.DateOfBirth;
                 }
 
+                // ✅ FIX: CẬP NHẬT ImgUser - QUAN TRỌNG!
+                if (!string.IsNullOrWhiteSpace(model.ImgUser))
+                {
+                    _logger.LogInformation("Updating ImgUser for user {UserId} from '{OldImg}' to '{NewImg}'", 
+                        id, existingUser.ImgUser, model.ImgUser);
+                    existingUser.ImgUser = model.ImgUser;
+                }
+                else
+                {
+                    _logger.LogWarning("model.ImgUser is null or empty for user {UserId}, keeping existing: {ExistingImg}", 
+                        id, existingUser.ImgUser);
+                }
+
                 existingUser.FullName = model.FullName;
                 existingUser.Email = model.Email;
                 existingUser.PhoneNumber = model.PhoneNumber;
@@ -838,7 +855,8 @@ namespace Public_Transport.Services
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("User updated successfully with ID: {UserId} by {UpdatedBy}", id, currentUserEmail);
+                _logger.LogInformation("User {UserId} updated successfully. Final ImgUser: {FinalImg}", 
+                    id, existingUser.ImgUser);
                 return existingUser;
             }
             catch (Exception ex)
@@ -930,9 +948,67 @@ namespace Public_Transport.Services
             return passwordRegex.IsMatch(password);
         }
 
-        public Task CreateUserAsync(Users model)
+        // ✅ ADD: Implement CreateUserAsync method
+        public async Task CreateUserAsync(Users model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Validate email không trùng
+                if (await IsEmailExistsAsync(model.Email))
+                {
+                    throw new InvalidOperationException("Email already exists in the system");
+                }
+
+                // Validate DateOfBirth
+                if (!model.DateOfBirth.HasValue)
+                {
+                    throw new InvalidOperationException("Date of birth is required");
+                }
+
+                if (model.DateOfBirth.Value > DateTime.Today)
+                {
+                    throw new InvalidOperationException("Date of birth cannot be in the future");
+                }
+
+                // Validate age
+                var age = DateTime.Today.Year - model.DateOfBirth.Value.Year;
+                if (model.DateOfBirth.Value.Date > DateTime.Today.AddYears(-age)) age--;
+                
+                if (age < 16)
+                {
+                    throw new InvalidOperationException("User must be at least 16 years old");
+                }
+
+                // Nếu không có ImgUser, set default
+                if (string.IsNullOrWhiteSpace(model.ImgUser))
+                {
+                    model.ImgUser = WebConstants.DEFAULT_AVATAR;
+                }
+
+                // Đảm bảo metadata đã được set
+                if (model.CreatedAt == default)
+                {
+                    model.CreatedAt = DateTime.Now;
+                }
+                
+                if (model.UpdatedAt == default)
+                {
+                    model.UpdatedAt = DateTime.Now;
+                }
+
+                model.Deleted = false;
+
+                _context.Users.Add(model);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("User created successfully with ID: {UserId} by {CreatedBy}", 
+                    model.Uid, model.CreatedBy);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating user");
+                throw;
+            }
         }
 
         #endregion

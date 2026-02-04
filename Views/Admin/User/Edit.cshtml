@@ -1,9 +1,41 @@
-﻿
+﻿@using System.Text.Json
+
 @model Public_Transport.Models.Entities.Users
 @{
     Layout = "_LayoutAdmin";
     ViewData["title"] = "Edit User";
     var roles = ViewBag.Roles as IEnumerable<Public_Transport.Models.Entities.Roles>;
+    
+    // ✅ FIX: Parse ảnh từ JSON
+    var imageUrl = "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png";
+    
+    if (!string.IsNullOrWhiteSpace(Model.ImgUser))
+    {
+        try
+        {
+            // Kiểm tra nếu là URL trực tiếp
+            if (Model.ImgUser.StartsWith("http"))
+            {
+                imageUrl = Model.ImgUser;
+            }
+            // Kiểm tra nếu là JSON array
+            else if (Model.ImgUser.TrimStart().StartsWith("["))
+            {
+                var images = JsonSerializer.Deserialize<List<string>>(Model.ImgUser);
+                imageUrl = images?.FirstOrDefault() ?? imageUrl;
+            }
+            else
+            {
+                // Remove brackets and quotes nếu có
+                imageUrl = Model.ImgUser.Trim('[', ']', '"', ' ');
+            }
+        }
+        catch
+        {
+            // Use default if parsing fails
+            imageUrl = Model.ImgUser.Trim('[', ']', '"', ' ');
+        }
+    }
 }
 
 <style>
@@ -228,17 +260,17 @@
         <form asp-action="Edit" asp-route-id="@Model.Uid" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Uid" />
-            <input type="hidden" asp-for="ImgUser" id="currentAvatar" />
 
-            <!-- ✅ THÊM: Avatar Upload Section -->
+            <!-- ✅ Avatar Upload Section -->
             <div class="form-section">
                 <h3 class="section-title">User Avatar</h3>
                 <div class="avatar-upload-section">
                     <div class="avatar-preview-container">
                         <img id="avatarPreview"
-                             src="@(string.IsNullOrEmpty(Model.ImgUser) ? "https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png" : Model.ImgUser)"
+                             src="@imageUrl"
                              alt="Avatar Preview"
-                             class="avatar-preview" />
+                             class="avatar-preview"
+                             onerror="this.src='https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png'" />
                     </div>
                     <div class="form-group">
                         <label for="avatarUpload" class="avatar-upload-btn">
@@ -295,7 +327,7 @@
                             <option value="">-- Select Role --</option>
                             @if (roles != null)
                             {
-                                @foreach (var role in roles)
+                                foreach (var role in roles)
                                 {
                                     <option value="@role.Uid">@role.RoleName</option>
                                 }
@@ -370,23 +402,29 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
     <script>
         $(document).ready(function() {
-            // ✅ Avatar Upload Preview
+            // ✅ Avatar Upload Preview với validation chi tiết
             $('#avatarUpload').on('change', function(e) {
                 const file = e.target.files[0];
 
+                console.log('===== AVATAR FILE SELECTED =====');
+                console.log('File:', file);
+
                 if (file) {
+                    console.log('File name:', file.name);
+                    console.log('File size:', file.size, 'bytes');
+                    console.log('File type:', file.type);
+
                     // Validate file size (5MB max)
-                    if (file.size > 5 * 1024 * 1024) {
+                    const maxSize = 5 * 1024 * 1024; // 5MB
+                    if (file.size > maxSize) {
                         Swal.fire({
                             icon: 'error',
                             title: 'File Too Large',
-                            text: 'Avatar file must be less than 5MB'
+                            text: `File size is ${(file.size / 1024 / 1024).toFixed(2)}MB. Maximum allowed is 5MB.`
                         });
-                        $(this).val('');
+                        $(this).val(''); // Clear input
                         return;
                     }
 
@@ -396,18 +434,31 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Invalid File Type',
-                            text: 'Only JPG, PNG, and GIF images are allowed'
+                            text: 'Only JPG, PNG, and GIF images are allowed. Your file type: ' + file.type
                         });
-                        $(this).val('');
+                        $(this).val(''); // Clear input
                         return;
                     }
 
-                    // Preview image
+                    // ✅ Preview image
                     const reader = new FileReader();
                     reader.onload = function(e) {
+                        console.log('✅ Image loaded for preview');
                         $('#avatarPreview').attr('src', e.target.result);
                     };
+                    reader.onerror = function(e) {
+                        console.error('❌ Error reading file:', e);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to read image file'
+                        });
+                    };
                     reader.readAsDataURL(file);
+
+                    console.log('✅ File validation passed');
+                } else {
+                    console.log('❌ No file selected');
                 }
             });
 
@@ -432,6 +483,108 @@
                     $('#confirmPasswordError').text('');
                 }
             });
+
+            // ✅ QUAN TRỌNG: Validate và log khi submit form
+            $('form').on('submit', function(e) {
+                console.log('===== FORM SUBMIT TRIGGERED =====');
+
+                const fileInput = document.getElementById('avatarUpload');
+                const file = fileInput ? fileInput.files[0] : null;
+                const newPassword = $('#newPassword').val();
+                const confirmPassword = $('#confirmPassword').val();
+
+                // ✅ Validate password nếu có nhập
+                if (newPassword && newPassword.trim() !== '') {
+                    if (!confirmPassword || confirmPassword.trim() === '') {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Missing Confirmation',
+                            text: 'Please confirm your new password'
+                        });
+                        console.log('❌ Form submit prevented: Missing password confirmation');
+                        return false;
+                    }
+
+                    if (newPassword !== confirmPassword) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Password Mismatch',
+                            text: 'Password and confirmation password do not match'
+                        });
+                        console.log('❌ Form submit prevented: Password mismatch');
+                        return false;
+                    }
+
+                    // Validate password strength
+                    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+                    if (!passwordRegex.test(newPassword)) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Weak Password',
+                            text: 'Password must be at least 6 characters with 1 uppercase, 1 lowercase, 1 number and 1 special character'
+                        });
+                        console.log('❌ Form submit prevented: Weak password');
+                        return false;
+                    }
+                }
+
+                // ✅ Log form data
+                console.log('Form action:', $(this).attr('action'));
+                console.log('Form method:', $(this).attr('method'));
+                console.log('Form enctype:', $(this).attr('enctype'));
+
+                if (fileInput) {
+                    console.log('File input name:', fileInput.name);
+                    console.log('File attached:', file ? `${file.name} (${file.size} bytes)` : 'No file');
+                }
+
+                if (!file) {
+                    console.log('⚠️ WARNING: No avatar file selected, will keep existing avatar');
+                } else {
+                    console.log('✅ Avatar file will be uploaded:', file.name);
+                }
+
+                // ✅ Kiểm tra FormData sẽ được gửi
+                const formData = new FormData(this);
+                console.log('===== FormData Contents =====');
+                for (let pair of formData.entries()) {
+                    if (pair[1] instanceof File) {
+                        console.log(`  ${pair[0]}: [File] ${pair[1].name} (${pair[1].size} bytes)`);
+                    } else {
+                        console.log(`  ${pair[0]}: ${pair[1]}`);
+                    }
+                }
+
+                console.log('✅ Form validation passed - submitting...');
+                // Không prevent default - để form submit bình thường
+                return true;
+            });
+
+            // ✅ Date of Birth age calculator
+            $('#dateOfBirth').on('change', function() {
+                const dob = new Date($(this).val());
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const monthDiff = today.getMonth() - dob.getMonth();
+
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+
+                if (age >= 0) {
+                    $('#ageDisplay').text(`Age: ${age} years old`);
+                } else {
+                    $('#ageDisplay').text('');
+                }
+            });
+
+            // ✅ Trigger age calculation on page load if date exists
+            if ($('#dateOfBirth').val()) {
+                $('#dateOfBirth').trigger('change');
+            }
         });
     </script>
 }
