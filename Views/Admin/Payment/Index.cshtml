@@ -270,23 +270,23 @@
         const statsGrid = document.getElementById('statsGrid');
         statsGrid.innerHTML = `
             <div class="stat-card">
-                <div class="stat-label">Total Revenue</div>
+                <div class="stat-label" style="color:#2E7D32">Total Revenue</div>
                 <div class="stat-value">${formatCurrency(stats.totalRevenue)}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Transactions</div>
+                <div class="stat-label" style="color:#1565C0">Total Transactions</div>
                 <div class="stat-value">${stats.totalTransactions}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Successful</div>
+                <div class="stat-label" style="color:#4CAF50">Successful</div>
                 <div class="stat-value">${stats.successfulTransactions}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Pending</div>
+                <div class="stat-label" style="color:#EF6C00">Pending</div>
                 <div class="stat-value">${stats.pendingTransactions}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Failed</div>
+                <div class="stat-label" style="color:#C62828">Failed</div>
                 <div class="stat-value">${stats.failedTransactions}</div>
             </div>
         `;

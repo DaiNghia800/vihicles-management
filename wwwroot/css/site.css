@@ -36,7 +36,6 @@ body {
 
 /* Override màu chủ đạo */
 .btn-primary,
-.sidebar-link.active,
 .section-title::after {
     background-color: var(--theme-color) !important;
     border-color: var(--theme-color) !important;
@@ -51,10 +50,10 @@ body {
     color: var(--theme-color) !important;
 }
 
-.sidebar-link.active {
+/*.sidebar-link.active {
     background-color: rgba(255, 186, 0, 0.1) !important;
     border-left: 4px solid var(--theme-color);
-}
+}*/
 
 /* Đã chuyển sang dùng Google Fonts */
 /*

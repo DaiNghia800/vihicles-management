@@ -307,7 +307,6 @@ if (productList) {
                     })
                         .then(res => res.json())
                         .then(data => {
-                            console.log(data.code)
                             if (data.code == 0) {
                                 Swal.fire({
                                     title: "Deleted!",
@@ -554,7 +553,15 @@ if (tablePermission) {
                 .then(res => res.json())
                 .then(data => {
                     if (data.code == "success") {
-                        location.reload();
+                        Swal.fire({
+                            title: "Update successful",
+                            text: "",
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
                     }
                 })
         });

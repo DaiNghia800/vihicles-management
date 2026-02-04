@@ -18,8 +18,18 @@ namespace Public_Transport.Controllers.Admin
         public IActionResult Dashboard()
         {
             int totalVehicleActive = _dashboardService.getVehicleActive();
+            int totalDailyPassengers = _dashboardService.getDailyPassengers();
+            int totalOperatingRoutes = _dashboardService.getOperatingTripsToday();
             ViewData["totalVehicleActive"] = totalVehicleActive;
+            ViewData["totalDailyPassengers"] = totalDailyPassengers;
+            ViewData["totalOperatingRoutes"] = totalOperatingRoutes;
             return View("~/Views/Admin/Dashboard.cshtml");
+        }
+
+        [HttpGet("traffic-flow")]
+        public IActionResult GetTrafficFlow()
+        {
+            return Ok(_dashboardService.GetTrafficFlow());
         }
     }
 }

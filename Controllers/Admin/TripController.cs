@@ -19,6 +19,24 @@ namespace Public_Transport.Controllers.Admin
         // GET: admin/trip
         public async Task<IActionResult> Index(string? error = null)
         {
+            //search
+            string keyword = Request.Query["keyword"];
+            //end search
+
+            //pagination
+            string pageStr = Request.Query["page"];
+            int page = 1;
+            int limitItem = 2;
+            if (!string.IsNullOrEmpty(pageStr))
+            {
+                int.TryParse(pageStr, out page);
+            }
+
+            int skip = (page - 1) * limitItem;
+            int totalProduct = _context.Trips.Where(p => string.IsNullOrEmpty(keyword) || p.Route.RouteName.Contains(keyword)).Count();
+            int totalPage = (int)Math.Ceiling((double)totalProduct / limitItem);
+            //pagination
+
             // Show error message if redirected from Delete action
             if (!string.IsNullOrEmpty(error))
             {
@@ -29,7 +47,10 @@ namespace Public_Transport.Controllers.Admin
                 .Include(t => t.Route)
                 .Include(t => t.Vehicle)
                 .Include(t => t.Driver).ThenInclude(d => d.User)
+                .Where(t => string.IsNullOrEmpty(keyword) || t.Route.RouteName.Contains(keyword))
                 .OrderByDescending(t => t.DepartureTime)
+                .Skip(skip)
+                .Take(limitItem)
                 .ToListAsync();
 
             // --- AUTO-UPDATE STATUS LOGIC ---
@@ -64,6 +85,8 @@ namespace Public_Transport.Controllers.Admin
             }
             // ---------------------------------------
 
+            ViewData["TotalPage"] = totalPage;
+            ViewData["CurrentPage"] = page;
             return View("~/Views/Admin/Trip/Index.cshtml", trips);
         }
 

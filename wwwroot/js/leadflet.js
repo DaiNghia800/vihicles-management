@@ -103,44 +103,45 @@
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    // --- 1. TRAFFIC FLOW CHART (Chart.js) ---
-    const ctx = document.getElementById('trafficChart').getContext('2d');
+    fetch('/admin/dashboard/traffic-flow')
+        .then(res => res.json())
+        .then(data => {
 
-    // Tạo gradient cho biểu đồ giống hình mẫu
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(28, 200, 138, 0.4)');
-    gradient.addColorStop(1, 'rgba(28, 200, 138, 0)');
+            const labels = data.map(x => x.hourLabel);
+            const values = data.map(x => x.passengerCount);
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:00'],
-            datasets: [{
-                label: 'Passenger Volume',
-                data: [150, 100, 850, 600, 950, 700, 300], // Dữ liệu khớp với biểu đồ mẫu
-                borderColor: '#1cc88a',
-                backgroundColor: gradient,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#1cc88a'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                x: { grid: { display: false } },
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#f8f9fa' }
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(28, 200, 138, 0.4)');
+            gradient.addColorStop(1, 'rgba(28, 200, 138, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Passenger Volume',
+                        data: values,
+                        borderColor: '#1cc88a',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#1cc88a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true }
+                    }
                 }
-            }
-        }
-    });
+            });
+        });
 
     // --- 2. RECENT TRIP STATUS DATA ---
     const trips = [

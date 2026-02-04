@@ -8,10 +8,22 @@
 <div class="card shadow-sm">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 text-primary fw-bold"><i class="fa-solid fa-calendar-days me-2"></i>Trip List</h5>
-        <a asp-action="Create" class="btn btn-primary btn-sm rounded-pill px-3">
-            <i class="fa-solid fa-plus me-1"></i> New Trip
-        </a>
+        <div class="d-flex">
+            <div class="table-search">
+                <label>
+                    Search
+                    <input type="text" name="name" value="" input-search />
+                </label>
+            </div>
+            @if (User.HasClaim("permission", "trip_create"))
+            {
+                <a asp-action="Create" class="btn btn-primary btn-sm rounded-pill px-3 ms-3">
+                    <i class="fa-solid fa-plus me-1"></i> New Trip
+                </a>
+            }
+        </div>
     </div>
+    
     @if (ViewData["Error"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
@@ -19,7 +31,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    <div class="card-body p-0">
+    <div class="card-body p-0" id="product-list">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light text-secondary">
@@ -79,13 +91,44 @@
                                 }
                             </td>
                             <td class="text-end pe-4">
-                                <a asp-action="Edit" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-primary me-1"><i class="fa-solid fa-pen"></i></a>
-                                <a asp-action="Delete" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                                @if (User.HasClaim("permission", "trip_edit"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-primary me-1"><i class="fa-solid fa-pen"></i></a>
+                                }
+                                @if (User.HasClaim("permission", "trip_delete"))
+                                {
+                                    <a asp-action="Delete" asp-route-id="@item.TripId" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                                }
                             </td>
                         </tr>
                     }
                 </tbody>
+                
             </table>
+            <nav class="box-page">
+                <ul class="d-flex justify-content-center gap-2">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a href="" button-pagination=@(ViewBag.CurrentPage - 1)>
+                            <i class="fa-solid fa-angles-left"></i>
+                        </a>
+                    </li>
+                    @{
+                        for (int i = 1; i <= ViewBag.TotalPage; i++)
+                        {
+                            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                <a href="#" button-pagination=@i>
+                                    @i
+                                </a>
+                            </li>
+                        }
+                    }
+                    <li class="page-item @(ViewBag.TotalPage == ViewBag.CurrentPage ? "disabled" : "")">
+                        <a href="" button-pagination=@(ViewBag.CurrentPage + 1)>
+                            <i class="fa-solid fa-angles-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
