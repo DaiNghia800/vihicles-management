@@ -22,7 +22,62 @@ namespace Public_Transport.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-<<<<<<< HEAD
+            modelBuilder.Entity("Public_Transport.Models.Entities.BlogCategories", b =>
+                {
+                    b.Property<int>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Uid"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Uid");
+
+                    b.ToTable("BlogCategories");
+                });
+
+            modelBuilder.Entity("Public_Transport.Models.Entities.BlogPosts", b =>
+                {
+                    b.Property<int>("Uid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Uid"));
+
+                    b.Property<int>("AuthorUid")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryUid")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Uid");
+
+                    b.HasIndex("AuthorUid");
+
+                    b.HasIndex("CategoryUid");
+
+                    b.ToTable("BlogPosts");
+                });
+
             modelBuilder.Entity("Public_Transport.Models.Entities.Driver", b =>
                 {
                     b.Property<int>("DriverId")
@@ -73,65 +128,6 @@ namespace Public_Transport.Migrations
                     b.ToTable("Drivers");
                 });
 
-            modelBuilder.Entity("Public_Transport.Models.Entities.BlogCategories", b =>
-                {
-                    b.Property<int>("Uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Uid"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Uid");
-
-                    b.ToTable("BlogCategories");
-                });
-
-            modelBuilder.Entity("Public_Transport.Models.Entities.BlogPosts", b =>
-                {
-                    b.Property<int>("Uid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Uid"));
-
-                    b.Property<int>("AuthorUid")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryUid")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("Uid");
-
-                    b.HasIndex("AuthorUid");
-
-                    b.HasIndex("CategoryUid");
-
-                    b.ToTable("BlogPosts");
-                });
-
-=======
->>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Function", b =>
                 {
                     b.Property<int>("Uid")
@@ -156,10 +152,6 @@ namespace Public_Transport.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Status")
-<<<<<<< HEAD
-                        .IsRequired()
-=======
->>>>>>> origin/role
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -170,7 +162,6 @@ namespace Public_Transport.Migrations
                     b.ToTable("Functions");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.Payment", b =>
                 {
                     b.Property<int>("PaymentId")
@@ -193,7 +184,6 @@ namespace Public_Transport.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -203,7 +193,6 @@ namespace Public_Transport.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TransactionRef")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -215,8 +204,6 @@ namespace Public_Transport.Migrations
                     b.ToTable("Payments");
                 });
 
-=======
->>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Permission", b =>
                 {
                     b.Property<int>("Uid")
@@ -316,7 +303,6 @@ namespace Public_Transport.Migrations
                     b.ToTable("Roles");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.Route", b =>
                 {
                     b.Property<int>("RouteId")
@@ -329,7 +315,6 @@ namespace Public_Transport.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RouteName")
@@ -386,12 +371,14 @@ namespace Public_Transport.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StationId"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Coordinates")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("StationName")
                         .IsRequired()
@@ -420,7 +407,6 @@ namespace Public_Transport.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -462,7 +448,6 @@ namespace Public_Transport.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -480,8 +465,6 @@ namespace Public_Transport.Migrations
                     b.ToTable("Trips");
                 });
 
-=======
->>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Users", b =>
                 {
                     b.Property<int>("Uid")
@@ -571,11 +554,6 @@ namespace Public_Transport.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleId"));
 
-<<<<<<< HEAD
-                    b.Property<string>("LicensePlate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-=======
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -594,71 +572,11 @@ namespace Public_Transport.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
->>>>>>> origin/role
 
                     b.Property<int>("SeatCapacity")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
-<<<<<<< HEAD
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VehicleType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("VehicleId");
-
-                    b.ToTable("Vehicles");
-                });
-
-            modelBuilder.Entity("Public_Transport.Models.Entities.Driver", b =>
-                {
-                    b.HasOne("Public_Transport.Models.Entities.Users", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Public_Transport.Models.Entities.Vehicle", "VehicleAssigned")
-                        .WithMany()
-                        .HasForeignKey("VehicleAssignedId");
-
-                    b.Navigation("User");
-
-                    b.Navigation("VehicleAssigned");
-                });
-
-            modelBuilder.Entity("Public_Transport.Models.Entities.BlogPosts", b =>
-                {
-                    b.HasOne("Public_Transport.Models.Entities.Users", "Users")
-                        .WithMany()
-                        .HasForeignKey("AuthorUid")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Public_Transport.Models.Entities.BlogCategories", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryUid")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Public_Transport.Models.Entities.Payment", b =>
-                {
-                    b.HasOne("Public_Transport.Models.Entities.Ticket", "Ticket")
-                        .WithOne("Payment")
-                        .HasForeignKey("Public_Transport.Models.Entities.Payment", "TicketId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Ticket");
-=======
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)")
@@ -685,7 +603,53 @@ namespace Public_Transport.Migrations
                     b.HasKey("VehicleId");
 
                     b.ToTable("Vehicles", (string)null);
->>>>>>> origin/role
+                });
+
+            modelBuilder.Entity("Public_Transport.Models.Entities.BlogPosts", b =>
+                {
+                    b.HasOne("Public_Transport.Models.Entities.Users", "Users")
+                        .WithMany()
+                        .HasForeignKey("AuthorUid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Public_Transport.Models.Entities.BlogCategories", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryUid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Public_Transport.Models.Entities.Driver", b =>
+                {
+                    b.HasOne("Public_Transport.Models.Entities.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Public_Transport.Models.Entities.Vehicle", "VehicleAssigned")
+                        .WithMany()
+                        .HasForeignKey("VehicleAssignedId");
+
+                    b.Navigation("User");
+
+                    b.Navigation("VehicleAssigned");
+                });
+
+            modelBuilder.Entity("Public_Transport.Models.Entities.Payment", b =>
+                {
+                    b.HasOne("Public_Transport.Models.Entities.Ticket", "Ticket")
+                        .WithOne("Payment")
+                        .HasForeignKey("Public_Transport.Models.Entities.Payment", "TicketId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Public_Transport.Models.Entities.Permission", b =>
@@ -715,7 +679,6 @@ namespace Public_Transport.Migrations
                     b.Navigation("Role");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.RouteDetail", b =>
                 {
                     b.HasOne("Public_Transport.Models.Entities.Route", "Route")
@@ -777,8 +740,6 @@ namespace Public_Transport.Migrations
                     b.Navigation("Vehicle");
                 });
 
-=======
->>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Users", b =>
                 {
                     b.HasOne("Public_Transport.Models.Entities.Roles", "Role")
@@ -790,14 +751,11 @@ namespace Public_Transport.Migrations
                     b.Navigation("Role");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.Driver", b =>
                 {
                     b.Navigation("Trips");
                 });
 
-=======
->>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Function", b =>
                 {
                     b.Navigation("Permissions");
@@ -814,7 +772,6 @@ namespace Public_Transport.Migrations
 
                     b.Navigation("Users");
                 });
-<<<<<<< HEAD
 
             modelBuilder.Entity("Public_Transport.Models.Entities.Route", b =>
                 {
@@ -830,16 +787,13 @@ namespace Public_Transport.Migrations
 
             modelBuilder.Entity("Public_Transport.Models.Entities.Ticket", b =>
                 {
-                    b.Navigation("Payment")
-                        .IsRequired();
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Public_Transport.Models.Entities.Vehicle", b =>
                 {
                     b.Navigation("Trips");
                 });
-=======
->>>>>>> origin/role
 #pragma warning restore 612, 618
         }
     }

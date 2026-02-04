@@ -19,7 +19,6 @@ namespace Public_Transport.Models.EF
         public DbSet<PermissionType> PermissionTypes { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Users> Users { get; set; }
-<<<<<<< HEAD
         public DbSet<Station> Stations { get; set; }
         public DbSet<Public_Transport.Models.Entities.Route> Routes { get; set; }
         public DbSet<RouteDetail> RouteDetails { get; set; }
@@ -31,9 +30,6 @@ namespace Public_Transport.Models.EF
         // --- THÊM MỚI: Tickets và Payments ---
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Payment> Payments { get; set; }
-=======
-        public DbSet<Vehicle> Vehicles { get; set; }
->>>>>>> origin/role
 
         public DbSet<Driver> Drivers { get; set; }
 
@@ -177,7 +173,6 @@ namespace Public_Transport.Models.EF
                 entity.Property(e => e.Deleted)
                     .HasDefaultValue(false);
             });
-<<<<<<< HEAD
             modelBuilder.Entity<BlogCategories>(entity =>
             {
                 entity.HasKey(e => e.Uid);
@@ -248,8 +243,7 @@ namespace Public_Transport.Models.EF
                 entity.Property(e => e.Status)
                     .HasDefaultValue("Pending");
             });
-            
-=======
+           
 
             modelBuilder.Entity<Vehicle>(entity =>
             {
@@ -292,7 +286,6 @@ namespace Public_Transport.Models.EF
                 entity.Property(v => v.Deleted)
                       .HasDefaultValue(false);
             });
->>>>>>> origin/role
         }
     }
 }

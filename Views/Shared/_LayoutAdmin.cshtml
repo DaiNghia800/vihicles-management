@@ -263,6 +263,28 @@
                                         <a href="/blogs" target="_blank" class="text-capitalize">
                                             View Blog Page
                                         </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="/admin/payment" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/payment") ? "active" : "")">
+                                    <i class="fa-solid fa-credit-card"></i>
+                                    <span class="text-capitalize">Payments</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="/admin/tickets" class="sidebar-link @(Context.Request.Path == "/admin/tickets" ? "active" : "")">
+                                    <i class="fas fa-ticket-alt"></i>
+                                    <span class="text-capitalize">Tickets</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="/admin/trip/index" class="sidebar-link @(Context.Request.Path.ToString().Contains("/admin/trip") ? "active" : "")">
+                                    <i class="fa-solid fa-bus"></i>
+                                    <span class="text-capitalize">Trips</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-list">
                                 <a href="#collapseVehicle" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/vehicle") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseVehicle">
                                     <i class="fa-solid fa-bus"></i>
                                     <span class="text-capitalize">Vehicle</span>
@@ -283,29 +305,6 @@
                                     </li>
                                 </ul>
                             </li>
-                                </ul>
-                            </li>
-                            <li class="sidebar-list">
-                                <a href="/admin/payment" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/payment") ? "active" : "")">
-                                    <i class="fa-solid fa-credit-card"></i>
-                                    <span class="text-capitalize">Payments</span>
-                                </a>
-                            </li>
-                            <li class="sidebar-list">
-                                <a href="/admin/tickets" class="sidebar-link @(Context.Request.Path == "/admin/tickets" ? "active" : "")">
-                                    <i class="fas fa-ticket-alt"></i>
-                                    <span class="text-capitalize">Tickets</span>
-                                </a>
-                            </li>
-                            <li class="sidebar-list">
-                                <a href="/admin/trip/index" class="sidebar-link @(Context.Request.Path == "/admin/trip/index" ? "active" : "")">
-                                    <i class="fa-regular fa-house"></i>
-                                <a href="/admin/trip/index" class="sidebar-link @(Context.Request.Path.ToString().Contains("/admin/trip") ? "active" : "")">
-                                    <i class="fa-solid fa-bus"></i>
-                                    <span class="text-capitalize">Trips</span>
-                                </a>
-                            </li>
-
                             <li class="sidebar-list">
                                 <a href="/admin/route/index" class="sidebar-link @(Context.Request.Path.ToString().Contains("/admin/route") ? "active" : "")">
                                     <i class="fa-solid fa-route"></i>
@@ -320,8 +319,7 @@
                                 </a>
                             </li>
                             <li class="sidebar-list">
-                                <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
-                                    <i class="fa-regular fa-user"></i>
+                                
                                 <a href="#collapseDriver" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseDriver">
                                     <i class="fa-solid fa-user-tie"></i>
                                     <span class="text-capitalize">Driver</span>
