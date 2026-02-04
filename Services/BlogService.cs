@@ -17,6 +17,7 @@ namespace Public_Transport.Services
         }
 
         // === Public BlogController ===
+        // Method này đã đúng - trả về blogs cho public
         public async Task<object> GetBlogsPublicAsync()
         {
             return await _context.BlogPosts
@@ -38,6 +39,7 @@ namespace Public_Transport.Services
                 .ToListAsync();
         }
 
+        // Method này đã đúng - trả về detail 1 blog
         public async Task<object> GetBlogDetailPublicAsync(int id)
         {
             return await _context.BlogPosts

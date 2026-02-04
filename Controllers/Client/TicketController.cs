@@ -214,8 +214,17 @@ namespace Public_Transport.Controllers.Client
                     return BadRequest(new { message = "Ticket already cancelled" });
                 }
 
-                ticket.Status = "Cancelled";
+                if (ticket.Status == "Used")
+                {
+                    return BadRequest(new { message = "Cannot cancel a used ticket" });
+                }
+
+                var oldStatus = ticket.Status;
+                ticket.Status = "Cancelled"; // ✅ Booked/Paid -> Cancelled (-1 slot released)
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("✅ Ticket #{TicketId} cancelled by user. Status: {OldStatus} -> Cancelled (1 seat released)", 
+                    ticketId, oldStatus);
 
                 return Ok(new { message = "Ticket cancelled successfully" });
             }

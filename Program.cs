@@ -120,7 +120,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
-
+builder.Services.AddHostedService<TicketExpirationService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
