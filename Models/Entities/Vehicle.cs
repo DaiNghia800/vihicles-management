@@ -4,15 +4,25 @@ namespace Public_Transport.Models.Entities
 {
     public class Vehicle
     {
-        [Key]
         public int VehicleId { get; set; }
 
-        [Required]
-        public string LicensePlate { get; set; } // Biển số xe: 59-X1 123.45
+        [Required(ErrorMessage = "The license plate must not be left blank.")]
+        [StringLength(15, ErrorMessage = "Vehicle license plates can have a maximum of 15 characters.")]
+        public string LicensePlate { get; set; } 
+        public string Thumbnail { get; set; }
 
-        public string VehicleType { get; set; } // Giường nằm, Ghế ngồi
-        public int SeatCapacity { get; set; }   // Số chỗ ngồi
-        public string Status { get; set; }      // Active, Maintenance
+        [Required(ErrorMessage = "The vehicle type cannot be left blank.")]
+        [StringLength(50)]
+        public string VehicleType { get; set; }
+
+        [Range(1, 100, ErrorMessage = "The number of seats must be greater than 0.")]
+        public int SeatCapacity { get; set; }   
+        public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
+        public bool Deleted { get; set; }
 
         public ICollection<Trip> Trips { get; set; }
     }

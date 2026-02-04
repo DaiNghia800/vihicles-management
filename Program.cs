@@ -41,7 +41,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         googleOptions.SignInScheme = "External";
         googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
         googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-
         googleOptions.CallbackPath = "/signin-google";
         googleOptions.Scope.Clear();
         googleOptions.Scope.Add("openid");
@@ -102,6 +101,11 @@ builder.Services.AddScoped<MoMoService>();
 
 // ✅ === Cloudinary Settings ===
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<IUploadService, UploadService>();
 
 var app = builder.Build();
 

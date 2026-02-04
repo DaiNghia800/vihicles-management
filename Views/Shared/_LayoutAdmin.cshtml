@@ -263,7 +263,26 @@
                                         <a href="/blogs" target="_blank" class="text-capitalize">
                                             View Blog Page
                                         </a>
+                                <a href="#collapseVehicle" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/vehicle") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseVehicle">
+                                    <i class="fa-solid fa-bus"></i>
+                                    <span class="text-capitalize">Vehicle</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/vehicle") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/vehicle") ? "show" : "")" id="collapseVehicle">
+                                    <li>
+                                        <a href="/admin/vehicle" class="text-capitalize">
+                                            All Vehicle
+                                        </a>
                                     </li>
+                                    <li>
+                                        <a href="/admin/vehicle/create" class="text-capitalize">
+                                            Add new Vehicle
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                                 </ul>
                             </li>
                             <li class="sidebar-list">
@@ -303,6 +322,29 @@
                             <li class="sidebar-list">
                                 <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
                                     <i class="fa-regular fa-user"></i>
+                                <a href="#collapseDriver" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseDriver">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                    <span class="text-capitalize">Driver</span>
+                                    <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "active" : "")">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                                <ul class="sidebar-submenu position-relative p-0 list-unstyled w-100 collapse @(Context.Request.Path.StartsWithSegments("/admin/Driver") ? "show" : "")" id="collapseDriver">
+                                    <li>
+                                        <a href="/admin/driver" class="text-capitalize">
+                                            All Driver
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/admin/driver/create" class="text-capitalize">
+                                            Add new Driver
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-list">
+                                <a href="#collapseRole" class="sidebar-link @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseRole">
+                                    <i class="fa-solid fa-user-shield"></i>
                                     <span class="text-capitalize">Role</span>
                                     <div class="according-menu @(Context.Request.Path.StartsWithSegments("/admin/role") ? "active" : "")">
                                         <i class="fa-solid fa-chevron-right"></i>

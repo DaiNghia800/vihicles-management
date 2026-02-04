@@ -1,0 +1,109 @@
+﻿@using Public_Transport.Models.Entities;
+@using System.Text.Json
+@model Roles;
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["title"] = "Permission";
+}
+
+<section class="product-category-create">
+    <div class="card">
+        <div class="card-header2">
+            <h5>Permission</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table theme-table mb-0" table-permission='@Html.Raw(JsonSerializer.Serialize(ViewData["permissions"]))'>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        @{
+                            if(ViewData["roles"] != null)
+                            {
+                                foreach(Roles role in ViewBag.roles)
+                                {
+                                    <th role-id=@role.Uid>@role.RoleName</th>
+                                }
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        // dashboard
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Dashboard</b>
+                            </td>
+                        </tr>
+                        <tr data-name="dashboard_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end role
+
+                        // role
+                        <tr>
+                            <td colspan="@ViewBag.roles.Count + 1" class="text-start">
+                                <b class="fs-5">Role Management</b>
+                            </td>
+                        </tr>
+                        <tr data-name="role_view">
+                            <td>View</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="role_create">
+                            <td>Create</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="role_edit">
+                            <td>Edit</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="role_delete">
+                            <td>Delete</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        <tr data-name="role_permission">
+                            <td>Permission</td>
+                            @foreach (Roles role in ViewBag.roles)
+                            {
+                                <td>
+                                    <input type="checkbox" class="checkbox_animated checkall" data-id="@role.Uid" />
+                                </td>
+                            }
+                        </tr>
+                        // end role
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+        <button type="submit" class="btn text-white theme-bg-color ms-auto" button-submit data-patch="/admin/role/permission">Save</button>
+    </div>
+</section>

@@ -222,6 +222,120 @@ if (inputSearch) {
 }
 //end search
 
+//product list
+const productList = document.getElementById("product-list")
+if (productList) {
+    productList.addEventListener("click", function (e) {
+        const buttonPagination = e.target.closest("[button-pagination]");
+        const buttonChangeStatus = e.target.closest("[button-change-status]");
+        const buttonDelete = e.target.closest("[button-delete]");
+
+        //change status
+        if (buttonChangeStatus) {
+            const itemId = buttonChangeStatus.getAttribute("item-id");
+            const statusChange = buttonChangeStatus.getAttribute("button-change-status");
+            const patch = buttonChangeStatus.getAttribute("data-patch");
+
+            const data = {
+                id: itemId,
+                status: statusChange
+            }
+
+            fetch(patch, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.code == "success") {
+                        location.reload();
+                    }
+                })
+        }
+
+        //end change status
+
+        //pagination
+        if (buttonPagination) {
+            e.preventDefault();
+            let url = new URL(location.href);
+            const page = buttonPagination.getAttribute("button-pagination");
+            if (page) {
+                url.searchParams.set("page", page);
+            } else {
+                url.searchParams.delete("page");
+            }
+
+            location.href = url.href;
+        }
+
+        //end pagination
+
+
+
+        //delete
+        if (buttonDelete) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: "Are you sure you want to delete this record?",
+                text: "",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "Cancel",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const patch = buttonDelete.getAttribute("data-patch");
+                    const id = buttonDelete.getAttribute("button-id");
+
+                    const data = {
+                        id: id
+                    }
+
+                    fetch(patch, {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        method: "POST",
+                        body: JSON.stringify(data)
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data.code)
+                            if (data.code == 0) {
+                                Swal.fire({
+                                    title: "Deleted!",
+                                    text: "",
+                                    icon: "success",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else if (data.code > 0) {
+                                Swal.fire({
+                                    title: data.message,
+                                    text: "",
+                                    icon: "error",
+                                    timer: 3000,
+                                    showConfirmButton: false
+                                })
+                            }
+                        })
+                }
+            });
+        }
+        //end delete
+    });
+}
+//end product list
+
 
 //paginationv2
 const listButtonPagination = document.querySelectorAll(".box-page.pro [button-pagination]");
@@ -331,7 +445,6 @@ if (formChangeMulti) {
             const ids = [];
 
             const listInputChange = document.querySelectorAll("[input-change]:checked");
-            console.log(listInputChange)
             listInputChange.forEach(input => {
                 const id = input.getAttribute("input-change");
                 ids.push(id);

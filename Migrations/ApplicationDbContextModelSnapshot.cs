@@ -22,6 +22,7 @@ namespace Public_Transport.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.Driver", b =>
                 {
                     b.Property<int>("DriverId")
@@ -129,6 +130,8 @@ namespace Public_Transport.Migrations
                     b.ToTable("BlogPosts");
                 });
 
+=======
+>>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Function", b =>
                 {
                     b.Property<int>("Uid")
@@ -153,7 +156,10 @@ namespace Public_Transport.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Status")
+<<<<<<< HEAD
                         .IsRequired()
+=======
+>>>>>>> origin/role
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -164,6 +170,7 @@ namespace Public_Transport.Migrations
                     b.ToTable("Functions");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.Payment", b =>
                 {
                     b.Property<int>("PaymentId")
@@ -208,6 +215,8 @@ namespace Public_Transport.Migrations
                     b.ToTable("Payments");
                 });
 
+=======
+>>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Permission", b =>
                 {
                     b.Property<int>("Uid")
@@ -307,6 +316,7 @@ namespace Public_Transport.Migrations
                     b.ToTable("Roles");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.Route", b =>
                 {
                     b.Property<int>("RouteId")
@@ -470,6 +480,8 @@ namespace Public_Transport.Migrations
                     b.ToTable("Trips");
                 });
 
+=======
+>>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Users", b =>
                 {
                     b.Property<int>("Uid")
@@ -559,14 +571,36 @@ namespace Public_Transport.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VehicleId"));
 
+<<<<<<< HEAD
                     b.Property<string>("LicensePlate")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+=======
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LicensePlate")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+>>>>>>> origin/role
 
                     b.Property<int>("SeatCapacity")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
+<<<<<<< HEAD
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -624,6 +658,34 @@ namespace Public_Transport.Migrations
                         .IsRequired();
 
                     b.Navigation("Ticket");
+=======
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasDefaultValue("Active");
+
+                    b.Property<string>("Thumbnail")
+                        .IsUnicode(false)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("VehicleType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("VehicleId");
+
+                    b.ToTable("Vehicles", (string)null);
+>>>>>>> origin/role
                 });
 
             modelBuilder.Entity("Public_Transport.Models.Entities.Permission", b =>
@@ -653,6 +715,7 @@ namespace Public_Transport.Migrations
                     b.Navigation("Role");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.RouteDetail", b =>
                 {
                     b.HasOne("Public_Transport.Models.Entities.Route", "Route")
@@ -714,6 +777,8 @@ namespace Public_Transport.Migrations
                     b.Navigation("Vehicle");
                 });
 
+=======
+>>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Users", b =>
                 {
                     b.HasOne("Public_Transport.Models.Entities.Roles", "Role")
@@ -725,11 +790,14 @@ namespace Public_Transport.Migrations
                     b.Navigation("Role");
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("Public_Transport.Models.Entities.Driver", b =>
                 {
                     b.Navigation("Trips");
                 });
 
+=======
+>>>>>>> origin/role
             modelBuilder.Entity("Public_Transport.Models.Entities.Function", b =>
                 {
                     b.Navigation("Permissions");
@@ -746,6 +814,7 @@ namespace Public_Transport.Migrations
 
                     b.Navigation("Users");
                 });
+<<<<<<< HEAD
 
             modelBuilder.Entity("Public_Transport.Models.Entities.Route", b =>
                 {
@@ -769,6 +838,8 @@ namespace Public_Transport.Migrations
                 {
                     b.Navigation("Trips");
                 });
+=======
+>>>>>>> origin/role
 #pragma warning restore 612, 618
         }
     }

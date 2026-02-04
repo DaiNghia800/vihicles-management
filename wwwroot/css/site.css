@@ -1364,7 +1364,7 @@ header.close {
 }
 
 .table-search {
-    margin-bottom: 1.5625rem;
+/*    margin-bottom: 1.5625rem;*/
     color: #333;
     text-align: right;
 }
@@ -1462,6 +1462,11 @@ header.close {
 .theme-table tbody tr td.status-close button {
     background-color: rgba(47, 135, 51, 0.15);
     color: #2f8733;
+}
+
+.theme-table tbody tr td.status-warning button {
+    background-color: rgba(254, 164, 59, 0.15);
+    color: #FEA43B;
 }
 
 .theme-table tbody tr td:last-child ul {
@@ -2613,7 +2618,11 @@ h5.card-title {
 /* End otp */
 
 .custom-bus-icon {
+<<<<<<< HEAD
     background-color: #198754; 
+=======
+    background-color: #198754;
+>>>>>>> origin/role
     border: 2px solid #ffffff;
     border-radius: 50%;
     display: flex;
@@ -2623,5 +2632,3 @@ h5.card-title {
     transition: all 0.3s;
     padding: 10px;
 }
-
-
