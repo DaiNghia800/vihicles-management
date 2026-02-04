@@ -8,6 +8,7 @@ using Public_Transport.Services;
 using Public_Transport.Services.IServices;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
